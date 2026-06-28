@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click & Collect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { primary: '#DC143C' } } }
+        }
+    </script>
+</head>
+<body class="bg-white text-gray-900">
+
+    <!-- Header Section -->
+    <header class="p-6 pt-10">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-4xl font-extrabold tracking-tight text-primary">
+                    Click & Collect
+                </h1>
+                <p class="text-sm text-gray-400 mt-1 uppercase tracking-widest font-medium">
+                    Click Memory • Create Memory
+                </p>
+            </div>
+            <button id="themeToggle" class="bg-gray-100 p-3 rounded-full hover:bg-gray-200 transition-all">
+                🌙
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="px-6 pb-24 grid grid-cols-2 gap-4">
+        <!-- Profile Box 1 (Badi Image) -->
+        <div class="bg-gray-50 p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center">
+            <div class="w-24 h-24 bg-gray-300 rounded-full mb-4 shadow-inner"></div>
+            <p class="font-semibold text-lg">Abhishek</p>
+        </div>
+        
+        <!-- Add Friend Button -->
+        <div class="bg-primary p-6 rounded-3xl flex flex-col items-center justify-center text-white shadow-lg shadow-red-200">
+            <span class="text-4xl font-light mb-2">+</span>
+            <p class="font-medium">Add Friend</p>
+        </div>
+    </main>
+
+    <!-- Floating Footer -->
+    <footer class="fixed bottom-0 w-full bg-white border-t border-gray-100 p-4 text-center">
+        <p class="text-gray-400 text-xs uppercase tracking-widest">Built for Memories</p>
+    </footer>
+
+</body>
+</html>
