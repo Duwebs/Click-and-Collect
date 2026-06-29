@@ -5,39 +5,55 @@ themeToggle.addEventListener('click', (e) => {
     const y = e.clientY;
     const isDark = document.body.classList.contains('dark-mode');
 
-    // Naya ripple element
-    const ripple = document.createElement('div');
-    ripple.style.position = 'fixed';
-    ripple.style.top = '0'; ripple.style.left = '0';
-    ripple.style.width = '100vw'; ripple.style.height = '100vh';
-    ripple.style.pointerEvents = 'none';
-    ripple.style.zIndex = '9999'; // Upar rahega
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.zIndex = '5';
+    overlay.style.pointerEvents = 'none';
     
-    // YAHAN CHANGE: Ripple ka color wahi rakho jo next theme ka background hai
-    ripple.style.backgroundColor = isDark ? '#ffffff' : '#111827';
-    document.body.appendChild(ripple);
+    // Light -> Dark (Expand) ke liye Dark color, Dark -> Light (Shrink) ke liye Light color
+    overlay.style.backgroundColor = isDark ? '#ffffff' : '#111827';
+    
+    // --- REVERSE LOGIC START ---
+    // Agar Dark hai (Light pe jana hai), toh pura screen cover karke start karo (Shrink effect)
+    // Agar Light hai (Dark pe jana hai), toh 0px se start karo (Expand effect)
+    overlay.style.clipPath = isDark 
+        ? `circle(150vmax at ${x}px ${y}px)` 
+        : `circle(0px at ${x}px ${y}px)`;
+    
+    document.body.appendChild(overlay);
 
-    if (!isDark) {
-        // LIGHT TO DARK
-        ripple.style.clipPath = `circle(0% at ${x}px ${y}px)`;
-        requestAnimationFrame(() => {
-            ripple.style.transition = 'clip-path 0.6s ease-in-out';
-            ripple.style.clipPath = `circle(150% at ${x}px ${y}px)`;
-        });
-    } else {
-        // DARK TO LIGHT
-        ripple.style.clipPath = `circle(150% at ${x}px ${y}px)`;
-        requestAnimationFrame(() => {
-            ripple.style.transition = 'clip-path 0.6s ease-in-out';
-            ripple.style.clipPath = `circle(0% at ${x}px ${y}px)`;
-        });
-    }
+    // Forced Reflow
+    void overlay.offsetWidth; 
 
-    // Theme Switch: Animation ke middle mein (300ms)
+    overlay.style.transition = 'clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+    
+    // Animation ka direction swap
+    requestAnimationFrame(() => {
+        overlay.style.clipPath = isDark 
+            ? `circle(0px at ${x}px ${y}px)` 
+            : `circle(150vmax at ${x}px ${y}px)`;
+    });
+    // --- REVERSE LOGIC END ---
+
     setTimeout(() => {
         document.body.classList.toggle('dark-mode');
-        document.getElementById('themeIcon').innerText = document.body.classList.contains('dark-mode') ? '🌙' : '☀️';
-    }, 300);
+        
+        if(document.body.classList.contains('dark-mode')) {
+            document.body.classList.add('bg-gray-900', 'text-white');
+            document.body.classList.remove('bg-white', 'text-gray-900');
+            document.getElementById('themeIcon').innerText = '🌙';
+        } else {
+            document.body.classList.add('bg-white', 'text-gray-900');
+            document.body.classList.remove('bg-gray-900', 'text-white');
+            document.getElementById('themeIcon').innerText = '☀️';
+        }
+    }, 170);
 
-    setTimeout(() => ripple.remove(), 700);
+    setTimeout(() => {
+        overlay.remove();
+    }, 700);
 });

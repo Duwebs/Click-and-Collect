@@ -12,47 +12,40 @@
 </head>
 <body id="app-container" class="bg-white text-gray-900 transition-colors duration-300">
 
-    <!-- Content Wrapper: Iske niche ripple effect chalega -->
-    <div id="content-wrapper" class="relative z-10">
-        
-        <!-- Header Section -->
-        <header class="p-6 pt-10 transition-colors duration-300">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-4xl font-extrabold tracking-tight text-primary">Click & Collect</h1>
-                    <p class="text-xs text-gray-400 mt-1 uppercase tracking-[0.2em] font-semibold">Click Memory • Create Memory</p>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <!-- Login Button -->
-                    <button class="bg-gray-900 text-white text-[10px] px-4 py-1.5 rounded-full font-bold hover:bg-primary transition-all shadow-md">LOGIN</button>
-                    <!-- Toggle Button -->
-                    <button id="themeToggle" class="bg-gray-100 p-2 rounded-full flex items-center justify-center w-full h-8 shadow-sm">
-                        <span id="themeIcon">☀️</span>
-                    </button>
-                </div>
+    <!-- Header Section (Directly in body) -->
+    <header class="p-6 pt-10 transition-colors duration-300">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-extrabold tracking-tight text-primary">Click & Collect</h1>
+                <p class="text-xs text-gray-400 mt-1 uppercase tracking-[0.2em] font-semibold">Click Memory • Create Memory</p>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="px-6 pb-24">
-            <div class="grid grid-cols-2 gap-4">
-                <div class="profile-card bg-gray-50 p-6 rounded-3xl border border-gray-100 flex flex-col items-center transition-colors duration-300">
-                    <div class="w-24 h-24 bg-gray-200 rounded-full mb-4"></div>
-                    <p class="font-bold">Abhishek</p>
-                </div>
-                <div class="bg-primary p-6 rounded-3xl flex flex-col items-center justify-center text-white shadow-xl shadow-red-200">
-                    <span class="text-4xl font-light mb-1">+</span>
-                    <p class="font-bold">ADD</p>
-                </div>
+            <div class="flex flex-col gap-2">
+                <button class="bg-gray-900 text-white text-[10px] px-4 py-1.5 rounded-full font-bold hover:bg-primary transition-all shadow-md">LOGIN</button>
+                <button id="themeToggle" class="bg-gray-100 p-2 rounded-full flex items-center justify-center w-full h-8 shadow-sm">
+                    <span id="themeIcon">☀️</span>
+                </button>
             </div>
-        </main>
+        </div>
+    </header>
 
-        <!-- Footer -->
-        <footer class="fixed bottom-0 w-full bg-white border-t border-gray-100 p-4 text-center transition-colors duration-300">
-            <p class="text-gray-400 text-[10px] uppercase tracking-widest">Built for Memories</p>
-        </footer>
+    <!-- Main Content (Directly in body) -->
+    <main class="px-6 pb-24">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="profile-card bg-gray-50 p-6 rounded-3xl border border-gray-100 flex flex-col items-center transition-colors duration-300">
+                <div class="w-24 h-24 bg-gray-200 rounded-full mb-4"></div>
+                <p class="font-bold">Abhishek</p>
+            </div>
+            <div class="bg-primary p-6 rounded-3xl flex flex-col items-center justify-center text-white shadow-xl shadow-red-200">
+                <span class="text-4xl font-light mb-1">+</span>
+                <p class="font-bold">ADD</p>
+            </div>
+        </div>
+    </main>
 
-    </div> <!-- End of content-wrapper -->
+    <!-- Footer (Directly in body) -->
+    <footer class="fixed bottom-0 w-full bg-white border-t border-gray-100 p-4 text-center transition-colors duration-300">
+        <p class="text-gray-400 text-[10px] uppercase tracking-widest">Built for Memories</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
