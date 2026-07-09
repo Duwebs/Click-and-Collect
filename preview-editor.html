@@ -16,9 +16,12 @@
         .text-brand-coral { color: #e64d5c; }
         .bg-brand-coral { background-color: #e64d5c; }
         .content-card-curve { border-top-left-radius: 32px; border-top-right-radius: 32px; }
+        
         .tag-active { background-color: #e64d5c !important; color: white !important; border-color: #e64d5c !important; transform: scale(1.05); box-shadow: 0 4px 12px rgba(230, 77, 92, 0.2); }
+        
         @keyframes pulse-glow { 0%, 100% { box-shadow: 0 4px 14px rgba(230, 77, 92, 0.4); } 50% { box-shadow: 0 6px 22px rgba(230, 77, 92, 0.7); } }
         .animate-pulse-glow { animation: pulse-glow 2s infinite ease-in-out; }
+        
         @keyframes slideUp { 0% { opacity: 0; transform: translateY(40px); } 100% { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
     </style>
@@ -39,9 +42,7 @@
         <div class="px-6 pt-2 pb-6 flex-1 flex items-center justify-center">
             <div class="bg-white p-3 pb-8 rounded-2xl shadow-2xl transform rotate-1 border border-white max-w-xs w-full relative">
                 <div class="aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-100 relative">
-                    <!-- This image will now dynamic display your clicked photo -->
                     <img id="image-preview" src="" alt="Captured Moment" class="w-full h-full object-cover hidden">
-                    <!-- Loading placeholder if image takes a millisecond -->
                     <div id="loading-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 space-y-2">
                         <i class="fas fa-spinner animate-spin text-xl"></i>
                         <span class="text-[10px] font-bold tracking-wider">LOADING IMAGE...</span>
@@ -87,8 +88,22 @@
         </main>
     </div>
 
-    <script>
-        // --- LOAD THE CAPTURED IMAGE FROM STORAGE ---
+    <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center p-5 invisible opacity-0 transition-all duration-300">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div id="modal-box" class="bg-white rounded-2xl p-6 text-center shadow-2xl max-w-xs w-full relative z-10 transform scale-90 transition-all duration-300 text-slate-800">
+            <div class="w-14 h-14 bg-rose-50 rounded-xl flex items-center justify-center mx-auto mb-3.5 text-brand-coral text-2xl shadow-inner">
+                <i class="fas fa-glass-cheers animate-bounce"></i>
+            </div>
+            <h3 class="text-sm font-extrabold text-slate-800 mb-1 rounded-brand-font uppercase tracking-wide">Memory Locked!</h3>
+            <p class="text-[11px] text-slate-400 font-medium leading-relaxed px-2 mb-5">Hurrah! Your beautiful moment has been customized and locked safely inside C&C.</p>
+            <button id="modal-close-btn" class="w-full bg-brand-coral hover:bg-rose-600 text-white font-bold py-3 rounded-xl text-xs tracking-wider uppercase shadow-md shadow-rose-500/20 active:scale-95 transition">
+                Awesome!
+            </button>
+        </div>
+    </div>
+
+      <script>
+        // 1. Load Image from Temporary Storage (Dashboard se aayi hui photo)
         window.addEventListener('DOMContentLoaded', () => {
             const cachedImage = sessionStorage.getItem('recent_memory_image');
             const imgPreview = document.getElementById('image-preview');
@@ -99,7 +114,6 @@
                 imgPreview.classList.remove('hidden');
                 if(placeholder) placeholder.remove();
             } else {
-                // Fallback image if accessed directly without selecting a photo
                 if(imgPreview) {
                     imgPreview.src = "https://images.unsplash.com/photo-1547891654-e66ed7edd96c?auto=format&fit=crop&w=400&q=80";
                     imgPreview.classList.remove('hidden');
@@ -108,7 +122,7 @@
             }
         });
 
-        // Caption Char Counter
+        // 2. Caption Char Counter
         const captionInput = document.getElementById('caption-input');
         const charCounter = document.getElementById('char-counter');
         captionInput.addEventListener('input', (e) => {
@@ -118,17 +132,61 @@
             else charCounter.classList.replace('text-rose-400', 'text-slate-300');
         });
 
-        // Tags Selection Toggle
+        // 3. Tag Toggles
         const tags = document.querySelectorAll('.sticker-tag');
         tags.forEach(tag => {
             tag.addEventListener('click', () => { tag.classList.toggle('tag-active'); });
         });
 
-        // Save Redirect
+        // 4. PERMANENT SAVE & MODAL LOGIC
+        const successModal = document.getElementById('success-modal');
+        const modalBox = document.getElementById('modal-box');
+
         document.getElementById('save-memory-btn').addEventListener('click', () => {
-            alert('🎉 Hurrah! Your beautiful memory has been customized and locked safely in C&C.');
-            window.location.href = 'dashboard.html';
+            const imgPreview = document.getElementById('image-preview');
+            const captionText = captionInput.value.trim() || "A beautiful uncaptioned moment...";
+            
+            // Collect all selected tags
+            const selectedTags = [];
+            document.querySelectorAll('.sticker-tag.tag-active').forEach(tag => {
+                selectedTags.push(tag.textContent.trim());
+            });
+            if(selectedTags.length === 0) selectedTags.push("✨ Special");
+
+            // Create a premium memory object
+            const newMemory = {
+                id: Date.now(),
+                image: imgPreview.src,
+                caption: captionText,
+                tags: selectedTags,
+                date: "9 July 2026",
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            // Fetch old memories, push new one, and save back to localStorage
+            const existingMemories = JSON.parse(localStorage.getItem('cc_memories')) || [];
+            existingMemories.unshift(newMemory); // Nayi memory sabse upar dikhegi
+            localStorage.setItem('cc_memories', JSON.stringify(existingMemories));
+
+            // Show custom premium alert modal
+            successModal.classList.remove('invisible');
+            successModal.classList.add('opacity-100');
+            modalBox.classList.remove('scale-90');
+            modalBox.classList.add('scale-100');
+        });
+
+        document.getElementById('modal-close-btn').addEventListener('click', () => {
+            modalBox.classList.remove('scale-100');
+            modalBox.classList.add('scale-90');
+            successModal.classList.replace('opacity-100', 'opacity-0');
+            
+            setTimeout(() => {
+                successModal.classList.add('invisible');
+                // Redirect seedha timeline par taaki saved memories dikhein!
+                window.location.href = 'timeline.html';
+            }, 250);
         });
     </script>
+
 </body>
 </html>

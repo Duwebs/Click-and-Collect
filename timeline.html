@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C&C - Memories Timeline</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .rounded-brand-font { font-family: 'Fredoka', sans-serif; }
+        .premium-bg { background: radial-gradient(circle at center, #4fd1c5 0%, #36a39b 70%, #2c8a83 100%); }
+        .text-brand-coral { color: #e64d5c; }
+        .bg-brand-coral { background-color: #e64d5c; }
+        .content-card-curve { border-top-left-radius: 32px; border-top-right-radius: 32px; }
+        
+        /* Custom Scrollbar for clean UI */
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Timeline vertical connector line */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(226, 232, 240, 0.8);
+            z-index: 0;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop { animation: pop 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="h-full max-h-screen flex flex-col overflow-hidden select-none relative premium-bg text-white">
+
+    <header class="h-14 flex items-center justify-between px-4 shrink-0 bg-transparent relative z-10">
+        <a href="dashboard.html" class="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center text-white border border-white/20 active:scale-90 transition">
+            <i class="fas fa-arrow-left text-sm"></i>
+        </a>
+        <div class="flex items-center whitespace-nowrap">
+            <span class="text-xl font-bold tracking-wide text-white rounded-brand-font uppercase">C &amp; C Timeline</span>
+        </div>
+        <div class="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center text-xs font-bold border border-white/20">
+            <span id="total-count">3</span>
+        </div>
+    </header>
+
+    <main class="flex-1 bg-slate-50 text-slate-800 content-card-curve shadow-[0_-10px_32px_rgba(0,0,0,0.15)] overflow-y-auto p-6 relative scrollbar-none timeline-line">
+        
+        <div id="timeline-feed-wrapper" class="space-y-8 relative z-10">
+            
+            <div id="today-section" class="space-y-4">
+                <div class="flex items-center space-x-3 sticky top-0 bg-slate-50 py-1">
+                    <div class="w-2.5 h-2.5 rounded-full bg-brand-coral ring-4 ring-rose-100 z-10 ml-1.5"></div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Today's Special</span>
+                </div>
+
+                <div id="dynamic-memory-container" class="hidden pl-8">
+                    </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-teal-500 ring-4 ring-teal-100 z-10 ml-1.5"></div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Yesterday</span>
+                </div>
+
+                <div class="pl-8">
+                    <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+                        <div class="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 relative">
+                            <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=500&q=80" alt="Memory" class="w-full h-full object-cover">
+                            <span class="absolute bottom-2 left-2 bg-black/50 backdrop-blur-md text-white text-[9px] px-2.5 py-1 rounded-full font-bold">🌴 Travel</span>
+                        </div>
+                        <div class="flex justify-between items-start px-0.5">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-700 leading-snug">Chasing standard sunsets with the best team ever!</p>
+                                <span class="text-[9px] text-slate-400 font-medium">06:45 PM</span>
+                            </div>
+                            <button class="like-btn text-slate-300 hover:text-rose-500 p-1 transition active:scale-90">
+                                <i class="fas fa-heart text-base"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-slate-400 ring-4 ring-slate-100 z-10 ml-1.5"></div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Last Week</span>
+                </div>
+
+                <div class="pl-8">
+                    <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+                        <div class="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 relative">
+                            <img src="https://images.unsplash.com/photo-1464349172961-4649a28d150b?auto=format&fit=crop&w=500&q=80" alt="Memory" class="w-full h-full object-cover">
+                            <span class="absolute bottom-2 left-2 bg-black/50 backdrop-blur-md text-white text-[9px] px-2.5 py-1 rounded-full font-bold">🎂 Birthday</span>
+                        </div>
+                        <div class="flex justify-between items-start px-0.5">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-700 leading-snug">Midnight cake smash! 🎉 Happy birthday champion.</p>
+                                <span class="text-[9px] text-slate-400 font-medium">12:05 AM • 2 July 2026</span>
+                            </div>
+                            <button class="like-btn text-slate-300 hover:text-rose-500 p-1 transition active:scale-90">
+                                <i class="fas fa-heart text-base"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // 1. Fetch all permanently saved memories from localStorage
+            const savedMemories = JSON.parse(localStorage.getItem('cc_memories')) || [];
+            const dynamicContainer = document.getElementById('dynamic-memory-container');
+            const todaySection = document.getElementById('today-section');
+            const totalCountBadge = document.getElementById('total-count');
+
+            // Update header memory counter badge
+            totalCountBadge.textContent = savedMemories.length;
+
+            if (savedMemories.length > 0) {
+                todaySection.classList.remove('hidden');
+                dynamicContainer.classList.remove('hidden');
+                dynamicContainer.innerHTML = ''; // Clear previous mock elements
+
+                // Loop through each saved memory and render polaroid cards
+                savedMemories.forEach(memory => {
+                    // Generate HTML string for tags
+                    const tagsHTML = memory.tags.map(tag => 
+                        `<span class="bg-slate-100 text-slate-600 text-[9px] px-2.5 py-0.5 rounded-full font-bold">${tag}</span>`
+                    ).join(' ');
+
+                    const cardHTML = `
+                        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3 mb-5 transition transform active:scale-[0.99]">
+                            <div class="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 relative">
+                                <img src="${memory.image}" alt="Memory" class="w-full h-full object-cover">
+                                <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">
+                                    ${tagsHTML}
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-start px-0.5">
+                                <div class="pr-3">
+                                    <p class="text-xs font-semibold text-slate-700 leading-snug break-words">${memory.caption}</p>
+                                    <span class="text-[9px] text-slate-400 font-medium">${memory.time} • ${memory.date}</span>
+                                </div>
+                                <button class="like-btn text-slate-300 hover:text-rose-500 p-1 transition shrink-0 active:scale-90">
+                                    <i class="fas fa-heart text-base"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    dynamicContainer.innerHTML += cardHTML;
+                });
+            } else {
+                // If clean slate (No photos yet)
+                dynamicContainer.innerHTML = `
+                    <div class="text-center py-12 text-slate-400 space-y-2">
+                        <i class="fas fa-images text-3xl opacity-30"></i>
+                        <p class="text-xs font-medium">No locked memories yet. Let's go snapshot something!</p>
+                    </div>
+                `;
+                dynamicContainer.classList.remove('hidden');
+            }
+
+            // 2. Setup Active Heart Toggles for all dynamic cards
+            document.getElementById('dynamic-memory-container').addEventListener('click', (e) => {
+                const button = e.target.closest('.like-btn');
+                if (!button) return;
+
+                if (button.classList.contains('text-slate-300')) {
+                    button.classList.remove('text-slate-300');
+                    button.classList.add('text-rose-500', 'animate-pop');
+                    setTimeout(() => button.classList.remove('animate-pop'), 300);
+                } else {
+                    button.classList.remove('text-rose-500');
+                    button.classList.add('text-slate-300');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
