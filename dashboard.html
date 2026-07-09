@@ -184,7 +184,6 @@
     </div>
 
     <!-- RESTORED: FULL FUNCTIONAL JAVASCRIPT -->
-    <!-- UPDATED SCRIPT FOR DASHBOARD.HTML -->
     <script>
         const cameraPicker = document.getElementById('native-camera-picker');
         const galleryPicker = document.getElementById('native-gallery-picker');
@@ -200,11 +199,10 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Image ko compress karke temporary storage me daalna taaki next page pe load ho sake
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 800; // Mobile preview ke liye perfect size
+                    const MAX_WIDTH = 800; // Mobile screen ke liye perfect optimized size
                     let width = img.width;
                     let height = img.height;
 
@@ -232,9 +230,30 @@
             reader.readAsDataURL(file);
         }
 
-        function dismissTooltip() { if (tooltip) { tooltip.style.opacity = '0'; tooltip.style.transform = 'translateX(12px) scale(0.85)'; setTimeout(() => tooltip.remove(), 300); } }
-        function openBottomSheet() { bottomSheet.classList.remove('invisible'); sheetBackdrop.classList.remove('opacity-0'); sheetBackdrop.classList.add('opacity-100'); sheetContent.classList.remove('translate-y-full'); sheetContent.classList.add('translate-y-0'); }
-        function closeBottomSheet() { sheetBackdrop.classList.remove('opacity-100'); sheetBackdrop.classList.add('opacity-0'); sheetContent.classList.remove('translate-y-0'); sheetContent.mathbf{translate-y-full}; setTimeout(() => { bottomSheet.classList.add('invisible'); }, 300); }
+        function dismissTooltip() { 
+            if (tooltip) { 
+                tooltip.style.opacity = '0'; 
+                tooltip.style.transform = 'translateX(12px) scale(0.85)'; 
+                setTimeout(() => tooltip.remove(), 300); 
+            } 
+        }
+        
+        function openBottomSheet() { 
+            bottomSheet.classList.remove('invisible'); 
+            sheetBackdrop.classList.remove('opacity-0'); 
+            sheetBackdrop.classList.add('opacity-100'); 
+            sheetContent.classList.remove('translate-y-full'); 
+            sheetContent.classList.add('translate-y-0'); 
+        }
+        
+        // FIXED LINE HERE (Removed the broken formatting)
+        function closeBottomSheet() { 
+            sheetBackdrop.classList.remove('opacity-100'); 
+            sheetBackdrop.classList.add('opacity-0'); 
+            sheetContent.classList.remove('translate-y-0'); 
+            sheetContent.classList.add('translate-y-full'); 
+            setTimeout(() => { bottomSheet.classList.add('invisible'); }, 300); 
+        }
 
         // Event listeners for file picking
         cameraPicker.addEventListener('change', handleFileSelect);
@@ -250,6 +269,5 @@
         document.getElementById('sheet-open-gallery').addEventListener('click', () => { closeBottomSheet(); galleryPicker.click(); });
     </script>
 
-    
 </body>
 </html>
