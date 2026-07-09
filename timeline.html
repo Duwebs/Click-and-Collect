@@ -123,61 +123,94 @@
     </main>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            // 1. Fetch all permanently saved memories from localStorage
-            const savedMemories = JSON.parse(localStorage.getItem('cc_memories')) || [];
+        // --- 🪐 INDEXEDDB HELPER FUNCTIONS ---
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('CC_Memories_DB', 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('memories')) {
+                        db.createObjectStore('memories', { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function getAllMemoriesFromDB() {
+            const db = await initDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction('memories', 'readonly');
+                const store = transaction.objectStore('memories');
+                const request = store.getAll();
+                
+                request.onsuccess = () => {
+                    // Newest items first sorting
+                    const sortedData = request.result.sort((a, b) => b.id - a.id);
+                    resolve(sortedData);
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // --- 📱 LOAD & RENDER FEED ---
+        window.addEventListener('DOMContentLoaded', async () => {
             const dynamicContainer = document.getElementById('dynamic-memory-container');
             const todaySection = document.getElementById('today-section');
             const totalCountBadge = document.getElementById('total-count');
 
-            // Update header memory counter badge
-            totalCountBadge.textContent = savedMemories.length;
+            try {
+                // Load data from IndexedDB
+                const savedMemories = await getAllMemoriesFromDB();
+                totalCountBadge.textContent = savedMemories.length;
 
-            if (savedMemories.length > 0) {
-                todaySection.classList.remove('hidden');
-                dynamicContainer.classList.remove('hidden');
-                dynamicContainer.innerHTML = ''; // Clear previous mock elements
+                if (savedMemories.length > 0) {
+                    todaySection.classList.remove('hidden');
+                    dynamicContainer.classList.remove('hidden');
+                    dynamicContainer.innerHTML = ''; 
 
-                // Loop through each saved memory and render polaroid cards
-                savedMemories.forEach(memory => {
-                    // Generate HTML string for tags
-                    const tagsHTML = memory.tags.map(tag => 
-                        `<span class="bg-slate-100 text-slate-600 text-[9px] px-2.5 py-0.5 rounded-full font-bold">${tag}</span>`
-                    ).join(' ');
+                    savedMemories.forEach(memory => {
+                        const tagsHTML = memory.tags.map(tag => 
+                            `<span class="bg-slate-100 text-slate-600 text-[9px] px-2.5 py-0.5 rounded-full font-bold">${tag}</span>`
+                        ).join(' ');
 
-                    const cardHTML = `
-                        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3 mb-5 transition transform active:scale-[0.99]">
-                            <div class="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 relative">
-                                <img src="${memory.image}" alt="Memory" class="w-full h-full object-cover">
-                                <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">
-                                    ${tagsHTML}
+                        const cardHTML = `
+                            <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3 mb-5 transition transform active:scale-[0.99]">
+                                <div class="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 relative">
+                                    <img src="${memory.image}" alt="Memory" class="w-full h-full object-cover">
+                                    <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">
+                                        ${tagsHTML}
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-start px-0.5">
+                                    <div class="pr-3">
+                                        <p class="text-xs font-semibold text-slate-700 leading-snug break-words">${memory.caption}</p>
+                                        <span class="text-[9px] text-slate-400 font-medium">${memory.time} • ${memory.date}</span>
+                                    </div>
+                                    <button class="like-btn text-slate-300 hover:text-rose-500 p-1 transition shrink-0 active:scale-90">
+                                        <i class="fas fa-heart text-base"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="flex justify-between items-start px-0.5">
-                                <div class="pr-3">
-                                    <p class="text-xs font-semibold text-slate-700 leading-snug break-words">${memory.caption}</p>
-                                    <span class="text-[9px] text-slate-400 font-medium">${memory.time} • ${memory.date}</span>
-                                </div>
-                                <button class="like-btn text-slate-300 hover:text-rose-500 p-1 transition shrink-0 active:scale-90">
-                                    <i class="fas fa-heart text-base"></i>
-                                </button>
-                            </div>
+                        `;
+                        dynamicContainer.innerHTML += cardHTML;
+                    });
+                } else {
+                    // Empty Slate
+                    dynamicContainer.innerHTML = `
+                        <div class="text-center py-12 text-slate-400 space-y-2">
+                            <i class="fas fa-images text-3xl opacity-30"></i>
+                            <p class="text-xs font-medium">No locked memories yet. Let's go snapshot something!</p>
                         </div>
                     `;
-                    dynamicContainer.innerHTML += cardHTML;
-                });
-            } else {
-                // If clean slate (No photos yet)
-                dynamicContainer.innerHTML = `
-                    <div class="text-center py-12 text-slate-400 space-y-2">
-                        <i class="fas fa-images text-3xl opacity-30"></i>
-                        <p class="text-xs font-medium">No locked memories yet. Let's go snapshot something!</p>
-                    </div>
-                `;
-                dynamicContainer.classList.remove('hidden');
+                    dynamicContainer.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error loading timeline:", error);
             }
 
-            // 2. Setup Active Heart Toggles for all dynamic cards
+            // --- ❤️ LIKE BUTTON INTERACTION ---
             document.getElementById('dynamic-memory-container').addEventListener('click', (e) => {
                 const button = e.target.closest('.like-btn');
                 if (!button) return;

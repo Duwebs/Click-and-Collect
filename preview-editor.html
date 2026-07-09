@@ -102,8 +102,32 @@
         </div>
     </div>
 
-      <script>
-        // 1. Load Image from Temporary Storage (Dashboard se aayi hui photo)
+          <script>
+        // --- 🪐 INDEXEDDB HELPER FUNCTIONS ---
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('CC_Memories_DB', 1);
+                
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('memories')) {
+                        db.createObjectStore('memories', { keyPath: 'id' });
+                    }
+                };
+                
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function addMemoryToDB(memory) {
+            const db = await initDB();
+            const transaction = db.transaction('memories', 'readwrite');
+            const store = transaction.objectStore('memories');
+            store.add(memory);
+        }
+
+        // --- 📸 LOAD IMAGE FROM DASHBOARD ---
         window.addEventListener('DOMContentLoaded', () => {
             const cachedImage = sessionStorage.getItem('recent_memory_image');
             const imgPreview = document.getElementById('image-preview');
@@ -122,7 +146,7 @@
             }
         });
 
-        // 2. Caption Char Counter
+        // --- ✍️ CAPTION COUNTER ---
         const captionInput = document.getElementById('caption-input');
         const charCounter = document.getElementById('char-counter');
         captionInput.addEventListener('input', (e) => {
@@ -132,30 +156,29 @@
             else charCounter.classList.replace('text-rose-400', 'text-slate-300');
         });
 
-        // 3. Tag Toggles
+        // --- 🏷️ TAG SELECTION ---
         const tags = document.querySelectorAll('.sticker-tag');
         tags.forEach(tag => {
             tag.addEventListener('click', () => { tag.classList.toggle('tag-active'); });
         });
 
-        // 4. PERMANENT SAVE & MODAL LOGIC
+        // --- 💾 SAVE MEMORY ACTION ---
         const successModal = document.getElementById('success-modal');
         const modalBox = document.getElementById('modal-box');
 
-        document.getElementById('save-memory-btn').addEventListener('click', () => {
+        document.getElementById('save-memory-btn').addEventListener('click', async () => {
             const imgPreview = document.getElementById('image-preview');
             const captionText = captionInput.value.trim() || "A beautiful uncaptioned moment...";
             
-            // Collect all selected tags
             const selectedTags = [];
             document.querySelectorAll('.sticker-tag.tag-active').forEach(tag => {
                 selectedTags.push(tag.textContent.trim());
             });
             if(selectedTags.length === 0) selectedTags.push("✨ Special");
 
-            // Create a premium memory object
+            // Premium Memory Structure
             const newMemory = {
-                id: Date.now(),
+                id: Date.now(), // Unique ID based on timestamp
                 image: imgPreview.src,
                 caption: captionText,
                 tags: selectedTags,
@@ -163,16 +186,19 @@
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
-            // Fetch old memories, push new one, and save back to localStorage
-            const existingMemories = JSON.parse(localStorage.getItem('cc_memories')) || [];
-            existingMemories.unshift(newMemory); // Nayi memory sabse upar dikhegi
-            localStorage.setItem('cc_memories', JSON.stringify(existingMemories));
-
-            // Show custom premium alert modal
-            successModal.classList.remove('invisible');
-            successModal.classList.add('opacity-100');
-            modalBox.classList.remove('scale-90');
-            modalBox.classList.add('scale-100');
+            try {
+                // Save inside IndexedDB
+                await addMemoryToDB(newMemory);
+                
+                // Show Custom App Modal
+                successModal.classList.remove('invisible');
+                successModal.classList.add('opacity-100');
+                modalBox.classList.remove('scale-90');
+                modalBox.classList.add('scale-100');
+            } catch (error) {
+                console.error("Database Save Error:", error);
+                alert("Oops! Memory lock failure.");
+            }
         });
 
         document.getElementById('modal-close-btn').addEventListener('click', () => {
@@ -182,8 +208,7 @@
             
             setTimeout(() => {
                 successModal.classList.add('invisible');
-                // Redirect seedha timeline par taaki saved memories dikhein!
-                window.location.href = 'timeline.html';
+                window.location.href = 'timeline.html'; // Redirect to timeline
             }, 250);
         });
     </script>
