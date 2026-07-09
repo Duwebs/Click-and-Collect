@@ -184,6 +184,7 @@
     </div>
 
     <!-- RESTORED: FULL FUNCTIONAL JAVASCRIPT -->
+    <!-- UPDATED SCRIPT FOR DASHBOARD.HTML -->
     <script>
         const cameraPicker = document.getElementById('native-camera-picker');
         const galleryPicker = document.getElementById('native-gallery-picker');
@@ -192,17 +193,31 @@
         const sheetBackdrop = document.getElementById('sheet-backdrop');
         const sheetContent = document.getElementById('sheet-content');
 
+        // Function to redirect to editor
+        function redirectToEditor() {
+            window.location.href = 'preview-editor.html';
+        }
+
         function dismissTooltip() { if (tooltip) { tooltip.style.opacity = '0'; tooltip.style.transform = 'translateX(12px) scale(0.85)'; setTimeout(() => tooltip.remove(), 300); } }
 
         function openBottomSheet() { bottomSheet.classList.remove('invisible'); sheetBackdrop.classList.remove('opacity-0'); sheetBackdrop.classList.add('opacity-100'); sheetContent.classList.remove('translate-y-full'); sheetContent.classList.add('translate-y-0'); }
         function closeBottomSheet() { sheetBackdrop.classList.remove('opacity-100'); sheetBackdrop.classList.add('opacity-0'); sheetContent.classList.remove('translate-y-0'); sheetContent.classList.add('translate-y-full'); setTimeout(() => { bottomSheet.classList.add('invisible'); }, 300); }
 
+        // --- Event Listeners with Redirect ---
+        
+        // When file is picked, redirect to preview page
+        cameraPicker.addEventListener('change', redirectToEditor);
+        galleryPicker.addEventListener('change', redirectToEditor);
+
+        // UI Interactions
         document.getElementById('card-click-camera').addEventListener('click', () => { dismissTooltip(); cameraPicker.click(); });
         document.getElementById('card-open-gallery').addEventListener('click', () => { dismissTooltip(); galleryPicker.click(); });
         document.getElementById('main-fab-btn').addEventListener('click', () => { dismissTooltip(); openBottomSheet(); });
         sheetBackdrop.addEventListener('click', closeBottomSheet);
+        
         document.getElementById('sheet-click-camera').addEventListener('click', () => { closeBottomSheet(); cameraPicker.click(); });
         document.getElementById('sheet-open-gallery').addEventListener('click', () => { closeBottomSheet(); galleryPicker.click(); });
     </script>
+    
 </body>
 </html>
