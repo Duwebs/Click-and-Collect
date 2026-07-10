@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full w-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>C&C - Full Canvas Studio</title>
+    <title>C&C - Premium Canvas Studio</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -66,7 +66,7 @@
         .draggable-sticker.selected .sticker-delete-btn { display: flex; }
     </style>
 </head>
-<body class="h-full max-h-screen flex flex-col overflow-hidden select-none premium-bg text-white">
+<body class="h-full w-full max-h-screen flex flex-col overflow-hidden select-none premium-bg text-white">
 
     <header class="h-16 flex items-center justify-between px-4 shrink-0 bg-black/15 backdrop-blur-xl relative z-20 border-b border-white/5">
         <button id="back-guard-trigger" class="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/10 active:scale-90 transition">
@@ -85,7 +85,7 @@
             <div id="polaroid-card" class="skin-white p-3 pb-6 rounded-2xl shadow-2xl max-w-xs w-full relative transition-all">
                 <div id="sticker-dropzone" class="aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-200 relative shadow-inner cursor-zoom-in">
                     <img id="image-preview" src="" alt="Captured Moment" class="w-full h-full object-cover hidden pointer-events-none">
-                    <div id="loading-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 space-y-2">
+                    <div id="loading-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
                         <i class="fas fa-spinner animate-spin text-xl"></i>
                     </div>
                     <div id="active-stickers-layer" class="absolute inset-0 pointer-events-auto overflow-hidden"></div>
@@ -103,7 +103,7 @@
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
                     <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Tap To Add Sticker</label>
-                    <span class="text-[9px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md">Tap photo to see Fullscreen Preview!</span>
+                    <span class="text-[9px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md">Tap center photo for Real Fullscreen view!</span>
                 </div>
                 <div class="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
                     <button class="emoji-selector-btn text-2xl p-1.5 bg-slate-50 border border-slate-100 rounded-xl active:scale-90 transition-all">❤️</button>
@@ -147,31 +147,35 @@
         </main>
     </div>
 
-    <div id="big-preview-modal" class="fixed inset-0 z-[500] flex flex-col justify-between bg-slate-950/98 invisible opacity-0 transition-all duration-300">
-        <header class="h-16 flex items-center justify-between px-4 bg-black/40 backdrop-blur-md">
-            <button id="close-preview-btn" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
-            <span class="text-xs font-bold tracking-widest uppercase text-slate-300">Fullscreen Live View</span>
-            <div class="w-10 h-10 opacity-0"></div>
+    <div id="big-preview-modal" class="fixed inset-0 w-screen h-screen bg-slate-950/98 flex flex-col justify-between hidden z-[9999] opacity-0 transition-opacity duration-300">
+        <header class="h-16 w-full flex items-center justify-between px-4 bg-black/40 backdrop-blur-md shrink-0">
+            <button id="close-preview-btn" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white text-sm"><i class="fas fa-times"></i></button>
+            <span class="text-xs font-black tracking-widest uppercase text-slate-300 rounded-brand-font">Fullscreen Canvas Live</span>
+            <div class="w-10 h-10 opacity-0 pointer-events-none"></div>
         </header>
         
-        <div class="flex-1 flex items-center justify-center p-4">
-            <div id="big-polaroid-container" class="skin-white p-4 pb-10 rounded-2xl shadow-2xl w-full max-w-sm transform scale-100 transition-all">
+        <div class="flex-1 w-full flex items-center justify-center p-6 overflow-hidden">
+            <div id="big-polaroid-container" class="skin-white p-4 pb-8 rounded-2xl shadow-2xl w-full max-w-xs transition-all transform scale-105">
                 <div class="aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-800 relative shadow-inner">
                     <img id="big-image-preview" src="" class="w-full h-full object-cover pointer-events-none">
                     <div id="big-active-stickers-layer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
                 </div>
-                <div class="mt-4 text-center px-2">
-                    <p id="big-caption-sync" class="text-xs font-bold tracking-wide text-slate-700"></p>
+                <div class="mt-4 text-center px-1">
+                    <p id="big-caption-sync" class="text-xs font-bold tracking-wide text-slate-700 break-words"></p>
                 </div>
             </div>
         </div>
+        
+        <div class="h-12 w-full flex items-center justify-center bg-black/20 text-[10px] uppercase font-black tracking-widest text-teal-400 shrink-0">
+            📸 Screen preview verified safely
+        </div>
     </div>
 
-    <div id="back-guard-modal" class="fixed inset-0 z-[600] flex items-center justify-center p-5 invisible opacity-0 transition-all duration-300">
+    <div id="back-guard-modal" class="fixed inset-0 z-[6000] flex items-center justify-center p-5 invisible opacity-0 transition-all duration-300">
         <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md"></div>
         <div class="bg-white rounded-3xl p-6 text-center shadow-2xl max-w-xs w-full relative z-10 text-slate-800">
             <h3 class="text-sm font-black text-slate-900 mb-1 uppercase tracking-wide rounded-brand-font">Discard Memory?</h3>
-            <p class="text-[11px] text-slate-400 mb-6">Are you sure you want to go back? Changes will be lost.</p>
+            <p class="text-[11px] text-slate-400 mb-6">Are you sure you want to exit? Changes will be dropped.</p>
             <div class="flex gap-3">
                 <button id="guard-cancel-btn" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-xs uppercase">Keep Editing</button>
                 <button id="guard-confirm-btn" class="flex-1 bg-rose-500 text-white font-bold py-3 rounded-xl text-xs uppercase">Yes, Exit</button>
@@ -179,7 +183,7 @@
         </div>
     </div>
 
-    <div id="success-modal" class="fixed inset-0 z-[700] flex items-center justify-center p-5 invisible opacity-0 transition-all duration-300">
+    <div id="success-modal" class="fixed inset-0 z-[7000] flex items-center justify-center p-5 invisible opacity-0 transition-all duration-300">
         <div class="absolute inset-0 bg-black/70 backdrop-blur-md"></div>
         <div class="bg-white rounded-3xl p-6 text-center shadow-2xl max-w-xs w-full relative z-10 text-slate-800">
             <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-500 text-3xl"><i class="fas fa-check-circle"></i></div>
@@ -189,7 +193,7 @@
     </div>
 
     <script>
-        // --- DATA INTERFACE LAYER ---
+        // --- DATABASE PROTOCOLS ---
         function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('CC_Memories_DB', 1);
@@ -213,6 +217,7 @@
         const bigImgPreview = document.getElementById('big-image-preview');
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Using custom fallback structure from image files
             const cachedImage = sessionStorage.getItem('recent_memory_image') || "https://images.unsplash.com/photo-1547891654-e66ed7edd96c?auto=format&fit=crop&w=400&q=80";
             imgPreview.src = cachedImage;
             bigImgPreview.src = cachedImage;
@@ -220,7 +225,7 @@
             document.getElementById('loading-placeholder')?.remove();
         });
 
-        // --- ANTI ACCIDENTAL DEVICE BACK SYSTEM BUTTONS ---
+        // --- ANTI BACK CONTROL HOOKS ---
         const backTrigger = document.getElementById('back-guard-trigger');
         const guardModal = document.getElementById('back-guard-modal');
         const guardCancel = document.getElementById('guard-cancel-btn');
@@ -234,7 +239,7 @@
         guardCancel.addEventListener('click', (e) => { e.stopPropagation(); hideGuardModal(); });
         guardConfirm.addEventListener('click', () => { window.location.replace('dashboard.html'); });
 
-        // --- SKIN SWAPPER MANAGER ---
+        // --- SKIN SWAPPING UTILS ---
         const polaroidCard = document.getElementById('polaroid-card');
         const bigPolaroidContainer = document.getElementById('big-polaroid-container');
         const skinBtns = document.querySelectorAll('.skin-btn');
@@ -246,11 +251,11 @@
                 btn.classList.add('skin-active');
                 activeSkinClass = btn.getAttribute('data-skin');
                 polaroidCard.className = `p-3 pb-6 rounded-2xl shadow-2xl max-w-xs w-full relative transition-all ${activeSkinClass}`;
-                bigPolaroidContainer.className = `skin-white p-4 pb-10 rounded-2xl shadow-2xl w-full max-w-sm transform scale-100 transition-all ${activeSkinClass}`;
+                bigPolaroidContainer.className = `p-4 pb-8 rounded-2xl shadow-2xl w-full max-w-xs transition-all transform scale-105 ${activeSkinClass}`;
             });
         });
 
-        // --- CRITICAL FIXED TOUCH-DRAG COORDINATES RECONCILIATION ENGINE ---
+        // --- SYNC INTERACTION STICKERS TRACKING SYSTEM ---
         const emojiBtns = document.querySelectorAll('.emoji-selector-btn');
         const mainStickersLayer = document.getElementById('active-stickers-layer');
         let stickersArray = [];
@@ -263,10 +268,9 @@
         emojiBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const uniqueId = Date.now();
-                // Store structural object inside local global array
+                // Core atomic object references
                 const stickerObj = { id: uniqueId, char: btn.textContent, left: 35, top: 35, scale: 1.2, angle: 0 };
                 stickersArray.push(stickerObj);
-                
                 spawnCanvasStickerElement(stickerObj);
             });
         });
@@ -302,12 +306,12 @@
             attachMobileInteractiveTouchTracks(sticker, obj);
         }
 
-        // PERFECT MOBILE TRACKING MAPPER TO SAVE COORDINATES SAFELY
         function attachMobileInteractiveTouchTracks(elm, referenceObj) {
             let startX = 0, startY = 0;
             let startLeft = 0, startTop = 0;
             const parent = document.getElementById('sticker-dropzone');
 
+            // TOUCH EVENTS
             elm.addEventListener('touchstart', (e) => {
                 deselectAllStickers();
                 elm.classList.add('selected');
@@ -324,16 +328,16 @@
                     let nextL = startLeft + (e.touches[0].clientX - startX);
                     let nextT = startTop + (e.touches[0].clientY - startY);
 
-                    if(nextL > -10 && nextL < (parent.offsetWidth - 20)) elm.style.left = nextL + "px";
-                    if(nextT > -10 && nextT < (parent.offsetHeight - 20)) elm.style.top = nextT + "px";
+                    if(nextL > -15 && nextL < (parent.offsetWidth - 20)) elm.style.left = nextL + "px";
+                    if(nextT > -15 && nextT < (parent.offsetHeight - 20)) elm.style.top = nextT + "px";
 
-                    // CRITICAL SAVING STEP: Save real-time modifications directly into reference array!
+                    // FORCE IMMUTABLE REFERENCE COORDINATE PERSISTENCE
                     referenceObj.left = (elm.offsetLeft / parent.offsetWidth) * 100;
                     referenceObj.top = (elm.offsetTop / parent.offsetHeight) * 100;
                 }
             }, { passive: true });
 
-            // Desktop compatibility drag tracking support
+            // MOUSE ON DESKTOP FLOWS
             elm.addEventListener('mousedown', (e) => {
                 deselectAllStickers(); elm.classList.add('selected');
                 let mX = e.clientX, mY = e.clientY, sL = elm.offsetLeft, sT = elm.offsetTop;
@@ -347,7 +351,7 @@
             });
         }
 
-        // --- FULL CINEMATIC SCREEN PREVIEW HANDLERS ---
+        // --- PURE SEAMLESS FULLSCREEN MODAL CONTROLLERS ---
         const bigPreviewModal = document.getElementById('big-preview-modal');
         const bigStickersLayer = document.getElementById('big-active-stickers-layer');
         const bigCaptionSync = document.getElementById('big-caption-sync');
@@ -357,30 +361,35 @@
             if(e.target.closest('.draggable-sticker')) return;
 
             bigCaptionSync.textContent = captionInput.value.trim() || "A beautiful uncaptioned memory...";
-            bigStickersLayer.innerHTML = ''; // Wipe dirty clone buffers
+            bigStickersLayer.innerHTML = ''; 
 
-            // Seamless cloned mirror rendering algorithm
+            // Render mirrored vector points flawlessly
             stickersArray.forEach(st => {
-                const mirrorSticker = document.createElement('div');
-                mirrorSticker.style.position = 'absolute';
-                mirrorSticker.style.left = st.left + '%';
-                mirrorSticker.style.top = st.top + '%';
-                mirrorSticker.style.transform = `scale(${st.scale}) rotate(${st.angle}deg)`;
-                mirrorSticker.innerHTML = `<span style="font-size:38px; display:inline-block;">${st.char}</span>`;
-                bigStickersLayer.appendChild(mirrorSticker);
+                const mirror = document.createElement('div');
+                mirror.style.position = 'absolute';
+                mirror.style.left = st.left + '%';
+                mirror.style.top = st.top + '%';
+                mirror.style.transform = `scale(${st.scale}) rotate(${st.angle}deg) translate(-10%, -10%)`;
+                mirror.innerHTML = `<span style="font-size:36px; display:inline-block; user-select:none;">${st.char}</span>`;
+                bigStickersLayer.appendChild(mirror);
             });
 
-            bigPreviewModal.classList.remove('invisible', 'opacity-0');
-            bigPreviewModal.classList.add('opacity-100');
+            // Trigger absolute visual display state change
+            bigPreviewModal.classList.remove('hidden');
+            setTimeout(() => { bigPreviewModal.classList.add('opacity-100'); }, 10);
         });
 
         document.getElementById('close-preview-btn').addEventListener('click', () => {
-            bigPreviewModal.classList.add('opacity-0'); setTimeout(() => bigPreviewModal.classList.add('invisible'), 250);
+            bigPreviewModal.classList.remove('opacity-100');
+            setTimeout(() => { bigPreviewModal.classList.add('hidden'); }, 300);
         });
 
-        // Save and lock down inside database structure seamlessly
+        // --- SUBMIT SAVE PIPELINE ---
         const successModal = document.getElementById('success-modal');
         document.getElementById('save-memory-btn').addEventListener('click', async () => {
+            // Mapping deep cloned state object values directly to freeze positions
+            const payloadStickers = stickersArray.map(s => ({ id: s.id, char: s.char, left: s.left, top: s.top, scale: s.scale, angle: s.angle }));
+            
             const newMemory = {
                 id: Date.now(),
                 image: imgPreview.src,
@@ -389,7 +398,7 @@
                 date: "11 July 2026",
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 skin: activeSkinClass,
-                stickers: [...stickersArray] // Array with accurate positions logs
+                stickers: payloadStickers 
             };
             try {
                 await addMemoryToDB(newMemory);
