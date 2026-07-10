@@ -430,5 +430,151 @@
     
     <script src="script.js"></script>
 
+
+<div id="update-modal-wrapper" class="fixed inset-0 z-[200] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500 ease-out">
+    
+    <div id="update-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-md"></div>
+    
+    <div id="update-modal-box" class="relative bg-white w-full max-w-[350px] rounded-[30px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] overflow-hidden transform scale-90 transition-all duration-500 ease-out text-slate-800">
+        
+        <div class="relative bg-gradient-to-br from-[#E14D57] via-[#f0626d] to-[#ff7681] h-48 flex flex-col items-center justify-center overflow-hidden">
+            
+            <div class="absolute inset-0 opacity-20 pointer-events-none">
+                <div class="absolute top-4 left-6 text-white text-xs animate-pulse"><i class="fas fa-sparkles"></i></div>
+                <div class="absolute top-12 right-12 text-white text-lg animate-bounce" style="animation-duration: 4s;"><i class="fas fa-star"></i></div>
+                <div class="absolute bottom-16 left-12 text-white text-sm opacity-50"><i class="fas fa-moon"></i></div>
+            </div>
+
+            <div class="relative z-10 w-24 h-24 flex items-center justify-center animate-rocket-float">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-20 h-20 text-white drop-shadow-[0_10px_15px_rgba(0,0,0,0.2)]">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.63 8.41m5.96 5.96a14.96 14.96 0 01-12.12 6.16 14.96 14.96 0 016.16-12.12m5.96 5.96l-5.96-5.96m0 0L3.92 3.92m0 0a1.5 1.5 0 012.122 0L10.5 8.5M3.92 3.92a1.5 1.5 0 000 2.122L8.5 10.5m4.5-4.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                </svg>
+            </div>
+
+            <div class="absolute bottom-0 inset-x-0 w-full overflow-hidden leading-[0]">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-[25px] fill-white">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C26.9,4.75,55.05,8.58,83.19,12.44,170.9,24.31,259,33.15,321.39,56.44Z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div class="p-6 pt-4 pb-8 text-center">
+            
+            <span class="inline-block bg-rose-50 text-[#E14D57] font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-full mb-3 border border-rose-100/50">
+                ✨ App Update
+            </span>
+            
+            <h3 class="text-lg font-black text-slate-800 tracking-wide rounded-brand-font">
+                Look What's New!
+            </h3>
+            <p class="text-xs text-slate-400 font-medium mt-1 mb-5">
+                Humne aapke experience ko aur behtar banaya hai
+            </p>
+
+            <div class="text-left space-y-3.5 mb-6 max-w-[290px] mx-auto">
+                
+                <div class="flex items-start gap-3">
+                    <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <p class="text-[12px] text-slate-600 font-semibold leading-relaxed">
+                        <span class="font-bold text-slate-800">Super Fast Engine:</span> Photos load hone ki speed ab 2x tez ho gayi hai.
+                    </p>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <p class="text-[12px] text-slate-600 font-semibold leading-relaxed">
+                        <span class="font-bold text-slate-800">Custom Albums:</span> Apne haseen palon ko alag-alag folders mein sajaein.
+                    </p>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <p class="text-[12px] text-slate-600 font-semibold leading-relaxed">
+                        <span class="font-bold text-slate-800">Bug Fixes:</span> PWA install sheets aur animations ab bina lag ke makkhan chalengi.
+                    </p>
+                </div>
+            </div>
+
+            <button id="close-update-modal-btn" class="clean-shine-btn w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-3.5 rounded-2xl text-xs shadow-lg shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
+                Awesome, Got It!
+            </button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes clean-hardware-shine {
+            0% { transform: translateX(-150%) skewX(-25deg); }
+            35% { transform: translateX(180%) skewX(-25deg); }
+            100% { transform: translateX(180%) skewX(-25deg); }
+        }
+        .clean-shine-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 35%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent);
+            transform: skewX(-25deg);
+            will-change: transform;
+            animation: clean-hardware-shine 2.2s infinite cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        @keyframes rocket-float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(3deg); }
+        }
+        .animate-rocket-float {
+            animation: rocket-float 4s infinite ease-in-out;
+        }
+    </style>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Jab bhi tum future mein naye features dalo, bas ye niche wala number badal dena (e.g. '2.1', '3.0')
+        const DEPLOYED_APP_VERSION = '2.0'; 
+        
+        const wrapper = document.getElementById('update-modal-wrapper');
+        const modalBox = document.getElementById('update-modal-box');
+        const closeBtn = document.getElementById('close-update-modal-btn');
+        
+        const savedUserVersion = localStorage.getItem('app_last_seen_version');
+
+        // Target Checklist:
+        if (!savedUserVersion) {
+            // ❌ CASE 1: Ekdum Naya User aaya hai!
+            // Hum usko pareshan nahi karenge, chupchap storage set karke chhod denge.
+            localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+        } 
+        else if (savedUserVersion !== DEPLOYED_APP_VERSION) {
+            //  CASE 2: Purana User aaya hai AUR tumne naya update live kar diya hai!
+            // Boom! Isko clean popup dikhao.
+            setTimeout(() => {
+                // Remove hidden/pointer classes and apply transition properties
+                wrapper.classList.remove('opacity-0', 'pointer-events-none');
+                modalBox.classList.remove('scale-90', 'opacity-0');
+                modalBox.classList.add('scale-100', 'opacity-100');
+            }, 1200); // User ke dashboard pe aane ke 1.2s baad smooth open hoga
+        }
+
+        // Action Trigger: User clicks "Awesome, Got It!"
+        closeBtn.addEventListener('click', function () {
+            // Add elegant scaling down hide transitions
+            modalBox.classList.remove('scale-100', 'opacity-100');
+            modalBox.classList.add('scale-90', 'opacity-0');
+            wrapper.classList.add('opacity-0', 'pointer-events-none');
+            
+            // Ab user ka version update kar do taaki dobara aane par popup na khule
+            localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+        });
+    });
+</script>
+
+
+
+
 </body>
 </html>
