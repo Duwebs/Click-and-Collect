@@ -434,7 +434,7 @@
     
     <div id="update-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-md"></div>
     
-    <div id="update-modal-box" class="relative bg-white w-full max-w-[350px] rounded-[30px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] overflow-hidden transform scale-90 transition-all duration-500 ease-out text-slate-800">
+    <div id="update-modal-box" class="relative bg-white w-full max-w-[350px] rounded-[30px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] overflow-hidden transform scale-90 opacity-0 transition-all duration-500 ease-out text-slate-800">
         
         <div class="relative bg-gradient-to-br from-[#E14D57] via-[#f0626d] to-[#ff7681] h-48 flex flex-col items-center justify-center overflow-hidden">
             
@@ -471,7 +471,6 @@
             </p>
 
             <div class="text-left space-y-3.5 mb-6 max-w-[290px] mx-auto">
-                
                 <div class="flex items-start gap-3">
                     <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5">
                         <i class="fas fa-check"></i>
@@ -533,9 +532,8 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // 🏷️ PRODUCTION VERSION: Jab bhi sach mein naya update dena ho, tabhi ise badalna.
-        // Abhi test karne ke liye ise hum '4.0' kar dete hain taaki lock toot jaye!
-        const DEPLOYED_APP_VERSION = '4.0'; 
+        // 🏷️ PRODUCTION VERSION: Testing ke liye ise hum '5.0' kar rahe hain!
+        const DEPLOYED_APP_VERSION = '5.0'; 
         
         const wrapper = document.getElementById('update-modal-wrapper');
         const modalBox = document.getElementById('update-modal-box');
@@ -543,7 +541,6 @@
         
         let savedUserVersion = localStorage.getItem('app_last_seen_version');
         
-        // Safe check: Agar elements sahi se load nahi hue toh crash na ho
         if (!wrapper || !modalBox || !closeBtn) {
             console.error("HTML IDs nahi mili, kripya check karein!");
             return;
@@ -551,25 +548,31 @@
 
         // 🚀 SMART CHECKING LOGIC
         if (!savedUserVersion) {
-            // CASE 1: Ekdum Naya User — chupchap memory mein save karo, popup mat dikhao
+            // CASE 1: Ekdum Naya User — chupchap memory save karo, popup mat dikhao
             localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
         } 
         else if (savedUserVersion !== DEPLOYED_APP_VERSION) {
             // CASE 2: Returning User + Naya Update Mila = BOOM! Popup Dikhao
             setTimeout(() => {
+                // Wrapper show karo
                 wrapper.classList.remove('opacity-0', 'pointer-events-none');
+                wrapper.classList.add('opacity-100');
+                
+                // Modal scale aur opacity dynamic smoothly badhao
                 modalBox.classList.remove('scale-90', 'opacity-0');
                 modalBox.classList.add('scale-100', 'opacity-100');
-            }, 1000); // 1 second ke baad smooth slide in hoga
+            }, 1200); 
         }
 
         // ⚡ Close button action (Sirf ek baar dikhane ke liye memory lock)
         closeBtn.addEventListener('click', function () {
             modalBox.classList.remove('scale-100', 'opacity-100');
             modalBox.classList.add('scale-90', 'opacity-0');
+            
+            wrapper.classList.remove('opacity-100');
             wrapper.classList.add('opacity-0', 'pointer-events-none');
             
-            // Ab browser mein current version save ho jayega, jisse dobara nahi dikhega
+            // Version secure lock karo taaki baar-baar pareshan na kare
             localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
         });
     });
