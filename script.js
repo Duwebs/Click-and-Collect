@@ -1,3 +1,12 @@
+console.log(
+  "%c🚀 Developed by: Durgesh %c| ✉️ openmailon@gmail.com",
+  "color: #4fd1c5; font-size: 13px; font-weight: bold; background: #0f172a; padding: 8px 12px; border-radius: 4px 0 0 4px;",
+  "color: #fff; font-size: 12px; background: #1e293b; padding: 8px 12px; border-radius: 0 4px 4px 0;"
+);
+
+
+
+
 // Device aur Mode Detect Karne Ke Liye Global Checkers
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
