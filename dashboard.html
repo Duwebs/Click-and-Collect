@@ -9,29 +9,25 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Perfect Rounded Font -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    
-   <link rel="apple-touch-icon" sizes="57x57" href="assets/apple-icon-57x57.png">
-<link rel="apple-touch-icon" sizes="60x60" href="assets/apple-icon-60x60.png">
-<link rel="apple-touch-icon" sizes="72x72" href="assets/apple-icon-72x72.png">
-<link rel="apple-touch-icon" sizes="76x76" href="assets/apple-icon-76x76.png">
-<link rel="apple-touch-icon" sizes="114x114" href="assets/apple-icon-114x114.png">
-<link rel="apple-touch-icon" sizes="120x120" href="assets/apple-icon-120x120.png">
-<link rel="apple-touch-icon" sizes="144x144" href="assets/apple-icon-144x144.png">
-<link rel="apple-touch-icon" sizes="152x152" href="assets/apple-icon-152x152.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-icon-180x180.png">
-<link rel="icon" type="image/png" sizes="192x192" href="assets/android-icon-192x192.png">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="96x96" href="assets/favicon-96x96.png">
-<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
-<link rel="manifest" href="assets/manifest.json">
-<meta name="msapplication-TileColor" content="#ffffff">
-<meta name="msapplication-TileImage" content="assets/ms-icon-144x144.png">
-<meta name="theme-color" content="#ffffff">
-
-
+    <link rel="apple-touch-icon" sizes="57x57" href="assets/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="assets/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="assets/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="assets/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="assets/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="assets/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="assets/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="assets/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="assets/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="manifest" href="assets/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="assets/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
 
     <style>
         body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -96,33 +92,36 @@
                     </div>
                 </div>
             </div>
-            <!-- PERFECT UNIFORM CAPITAL ROUNDED FONT -->
+            
             <div class="animate-text-morph flex items-baseline whitespace-nowrap">
                 <span class="text-2xl font-bold tracking-wide text-white rounded-brand-font uppercase">C &amp; C</span>
             </div>
+
+            <button id="header-install-btn" class="absolute top-3 right-4 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold backdrop-blur-xl px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all active:scale-95 border border-white/10 hidden z-30 tracking-wide">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                </span>
+                INSTALL APP
+            </button>
         </header>
 
-        <!-- 🪐 HERO VISUALS: WITH SUBTLE TWINKLING STARS & FRESH FLAT VECTORS -->
         <div class="animate-fade-hero flex flex-col items-center text-center px-6 mt-2 relative">
             
-            <!-- 4 Non-Annoying Subtle Stars -->
             <i class="fas fa-star absolute top-0 left-8 text-yellow-300/50 text-[10px] star-twinkle"></i>
             <i class="fas fa-star absolute top-12 right-10 text-yellow-300/40 text-[8px] star-twinkle" style="animation-delay: 0.6s;"></i>
             <i class="fas fa-star absolute top-24 left-14 text-yellow-300/40 text-[9px] star-twinkle" style="animation-delay: 1.3s;"></i>
             <i class="fas fa-star absolute top-4 right-20 text-yellow-300/30 text-[7px] star-twinkle" style="animation-delay: 1.9s;"></i>
 
             <div class="flex items-end justify-center space-x-[-12px] mb-4 w-full max-w-sm relative z-10">
-                <!-- Flat Human Vector 1 (Left) -->
                 <div class="bg-white p-1.5 pb-4 rounded shadow-lg transform -rotate-12 w-24 border border-white/40">
                     <img src="/assets/selfie.jpg" alt="Vector Human 1" class="aspect-square w-full object-cover rounded-sm">
                 </div>
                 
-                <!-- Flat Family Vector 2 (Center Main) -->
                 <div class="bg-white p-2 pb-5 rounded-md shadow-2xl transform scale-110 z-20 w-32 border border-white relative polaroid-tip mb-1">
                     <img src="/assets/girl.svg" alt="Vector Family Center" class="aspect-square w-full object-cover rounded-sm">
                 </div>
                 
-                <!-- Flat Human Vector 3 (Right) -->
                 <div class="bg-white p-1.5 pb-4 rounded shadow-lg transform rotate-12 w-24 border border-white/40">
                     <img src="/assets/friends.jpg" alt="Vector Human 3" class="aspect-square w-full object-cover rounded-sm">
                 </div>
@@ -134,7 +133,6 @@
         </div>
     </div>
 
-    <!-- ⚙️ CORE CONTENT CARD: Wapis restored with safe-scroll & Green ticks -->
     <main class="animate-fade-content flex-1 flex flex-col px-5 pt-6 bg-white text-slate-800 content-card-curve space-y-5 shadow-[0_-8px_32px_rgba(0,0,0,0.05)] overflow-y-auto pb-32">
         <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-[0_4px_24px_rgba(0,0,0,0.02)] text-center w-full shrink-0">
             <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mx-auto mb-2 border border-slate-100/70">
@@ -147,7 +145,6 @@
             </div>
         </div>
         
-        <!-- 📋 RESTORED: PREMIUM EMERALD GREEN TICK LIST -->
         <div class="w-full pl-1">
             <ul class="space-y-3.5 text-left">
                 <li class="flex items-start space-x-2 text-[11px] text-slate-500 font-medium leading-tight">
@@ -170,18 +167,15 @@
         </div>
     </main>
 
-    <!-- RESTORED: SHIMMER FOOTER -->
     <footer class="h-11 shimmer-footer text-white/90 text-[10px] flex items-center justify-center space-x-1.5 shrink-0 font-medium tracking-wide z-10 border-t border-white/5">
         <i class="fas fa-lock text-[10px]"></i><span>Your memories are saved privately, only you can see these</span>
     </footer>
 
-    <!-- 🛑 RESTORED: FLOATING ACTION BUTTON WITH TOOLTIP -->
     <div class="animate-fade-content absolute bottom-16 right-4 z-40 flex items-center space-x-1.5">
         <div id="tutorial-tooltip" class="animate-nudge bg-brand-coral text-white text-[10.5px] font-semibold px-2.5 py-1.5 rounded shadow-md relative fab-tooltip tracking-wide flex items-center space-x-1 transition-all duration-300 ease-out origin-right"><i class="fas fa-hand-point-right text-xs mr-0.5 animate-pulse"></i><span>Add your First Photo</span></div>
         <button id="main-fab-btn" class="bg-brand-coral w-12 h-12 rounded-full flex items-center justify-center text-white text-base shadow-lg shadow-rose-500/30 active:scale-90 transition border border-white/10"><i class="fas fa-camera"></i></button>
     </div>
 
-    <!-- 📥 RESTORED: SLIDE-UP BOTTOM SHEET MENU -->
     <div id="bottom-sheet" class="fixed inset-0 z-50 invisible transition-all duration-300">
         <div id="sheet-backdrop" class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300"></div>
         <div id="sheet-content" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[24px] p-5 pb-8 transform translate-y-full transition-transform duration-300 ease-out text-slate-800 shadow-[0_-10px_32px_rgba(0,0,0,0.15)]">
@@ -206,7 +200,51 @@
         </div>
     </div>
 
-    <!-- RESTORED: FULL FUNCTIONAL JAVASCRIPT -->
+    <div id="pwa-bottom-sheet" class="fixed inset-x-0 bottom-0 bg-white rounded-t-[32px] shadow-[0_-12px_40px_rgba(0,0,0,0.15)] z-50 p-6 pb-8 transform translate-y-full transition-transform duration-500 ease-out hidden text-slate-800">
+        <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
+        
+        <div class="flex items-start justify-between mb-5">
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 premium-bg rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-md shadow-teal-100 rounded-brand-font">
+                    C&C
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-base rounded-brand-font tracking-wide">Click & Collect App</h3>
+                    <p class="text-[11px] text-slate-400 font-medium">Behtar aur seamless experience ke liye install karein</p>
+                </div>
+            </div>
+            <button id="close-sheet-btn" class="w-7 h-7 bg-slate-50 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 transition-colors text-xs">✕</button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5 mb-6">
+            <div class="bg-teal-50/40 p-3 rounded-xl flex flex-col items-center text-center gap-1.5 border border-teal-50">
+                <i class="fas fa-bolt text-teal-500 text-sm"></i>
+                <span class="text-[10px] font-bold text-slate-600">Super Fast</span>
+            </div>
+            <div class="bg-emerald-50/40 p-3 rounded-xl flex flex-col items-center text-center gap-1.5 border border-emerald-50">
+                <i class="fas fa-cloud-sun text-emerald-500 text-sm"></i>
+                <span class="text-[10px] font-bold text-slate-600">Offline Run</span>
+            </div>
+            <div class="bg-rose-50/40 p-3 rounded-xl flex flex-col items-center text-center gap-1.5 border border-rose-50">
+                <i class="fas fa-shield-alt text-brand-coral text-sm"></i>
+                <span class="text-[10px] font-bold text-slate-600">100% Secure</span>
+            </div>
+        </div>
+
+        <div id="android-action" class="hidden">
+            <button id="action-install-btn" class="w-full bg-brand-coral hover:opacity-95 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg shadow-rose-500/20 transition-all active:scale-[0.98] rounded-brand-font uppercase tracking-wider">
+                Install App Now
+            </button>
+        </div>
+
+        <div id="ios-action" class="hidden bg-slate-50 border border-slate-100 p-3.5 rounded-xl flex items-start gap-3">
+            <span class="text-base mt-0.5">💡</span>
+            <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
+                iPhone par install karne ke liye niche browser dashboard par <span class="font-bold text-blue-600">Share icon <i class="text-xs far fa-share-square"></i></span> par click karein aur phir <span class="font-bold text-slate-800">"Add to Home Screen"</span> chunein.
+            </p>
+        </div>
+    </div>
+
     <script>
         const cameraPicker = document.getElementById('native-camera-picker');
         const galleryPicker = document.getElementById('native-gallery-picker');
@@ -225,7 +263,7 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 800; // Mobile screen ke liye perfect optimized size
+                    const MAX_WIDTH = 800; 
                     let width = img.width;
                     let height = img.height;
 
@@ -269,7 +307,6 @@
             sheetContent.classList.add('translate-y-0'); 
         }
         
-        // FIXED LINE HERE (Removed the broken formatting)
         function closeBottomSheet() { 
             sheetBackdrop.classList.remove('opacity-100'); 
             sheetBackdrop.classList.add('opacity-0'); 
@@ -293,7 +330,6 @@
     </script>
     
     <script src="script.js"></script>
-
 
 </body>
 </html>
