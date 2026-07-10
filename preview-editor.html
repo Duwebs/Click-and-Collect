@@ -33,6 +33,7 @@
         .skin-lavender { background-color: #f3e8ff; color: #6b21a8; border-color: #e9d5ff !important; }
         .skin-matcha { background-color: #f0fdf4; color: #166534; border-color: #dcfce7 !important; }
 
+        /* Draggable / Pinchable Sticker Target Styles */
         .draggable-sticker {
             position: absolute;
             cursor: move;
@@ -93,14 +94,17 @@
         <div class="px-6 pt-4 pb-6 flex-1 flex items-center justify-center">
             
             <div id="polaroid-card" class="skin-white p-3 pb-6 rounded-2xl shadow-2xl transform rotate-1 border border-slate-100 max-w-xs w-full relative transition-all">
-                <div id="sticker-dropzone" class="aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-200 relative shadow-inner select-none">
+                
+                <div id="sticker-dropzone" class="aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-200 relative shadow-inner select-none cursor-zoom-in">
                     <img id="image-preview" src="" alt="Captured Moment" class="w-full h-full object-cover hidden pointer-events-none">
                     <div id="loading-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 space-y-2">
                         <i class="fas fa-spinner animate-spin text-xl"></i>
                         <span class="text-[10px] font-bold tracking-wider">LOADING IMAGE...</span>
                     </div>
+
                     <div id="active-stickers-layer" class="absolute inset-0 pointer-events-auto overflow-hidden"></div>
                 </div>
+
                 <div class="mt-3 flex justify-between items-center px-1">
                     <span id="current-date-stamp" class="text-[10px] font-bold uppercase tracking-wider opacity-60">Today, 11 July 2026</span>
                     <i class="fas fa-heart text-xs text-rose-400"></i>
@@ -114,7 +118,7 @@
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
                     <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Tap To Add Sticker</label>
-                    <span class="text-[9px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">Pinch Image to Resize &amp; Rotate!</span>
+                    <span class="text-[9px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">Tap Image for Big Preview mode!</span>
                 </div>
                 <div class="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
                     <button class="emoji-selector-btn text-2xl p-1.5 bg-slate-50 border border-slate-100 rounded-xl active:scale-90 transition-all">❤️</button>
@@ -152,12 +156,36 @@
             </div>
 
             <div class="pt-1">
-                <button id="save-memory-btn" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black py-4 rounded-xl text-xs tracking-wider uppercase flex items-center justify-center space-x-2 shadow-lg transition active:scale-95 shadow-emerald-500/20">
+                <button id="save-memory-btn" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black py-4 rounded-xl text-xs tracking-wider uppercase flex items-center justify-center space-x-2 shadow-lg transition active:scale-95 shadow-emerald-500/20">
                     <i class="fas fa-lock text-sm"></i>
                     <span>Lock In Timeline</span>
                 </button>
             </div>
         </main>
+    </div>
+
+    <div id="big-preview-modal" class="fixed inset-0 z-[500] flex flex-col justify-between p-4 bg-slate-950/95 backdrop-blur-xl invisible opacity-0 transition-all duration-300">
+        <header class="h-14 flex items-center justify-between">
+            <button id="close-preview-btn" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+            <span class="text-xs font-bold tracking-widest uppercase text-slate-400">Interactive Canvas Frame</span>
+            <div class="w-10 h-10 opacity-0"></div>
+        </header>
+        
+        <div class="flex-1 flex items-center justify-center p-2">
+            <div id="big-polaroid-container" class="w-full max-w-sm rounded-xl p-3 pb-8 shadow-2xl relative transition-all">
+                <div id="big-sticker-dropzone" class="aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-800 relative select-none">
+                    <img id="big-image-preview" src="" class="w-full h-full object-cover pointer-events-none">
+                    <div id="big-active-stickers-layer" class="absolute inset-0 pointer-events-auto overflow-hidden"></div>
+                </div>
+                <div class="mt-4 text-center">
+                    <p id="big-caption-sync" class="text-xs font-medium tracking-wide italic"></p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="p-4 text-center text-[10px] tracking-wider text-teal-400 font-bold uppercase bg-white/5 rounded-2xl">
+            ✨ You can drag, scale, pinch, or remove stickers inside this big window too!
+        </footer>
     </div>
 
     <div id="back-guard-modal" class="fixed inset-0 z-[600] flex items-center justify-center p-5 invisible opacity-0 transition-all duration-300">
@@ -190,6 +218,7 @@
     </div>
 
     <script>
+        // --- INDEXEDDB SEAMLESS IMPLEMENTATION ---
         function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('CC_Memories_DB', 1);
@@ -212,60 +241,42 @@
         }
 
         const imgPreview = document.getElementById('image-preview');
+        const bigImgPreview = document.getElementById('big-image-preview');
+
         window.addEventListener('DOMContentLoaded', () => {
             const cachedImage = sessionStorage.getItem('recent_memory_image');
             const placeholder = document.getElementById('loading-placeholder');
-            if (cachedImage && imgPreview) {
-                imgPreview.src = cachedImage;
-                imgPreview.classList.remove('hidden');
-                if(placeholder) placeholder.remove();
-            } else {
-                imgPreview.src = "https://images.unsplash.com/photo-1547891654-e66ed7edd96c?auto=format&fit=crop&w=400&q=80";
-                imgPreview.classList.remove('hidden');
-                if(placeholder) placeholder.remove();
-            }
+            const fallbackImg = "https://images.unsplash.com/photo-1547891654-e66ed7edd96c?auto=format&fit=crop&w=400&q=80";
+            
+            let finalSrc = cachedImage || fallbackImg;
+            imgPreview.src = finalSrc;
+            bigImgPreview.src = finalSrc;
+            imgPreview.classList.remove('hidden');
+            if(placeholder) placeholder.remove();
         });
 
-        // --- ACCIDENTAL EXIT BACK GUARD ALERT SYSTEM (FULLY FIXED) ---
+        // --- BACK CONFIRMATION GUARD SYSTEM ---
         const backTrigger = document.getElementById('back-guard-trigger');
         const guardModal = document.getElementById('back-guard-modal');
         const guardCancel = document.getElementById('guard-cancel-btn');
         const guardConfirm = document.getElementById('guard-confirm-btn');
 
-        // Block internal native back browser navigation layout
         window.history.pushState({ noBackExiting: true }, '');
-
-        window.addEventListener('popstate', (e) => {
+        window.addEventListener('popstate', () => {
             window.history.pushState({ noBackExiting: true }, '');
             showGuardModal();
         });
 
-        function showGuardModal() {
-            guardModal.classList.remove('invisible');
-            guardModal.classList.add('opacity-100');
-        }
+        function showGuardModal() { guardModal.classList.remove('invisible', 'opacity-0'); guardModal.classList.add('opacity-100'); }
+        function hideGuardModal() { guardModal.classList.add('opacity-0'); setTimeout(() => guardModal.classList.add('invisible'), 250); }
 
-        function hideGuardModal() {
-            guardModal.classList.add('opacity-0');
-            setTimeout(() => guardModal.classList.add('invisible'), 250);
-        }
+        backTrigger.addEventListener('click', (e) => { e.stopPropagation(); showGuardModal(); });
+        guardCancel.addEventListener('click', (e) => { e.stopPropagation(); hideGuardModal(); });
+        guardConfirm.addEventListener('click', () => { window.location.replace('dashboard.html'); });
 
-        backTrigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showGuardModal();
-        });
-        
-        guardCancel.addEventListener('click', (e) => {
-            e.stopPropagation();
-            hideGuardModal();
-        });
-        
-        guardConfirm.addEventListener('click', () => { 
-            window.location.replace('dashboard.html'); 
-        });
-
-        // --- SKINS CODE ---
+        // --- POLAROID BORDER SWITCHER LAYOUTS ---
         const polaroidCard = document.getElementById('polaroid-card');
+        const bigPolaroidContainer = document.getElementById('big-polaroid-container');
         const skinBtns = document.querySelectorAll('.skin-btn');
         let activeSkinClass = 'skin-white';
 
@@ -273,82 +284,103 @@
             btn.addEventListener('click', () => {
                 skinBtns.forEach(b => b.classList.remove('skin-active'));
                 btn.classList.add('skin-active');
-                polaroidCard.className = `p-3 pb-6 rounded-2xl shadow-2xl transform rotate-1 border border-slate-100 max-w-xs w-full relative transition-all ${btn.getAttribute('data-skin')}`;
                 activeSkinClass = btn.getAttribute('data-skin');
+                
+                polaroidCard.className = `p-3 pb-6 rounded-2xl shadow-2xl transform rotate-1 border border-slate-100 max-w-xs w-full relative transition-all ${activeSkinClass}`;
+                bigPolaroidContainer.className = `w-full max-w-sm rounded-xl p-3 pb-8 shadow-2xl relative transition-all ${activeSkinClass}`;
             });
         });
 
-        // --- TOUCH INTERACTIVE MATRIX CONTROLS ---
+        // --- STICKER STORES INFLOW PACKS & TIMELINE PERSISTENCE MATRIX ---
         const emojiBtns = document.querySelectorAll('.emoji-selector-btn');
-        const stickersLayer = document.getElementById('active-stickers-layer');
-        let currentSelectedSticker = null;
+        const mainStickersLayer = document.getElementById('active-stickers-layer');
+        const bigStickersLayer = document.getElementById('big-active-stickers-layer');
+        let stickersArray = [];
 
-        document.getElementById('sticker-dropzone').addEventListener('click', (e) => {
-            if(e.target === document.getElementById('sticker-dropzone') || e.target === imgPreview) {
+        // Global deselect trigger
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.draggable-sticker') && !e.target.closest('.emoji-selector-btn')) {
                 deselectAllStickers();
             }
         });
 
         function deselectAllStickers() {
             document.querySelectorAll('.draggable-sticker').forEach(s => s.classList.remove('selected'));
-            currentSelectedSticker = null;
         }
 
         emojiBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                deselectAllStickers();
-                
-                const sticker = document.createElement('div');
-                sticker.className = 'draggable-sticker selected';
-                sticker.style.left = '35%';
-                sticker.style.top = '35%';
-                
-                sticker.dataset.scale = 1.2;
-                sticker.dataset.angle = 0;
-                sticker.style.transform = `scale(1.2) rotate(0deg)`;
-                
-                const emojiSpan = document.createElement('span');
-                emojiSpan.style.fontSize = '36px';
-                emojiSpan.style.display = 'inline-block';
-                emojiSpan.textContent = btn.textContent;
-                sticker.appendChild(emojiSpan);
-
-                const delBtn = document.createElement('div');
-                delBtn.className = 'sticker-delete-btn';
-                delBtn.innerHTML = '<i class="fas fa-times"></i>';
-                delBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    sticker.remove();
-                    deselectAllStickers();
-                });
-                sticker.appendChild(delBtn);
-
-                sticker.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    deselectAllStickers();
-                    sticker.classList.add('selected');
-                    currentSelectedSticker = sticker;
-                });
-
-                stickersLayer.appendChild(sticker);
-                attachAdvancedTouchTrackers(sticker);
-                currentSelectedSticker = sticker;
+                createStickerInstance(btn.textContent, 35, 35, 1.2, 0, Date.now());
             });
         });
 
-        function attachAdvancedTouchTrackers(elm) {
+        function createStickerInstance(char, leftPercent, topPercent, scale, angle, uniqueId) {
+            deselectAllStickers();
+
+            // Object metadata definition mapping tracker
+            const stickerObj = { id: uniqueId, char: char, left: leftPercent, top: topPercent, scale: scale, angle: angle };
+            stickersArray.push(stickerObj);
+
+            // Spawn inside Main View Card
+            appendStickerToLayer(stickerObj, mainStickersLayer, false);
+            // Spawn inside Big View Card too
+            appendStickerToLayer(stickerObj, bigStickersLayer, true);
+        }
+
+        function appendStickerToLayer(obj, layer, isBigContainer) {
+            const sticker = document.createElement('div');
+            sticker.className = 'draggable-sticker selected';
+            sticker.dataset.id = obj.id;
+            sticker.style.left = obj.left + '%';
+            sticker.style.top = obj.top + '%';
+            sticker.dataset.scale = obj.scale;
+            sticker.dataset.angle = obj.angle;
+            sticker.style.transform = `scale(${obj.scale}) rotate(${obj.angle}deg)`;
+
+            const emojiSpan = document.createElement('span');
+            emojiSpan.style.fontSize = isBigContainer ? '44px' : '32px';
+            emojiSpan.style.display = 'inline-block';
+            emojiSpan.textContent = obj.char;
+            sticker.appendChild(emojiSpan);
+
+            const delBtn = document.createElement('div');
+            delBtn.className = 'sticker-delete-btn';
+            delBtn.innerHTML = '<i class="fas fa-times"></i>';
+            
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Remove from local tracking sync array
+                stickersArray = stickersArray.filter(s => s.id !== obj.id);
+                // Wipe both DOM objects instantly
+                document.querySelectorAll(`[data-id="${obj.id}"]`).forEach(el => el.remove());
+                deselectAllStickers();
+            });
+            sticker.appendChild(delBtn);
+
+            sticker.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deselectAllStickers();
+                // Select partner reflections in sync mode
+                document.querySelectorAll(`[data-id="${obj.id}"]`).forEach(el => el.classList.add('selected'));
+            });
+
+            layer.appendChild(sticker);
+            attachAdvancedTouchTrackers(sticker, isBigContainer);
+        }
+
+        function attachAdvancedTouchTrackers(elm, isBigContainer) {
             let startX = 0, startY = 0;
             let startLeft = 0, startTop = 0;
             let startDistance = 0;
             let startAngle = 0;
             let baseScale = 1.0;
             let baseAngle = 0;
+            const targetId = parseInt(elm.dataset.id);
 
             elm.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 deselectAllStickers();
-                elm.classList.add('selected');
-                currentSelectedSticker = elm;
+                document.querySelectorAll(`[data-id="${targetId}"]`).forEach(el => el.classList.add('selected'));
 
                 baseScale = parseFloat(elm.dataset.scale) || 1.0;
                 baseAngle = parseFloat(elm.dataset.angle) || 0;
@@ -366,7 +398,7 @@
 
             elm.addEventListener('touchmove', (e) => {
                 e.preventDefault();
-                const parent = document.getElementById('sticker-dropzone');
+                const currentDropzone = elm.parentElement;
 
                 if (e.touches.length === 1 && startX !== 0) {
                     let deltaX = e.touches[0].clientX - startX;
@@ -374,8 +406,15 @@
                     let nextLeft = startLeft + deltaX;
                     let nextTop = startTop + deltaY;
 
-                    if(nextLeft > -20 && nextLeft < (parent.offsetWidth - 40)) elm.style.left = nextLeft + "px";
-                    if(nextTop > -20 && nextTop < (parent.offsetHeight - 40)) elm.style.top = nextTop + "px";
+                    // Bounds boundaries calculation
+                    if(nextLeft > -20 && nextLeft < (currentDropzone.offsetWidth - 30)) elm.style.left = nextLeft + "px";
+                    if(nextTop > -20 && nextTop < (currentDropzone.offsetHeight - 30)) elm.style.top = nextTop + "px";
+
+                    // Sync percentage mapping conversions to twin reflection container
+                    let leftPct = (elm.offsetLeft / currentDropzone.offsetWidth) * 100;
+                    let topPct = (elm.offsetTop / currentDropzone.offsetHeight) * 100;
+                    
+                    updateStickerDataTrackers(targetId, leftPct, topPct, null, null);
                 } 
                 else if (e.touches.length === 2) {
                     let currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
@@ -385,50 +424,69 @@
                     let finalScale = Math.min(Math.max(baseScale * scaleFactor, 0.4), 3.0);
                     let finalAngle = baseAngle + (currentAngle - startAngle);
 
-                    elm.dataset.scale = finalScale;
-                    elm.dataset.angle = finalAngle;
-                    elm.style.transform = `scale(${finalScale}) rotate(${finalAngle}deg)`;
+                    updateStickerDataTrackers(targetId, null, null, finalScale, finalAngle);
                 }
             }, { passive: false });
-
-            elm.addEventListener('touchend', () => { startX = 0; startY = 0; });
-
-            elm.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                deselectAllStickers();
-                elm.classList.add('selected');
-                currentSelectedSticker = elm;
-                
-                let mX = e.clientX;
-                let mY = e.clientY;
-                let sL = elm.offsetLeft;
-                let sT = elm.offsetTop;
-
-                document.onmousemove = (me) => {
-                    let nextL = sL + (me.clientX - mX);
-                    let nextT = sT + (me.clientY - mY);
-                    elm.style.left = nextL + "px";
-                    elm.style.top = nextT + "px";
-                };
-                document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; };
-            });
         }
 
-        function getTouchDistance(t1, t2) {
-            return Math.sqrt(Math.pow(t2.clientX - t1.clientX, 2) + Math.pow(t2.clientY - t1.clientY, 2));
+        function updateStickerDataTrackers(id, left, top, scale, angle) {
+            const match = stickersArray.find(s => s.id === id);
+            if(match) {
+                if(left !== null) match.left = left;
+                if(top !== null) match.top = top;
+                if(scale !== null) match.scale = scale;
+                if(angle !== null) match.angle = angle;
+
+                // Sync UI reflections across channels
+                document.querySelectorAll(`[data-id="${id}"]`).forEach(el => {
+                    const p = el.parentElement;
+                    if(left !== null) el.style.left = (match.left * p.offsetWidth / 100) + 'px';
+                    if(top !== null) el.style.top = (match.top * p.offsetHeight / 100) + 'px';
+                    if(scale !== null || angle !== null) {
+                        el.dataset.scale = match.scale;
+                        el.dataset.angle = match.angle;
+                        el.style.transform = `scale(${match.scale}) rotate(${match.angle}deg)`;
+                    }
+                });
+            }
         }
 
-        function getTouchAngle(t1, t2) {
-            return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) * 180 / Math.PI;
-        }
+        function getTouchDistance(t1, t2) { return Math.sqrt(Math.pow(t2.clientX - t1.clientX, 2) + Math.pow(t2.clientY - t1.clientY, 2)); }
+        function getTouchAngle(t1, t2) { return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) * 180 / Math.PI; }
 
+        // --- PHOTO TAP CLICK TO OPEN INTERACTIVE BIG WINDOW VIEW MODE ---
+        const bigPreviewModal = document.getElementById('big-preview-modal');
+        const closePreviewBtn = document.getElementById('close-preview-btn');
         const captionInput = document.getElementById('caption-input');
+        const bigCaptionSync = document.getElementById('big-caption-sync');
+
+        document.getElementById('sticker-dropzone').addEventListener('click', (e) => {
+            // Check to avoid interception if clicking active emoji
+            if(e.target.closest('.draggable-sticker')) return;
+
+            bigCaptionSync.textContent = captionInput.value.trim() || "A beautiful uncaptioned memory...";
+            bigPreviewModal.classList.remove('invisible', 'opacity-0');
+            bigPreviewModal.classList.add('opacity-100');
+
+            // Recalculate runtime absolute twin bounding box placements mapping layouts
+            stickersArray.forEach(s => updateStickerDataTrackers(s.id, s.left, s.top, s.scale, s.angle));
+        });
+
+        closePreviewBtn.addEventListener('click', () => {
+            bigPreviewModal.classList.add('opacity-0');
+            setTimeout(() => bigPreviewModal.classList.add('invisible'), 250);
+        });
+
+        // Character counter
         const charCounter = document.getElementById('char-counter');
         captionInput.addEventListener('input', (e) => { charCounter.textContent = `${e.target.value.length}/60`; });
 
+        // --- COMPILATION LOGS AND SAVING SYSTEM ENGINE ---
         const successModal = document.getElementById('success-modal');
         document.getElementById('save-memory-btn').addEventListener('click', async () => {
             const captionText = captionInput.value.trim() || "A beautiful uncaptioned moment...";
+            
+            // IMMUTABLE PAYLOAD WITH INJECTED EMOJI CONFIG ARRAY
             const newMemory = {
                 id: Date.now(),
                 image: imgPreview.src,
@@ -436,11 +494,13 @@
                 tags: ["✨ Polaroid"],
                 date: "11 July 2026",
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                skin: activeSkinClass
+                skin: activeSkinClass,
+                stickers: stickersArray // <--- YEH DATA CHALA GAYA BASE MEIN PERMANENTLY!
             };
+            
             try {
                 await addMemoryToDB(newMemory);
-                successModal.classList.remove('invisible');
+                successModal.classList.remove('invisible', 'opacity-0');
                 successModal.classList.add('opacity-100');
             } catch (error) { console.error(error); }
         });
