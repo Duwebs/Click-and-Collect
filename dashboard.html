@@ -209,80 +209,97 @@
    
 <div id="pwa-wrapper" class="fixed inset-0 z-[100] opacity-0 pointer-events-none transition-all duration-500 ease-out">
     
-    <!-- Premium Backdrop Grid Layer -->
+    <!-- Ultra Blur Premium Backdrop -->
     <div id="pwa-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-500"></div>
     
-    <!-- 📱 Ultra-Premium Bottom Sheet -->
-    <div id="pwa-bottom-sheet" class="absolute bottom-0 inset-x-0 bg-gradient-to-b from-white via-slate-50 to-white rounded-t-[2.5rem] shadow-[0_-15px_50px_rgba(0,0,0,0.25)] p-6 pb-10 transform translate-y-full text-slate-800 overflow-hidden max-w-md mx-auto" style="transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);">
+    <!-- 📱 Tall Futuristic Bottom Sheet (Slides Higher) -->
+    <div id="pwa-bottom-sheet" class="absolute bottom-0 inset-x-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.3)] p-6 pt-5 pb-10 transform translate-y-full text-slate-800 overflow-hidden max-w-md mx-auto" style="transition: transform 650ms cubic-bezier(0.19, 1, 0.22, 1); min-height: 52vh;">
         
-        <!-- 🌀 1. Animated Background SVG Shapes (Cool Premium Vibe) -->
-        <div class="absolute -top-10 -right-10 w-40 h-40 bg-teal-400/10 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
-        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-rose-400/10 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-delay: 2s;"></div>
-        
-        <div class="absolute inset-0 opacity-[0.06] pointer-events-none mix-blend-overlay animate-float-svg">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full h-full object-cover">
-                <path fill="#4fd1c5" d="M0,160L60,176C120,192,240,224,360,213.3C480,203,600,149,720,144C840,139,960,181,1080,186.7C1200,192,1320,160,1380,144L1440,128L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path>
+        <!-- 🌀 Premium Animated SVG Geometric Graphics (Full Background Cover) -->
+        <div class="absolute inset-0 opacity-[0.08] pointer-events-none animate-bg-mesh">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <defs>
+                    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+                        <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#06b6d4" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
             </svg>
         </div>
-
-        <!-- Sleek Drag Handle Indicator -->
-        <div class="w-14 h-1.5 bg-slate-200/80 rounded-full mx-auto mb-6"></div>
         
-        <!-- 2. Header Section -->
-        <div class="flex items-start justify-between mb-6 relative z-10">
+        <!-- Moving Abstract Liquid Waves -->
+        <div class="absolute inset-x-0 bottom-0 h-48 opacity-[0.12] pointer-events-none mix-blend-multiply animate-wave-float">
+            <svg viewBox="0 0 1440 320" class="w-full h-full object-cover">
+                <path fill="#06b6d4" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,218.7C672,203,768,149,864,128C960,107,1056,117,1152,138.7C1248,160,1344,192,1392,208L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            </svg>
+        </div>
+        
+        <!-- Glow Orbs -->
+        <div class="absolute top-12 left-1/4 w-36 h-36 bg-teal-400/20 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+        <div class="absolute top-24 right-1/4 w-36 h-36 bg-rose-400/15 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-delay: 1.5s;"></div>
+
+        <!-- Sleek Drag Handle -->
+        <div class="w-14 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 relative z-10"></div>
+        
+        <!-- 2. Header Section (Beautiful Name & Icon Stacking) -->
+        <div class="flex items-start justify-between mb-7 relative z-10">
             <div class="flex items-center gap-4">
-                <!-- Glowing Interactive App Icon -->
-                <div class="w-14 h-14 bg-gradient-to-tr from-teal-500 to-emerald-400 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-teal-500/20 ring-4 ring-teal-50/60 transition-transform hover:scale-105 duration-300">
-                    C&amp;C
+                
+                <!-- 📸 Original Camera + Heart Icon Wrapper -->
+                <div class="relative w-14 h-14 bg-gradient-to-tr from-teal-600 to-emerald-400 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-teal-500/20 ring-4 ring-white transition-transform duration-300 hover:scale-105">
+                    <i class="fas fa-camera text-xl text-white"></i>
+                    <!-- Floating Heart Badge -->
+                    <div class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E14D57] rounded-full flex items-center justify-center border-2 border-white shadow-md animate-bounce" style="animation-duration: 3s;">
+                        <i class="fas fa-heart text-[8px] text-white"></i>
+                    </div>
                 </div>
+
+                <!-- 🏷️ Styled Premium Name -->
                 <div>
-                    <h3 class="font-black text-slate-800 text-lg tracking-wide leading-tight">
-                        Click &amp; Collect App
+                    <h3 class="font-black text-slate-800 text-xl tracking-wide leading-tight">
+                        Click <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">&amp;</span> Collect <span class="text-xs font-bold uppercase tracking-widest bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md ml-1 border border-slate-200/60">App</span>
                     </h3>
-                    <p class="text-xs text-slate-400 font-semibold mt-0.5">
+                    <p class="text-[11px] text-slate-400 font-semibold mt-1">
                         Behtar aur seamless experience ke liye install karein
                     </p>
                 </div>
             </div>
             
-            <!-- Modern Styled Close Button -->
+            <!-- Close Button -->
             <button id="close-sheet-btn" class="w-8 h-8 bg-slate-100/80 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90 shadow-sm text-xs">✕</button>
         </div>
 
-        <!-- 3. Premium Glassmorphic Features Grid -->
+        <!-- 3. Glassmorphic Features Grid -->
         <div class="grid grid-cols-3 gap-3 mb-8 relative z-10">
-            <!-- Feature 1 -->
-            <div class="bg-gradient-to-b from-teal-50/50 to-white border border-teal-100/40 p-3.5 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
-                <div class="w-9 h-9 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-500 shadow-inner">
+            <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
+                <div class="w-9 h-9 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-500">
                     <i class="fas fa-bolt text-sm"></i>
                 </div>
                 <span class="text-[11px] font-extrabold text-slate-700">Super Fast</span>
             </div>
-            <!-- Feature 2 -->
-            <div class="bg-gradient-to-b from-emerald-50/50 to-white border border-emerald-100/40 p-3.5 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
-                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-inner">
+            <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                     <i class="fas fa-cloud-sun text-sm"></i>
                 </div>
                 <span class="text-[11px] font-extrabold text-slate-700">Offline Run</span>
             </div>
-            <!-- Feature 3 -->
-            <div class="bg-gradient-to-b from-rose-50/50 to-white border border-rose-100/40 p-3.5 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
-                <div class="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shadow-inner">
+            <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
+                <div class="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
                     <i class="fas fa-shield-alt text-sm"></i>
                 </div>
                 <span class="text-[11px] font-extrabold text-slate-700">100% Secure</span>
             </div>
         </div>
 
-        <!-- 4. Android Action Button Section (Shining Effect Applied) -->
+        <!-- 4. Android Action Button Section (Smooth High-Speed Shine) -->
         <div id="android-action" class="hidden relative z-10">
-            <button id="action-install-btn" class="animate-shine-effect w-full bg-gradient-to-r from-[#E14D57] to-[#f0626d] hover:brightness-105 text-white font-black py-4 rounded-2xl text-xs shadow-xl shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
+            <button id="action-install-btn" class="gpu-shine w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-4 rounded-2xl text-xs shadow-xl shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
                 Install App Now
             </button>
         </div>
 
         <!-- 5. iOS Instructions Layer -->
-        <div id="ios-action" class="hidden bg-slate-100/60 border border-slate-200/50 p-4 rounded-2xl flex items-start gap-3 relative z-10 backdrop-blur-sm shadow-sm">
+        <div id="ios-action" class="hidden bg-white/80 border border-slate-200/60 p-4 rounded-2xl flex items-start gap-3 relative z-10 backdrop-blur-md shadow-sm">
             <span class="text-lg mt-0.5 animate-bounce">💡</span>
             <p class="text-[11px] text-slate-500 font-semibold leading-relaxed">
                 iPhone par install karne ke liye niche browser dashboard par <span class="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">Share icon <i class="text-xs far fa-share-square"></i></span> par click karein aur phir <span class="font-bold text-slate-800 bg-slate-200/50 px-1.5 py-0.5 rounded-md">"Add to Home Screen"</span> chunein.
@@ -290,30 +307,41 @@
         </div>
     </div>
 
-    <!-- 💎 6. Advanced Micro-Animations (Shine & Floating Wave Code) -->
+    <!-- 💎 Hardware Accelerated Smooth Animations -->
     <style>
-        @keyframes custom-shine {
-            0% { transform: translateX(-150%) rotate(45deg); }
-            40%, 100% { transform: translateX(250%) rotate(45deg); }
+        /* ⚡ Non-Laggy Smooth Shine Formula */
+        @keyframes fast-hardware-shine {
+            0% { transform: translateX(-150%) skewX(-30deg); }
+            40% { transform: translateX(200%) skewX(-30deg); }
+            100% { transform: translateX(200%) skewX(-30deg); }
         }
-        .animate-shine-effect::after {
+        .gpu-shine::after {
             content: '';
             position: absolute;
-            top: -100%; left: -60%; width: 40%; height: 300%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
-            transform: rotate(45deg);
-            animation: custom-shine 3.5s infinite ease-in-out;
+            top: 0; left: 0; width: 40%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+            transform: skewX(-30deg);
+            will-change: transform;
+            animation: fast-hardware-shine 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
-        @keyframes slow-wave {
+        
+        /* 🌀 Graphic Floating Animations */
+        @keyframes mesh-drift {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.03) translateY(-4px); }
+        }
+        .animate-bg-mesh {
+            animation: mesh-drift 10s infinite ease-in-out;
+        }
+        @keyframes liquid-wave {
             0%, 100% { transform: translateY(0) scaleY(1); }
-            50% { transform: translateY(-8px) scaleY(1.05); }
+            50% { transform: translateY(-6px) scaleY(1.03); }
         }
-        .animate-float-svg {
-            animation: slow-wave 8s infinite ease-in-out;
+        .animate-wave-float {
+            animation: liquid-wave 6s infinite ease-in-out;
         }
     </style>
 </div>
-
    
    <!----pwa html code ending-->
     <script>
