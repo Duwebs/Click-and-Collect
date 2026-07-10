@@ -1,7 +1,7 @@
 {
  "name": "Click & Collect",
  "short_name": "C&C",
- "start_url": "dashboard.html", 
+ "start_url": "/dashboard.html", 
  "display": "standalone",
  "background_color": "#4fd1c5",
  "theme_color": "#4fd1c5",
