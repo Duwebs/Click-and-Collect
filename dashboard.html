@@ -533,43 +533,55 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // 🏷️ CURRENT APP VERSION: Jab bhi future mein koi naya feature lao, bas ye number badal dena (Jaise '3.0')
-        const DEPLOYED_APP_VERSION = '4.0'; 
+        // 🏷️ CURRENT APP VERSION
+        const DEPLOYED_APP_VERSION = '3.0'; 
         
         const wrapper = document.getElementById('update-modal-wrapper');
         const modalBox = document.getElementById('update-modal-box');
         const closeBtn = document.getElementById('close-update-modal-btn');
         
-        // Browser ki memory se purana saved version check karo
-        const savedUserVersion = localStorage.getItem('app_last_seen_version');
+        // Browser ki memory check karo
+        let savedUserVersion = localStorage.getItem('app_last_seen_version');
+        
+        console.log("=== PWA Debugger ===");
+        console.log("App current version:", DEPLOYED_APP_VERSION);
+        console.log("Browser saved version:", savedUserVersion);
 
-        // 🚀 ACTUALLY PRODUCTION LOGIC STARTS HERE
+        // 🚀 SAFE CHECK
         if (!savedUserVersion) {
-            // ❌ CASE 1: Ekdum Naya User aaya hai!
-            // Isko pareshan nahi karna hai, bas memory mein current version set karke chhod do
+            // Agar bilkul naya user hai: version save karo (popup nahi dikhega)
+            console.log("Result: Naya User hai. Version save ho gaya.");
             localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
         } 
         else if (savedUserVersion !== DEPLOYED_APP_VERSION) {
-            //  CASE 2: Purana User aaya hai AUR tumne naya update live kiya hai!
-            // Isko popup smoothly screen par dikhao
+            // Purana user + Naya version = POPUP DIKHAO!
+            console.log("Result: Purana user + Naya update mila! Popup khul raha hai...");
+            
             setTimeout(() => {
-                wrapper.classList.remove('opacity-0', 'pointer-events-none');
-                modalBox.classList.remove('scale-90', 'opacity-0');
-                modalBox.classList.add('scale-100', 'opacity-100');
-            }, 1200); // Dashboard khulne ke 1.2s baad smooth pop hoga
+                if(wrapper && modalBox) {
+                    wrapper.classList.remove('opacity-0', 'pointer-events-none');
+                    modalBox.classList.remove('scale-90', 'opacity-0');
+                    modalBox.classList.add('scale-100', 'opacity-100');
+                } else {
+                    console.error("Error: HTML IDs check karo, wrapper ya modalBox nahi mila!");
+                }
+            }, 1000);
+        } else {
+            console.log("Result: User pehle se isi version par hai. No popup.");
         }
 
-        // ⚡ Action Trigger: User clicks "Awesome, Got It!"
-        closeBtn.addEventListener('click', function () {
-            // Smoothly hide animation lagao
-            modalBox.classList.remove('scale-100', 'opacity-100');
-            modalBox.classList.add('scale-90', 'opacity-0');
-            wrapper.classList.add('opacity-0', 'pointer-events-none');
-            
-            // 🔥 SABSE IMPORTANT: Click karte hi user ka version update kar do 
-            // Ab browser ko pata chal gaya ki isne dekh liya hai, toh baar-baar nahi dikhayega!
-            localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
-        });
+        // ⚡ Close button action
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function () {
+                modalBox.classList.remove('scale-100', 'opacity-100');
+                modalBox.classList.add('scale-90', 'opacity-0');
+                wrapper.classList.add('opacity-0', 'pointer-events-none');
+                
+                // Click hote hi memory lock
+                localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+                console.log("Popup closed. New version locked in storage:", DEPLOYED_APP_VERSION);
+            });
+        }
     });
 </script>
 
