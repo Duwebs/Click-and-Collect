@@ -1,56 +1,77 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C&C - Secure Join</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="h-full bg-slate-900 text-white p-6">
 
+<body class="h-full bg-slate-900 text-white p-6">
     <div class="max-w-sm mx-auto space-y-6">
         <h1 class="text-xl font-black uppercase tracking-widest text-rose-400">Secure Join</h1>
+        <div id="reader" class="w-full bg-black rounded-3xl overflow-hidden border-2 border-white/10" style="min-height: 300px;"></div>
         
-        <div id="reader" class="w-full bg-black rounded-3xl overflow-hidden border-2 border-white/10"></div>
-
         <div class="bg-white/5 p-6 rounded-3xl border border-white/10">
-            <p class="text-[10px] text-slate-400 font-bold uppercase mb-2">Enter Host's PIN</p>
-            <input type="number" id="pin-input" placeholder="0000" class="w-full bg-transparent text-center text-3xl font-black tracking-[0.5em] outline-none placeholder:text-white/20">
-            <button onclick="verifyAndConnect()" class="w-full mt-4 bg-rose-500 py-3 rounded-xl font-bold uppercase text-xs shadow-lg shadow-rose-500/20 active:scale-95 transition">Connect Now</button>
+            <input type="number" id="pin-input" placeholder="Enter PIN" class="w-full bg-transparent text-center text-3xl font-black tracking-[0.5em] outline-none">
+            <button id="connect-btn" class="w-full mt-4 bg-rose-500 py-3 rounded-xl font-bold uppercase text-xs">Connect Now</button>
         </div>
     </div>
-
-    <script>
-        // Scanner Setup
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { Html5Qrcode } from "https://unpkg.com/html5-qrcode";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI",
+            authDomain: "clickandcollect-6c5d4.firebaseapp.com",
+            databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "clickandcollect-6c5d4",
+            storageBucket: "clickandcollect-6c5d4.firebasestorage.app",
+            messagingSenderId: "739076323619",
+            appId: "1:739076323619:web:9f75d0012923c0b44bb496",
+            measurementId: "G-8V0CJ0ZJVM"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        // Scanner initialize
         const html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
+        
+        // Camera start karne ka function
+        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
             (decodedText) => {
-                // QR scan hone par verify karo
+                html5QrCode.stop();
                 verifyAndConnect(decodedText);
-            });
-
-        function verifyAndConnect(scannedPin = null) {
-            const inputPin = scannedPin || document.getElementById('pin-input').value;
-            const hostPin = localStorage.getItem('cc_room_pin');
-
-            // SECURITY GATE: Sirf match hone par hi connection allow karo
-            if (inputPin === hostPin) {
-                if (navigator.vibrate) navigator.vibrate(200);
-                
-                // Connection Successful Signal
-                localStorage.setItem('cc_connected', 'true');
-                
-                // Success feedback
-                alert("Connected to Host!");
+            },
+            (errorMessage) => {
+                // Scan error ko ignore karo (ye normal hai jab scan na ho raha ho)
+            }
+        ).catch(err => {
+            alert("Camera access block hai! Settings mein jaakar permission do.");
+        });
+        
+        async function verifyAndConnect(pin) {
+            const roomRef = ref(db, 'rooms/' + pin);
+            const snapshot = await get(roomRef);
+            if (snapshot.exists()) {
+                await update(roomRef, { status: 'connected' });
                 window.location.href = 'capture.html';
             } else {
-                alert("❌ Galat PIN ya Invalid QR Code!");
-                html5QrCode.stop(); // Scanner roko
-                location.reload(); // Reset
+                alert("Invalid PIN!");
+                location.reload();
             }
         }
+        
+        document.getElementById('connect-btn').onclick = () => {
+            const pin = document.getElementById('pin-input').value;
+            verifyAndConnect(pin);
+        };
     </script>
 </body>
+
 </html>

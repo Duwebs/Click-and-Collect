@@ -33,35 +33,41 @@
         <h1 class="text-3xl font-black mt-6 tracking-widest uppercase">Linked!</h1>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        // Firebase Config
+        const firebaseConfig = {
+          apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI",
+          authDomain: "clickandcollect-6c5d4.firebaseapp.com",
+          databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "clickandcollect-6c5d4",
+          storageBucket: "clickandcollect-6c5d4.firebasestorage.app",
+          messagingSenderId: "739076323619",
+          appId: "1:739076323619:web:9f75d0012923c0b44bb496",
+          measurementId: "G-8V0CJ0ZJVM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
         const pin = Math.floor(1000 + Math.random() * 9000).toString();
         document.getElementById('generated-pin').textContent = pin;
-
-        // Init LocalStorage Flags
-        localStorage.setItem('cc_room_pin', pin);
-        localStorage.setItem('cc_connected', 'false');
-
-        // Generate QR
         new QRCode(document.getElementById("qrcode"), { text: pin, width: 200, height: 200 });
 
-        // Polling logic: Check if guest connected
-        const checkInterval = setInterval(() => {
-            if(localStorage.getItem('cc_connected') === 'true') {
-                clearInterval(checkInterval);
-                showSuccess();
-            }
-        }, 1000);
+        // Firebase par room banao
+        set(ref(db, 'rooms/' + pin), { status: 'waiting' });
 
-        function showSuccess() {
-            document.getElementById('wait-screen').classList.add('hidden');
-            document.getElementById('success-screen').classList.remove('hidden');
-            if (navigator.vibrate) navigator.vibrate(500);
-            
-            // Redirect after animation
-            setTimeout(() => {
-                window.location.href = 'capture.html';
-            }, 2500);
-        }
+        // Real-time listener: Guest ka wait karo
+        onValue(ref(db, 'rooms/' + pin + '/status'), (snapshot) => {
+            if (snapshot.val() === 'connected') {
+                document.getElementById('wait-screen').classList.add('hidden');
+                document.getElementById('success-screen').classList.remove('hidden');
+                if (navigator.vibrate) navigator.vibrate(500);
+                setTimeout(() => window.location.href = 'capture.html', 2000);
+            }
+        });
     </script>
 </body>
 </html>
