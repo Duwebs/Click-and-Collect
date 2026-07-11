@@ -23,7 +23,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-        import { Html5Qrcode } from "https://unpkg.com/html5-qrcode";
         
         const firebaseConfig = {
             apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI",
@@ -35,42 +34,42 @@
             appId: "1:739076323619:web:9f75d0012923c0b44bb496",
             measurementId: "G-8V0CJ0ZJVM"
         };
-        
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        // Scanner initialize
-        const html5QrCode = new Html5Qrcode("reader");
-        
-        // Camera start karne ka function
-        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
-            (decodedText) => {
-                html5QrCode.stop();
-                verifyAndConnect(decodedText);
-            },
-            (errorMessage) => {
-                // Scan error ko ignore karo (ye normal hai jab scan na ho raha ho)
-            }
-        ).catch(err => {
-            alert("Camera access block hai! Settings mein jaakar permission do.");
-        });
-        
-        async function verifyAndConnect(pin) {
-            const roomRef = ref(db, 'rooms/' + pin);
+        // Global function banaya taaki button click access kar sake
+        window.verifyAndConnect = async function(pin) {
+            const inputPin = pin || document.getElementById('pin-input').value;
+            if (!inputPin) { alert("PIN daalo!"); return; }
+            
+            const roomRef = ref(db, 'rooms/' + inputPin);
             const snapshot = await get(roomRef);
+            
             if (snapshot.exists()) {
                 await update(roomRef, { status: 'connected' });
                 window.location.href = 'capture.html';
             } else {
-                alert("Invalid PIN!");
-                location.reload();
+                alert("❌ Galat PIN!");
             }
         }
         
-        document.getElementById('connect-btn').onclick = () => {
-            const pin = document.getElementById('pin-input').value;
-            verifyAndConnect(pin);
-        };
+        document.getElementById('connect-btn').addEventListener('click', () => window.verifyAndConnect());
+    </script>
+    
+    <script>
+        function startScanner() {
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    html5QrCode.stop();
+                    window.verifyAndConnect(decodedText);
+                }
+            ).catch(err => {
+                console.log("Camera error:", err);
+            });
+        }
+        // Page load hote hi camera start
+        window.onload = startScanner;
     </script>
 </body>
 
