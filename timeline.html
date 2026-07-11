@@ -2,109 +2,101 @@
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>C&C - Memories Timeline</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C&C - Memories Feed</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .premium-bg { background: radial-gradient(circle at center, #4fd1c5 0%, #36a39b 70%, #2c8a83 100%); }
-        .content-card-curve { border-top-left-radius: 32px; border-top-right-radius: 32px; }
-        .scrollbar-none::-webkit-scrollbar { display: none; }
-        .timeline-line::before { content: ''; position: absolute; left: 23px; top: 24px; bottom: 24px; width: 2px; background: linear-gradient(to bottom, rgba(79, 209, 197, 0.4) 0%, rgba(226, 232, 240, 0.6) 80%); z-index: 0; }
-        .hide-line::before { display: none !important; }
-        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+        .gradient-bg { background: linear-gradient(135deg, #f0fdfa 0%, #fdf2f8 100%); }
+        .card-glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .timeline-line::before { content: ''; position: absolute; left: 24px; top: 20px; bottom: 20px; width: 2px; background: #e2e8f0; }
+        .btn-active { background: linear-gradient(135deg, #0d9488 0%, #e11d48 100%) !important; color: white !important; }
+        #lightbox { display: none; }
+        #lightbox.active { display: flex; }
     </style>
 </head>
-<body class="h-full flex flex-col overflow-hidden bg-teal-800 text-white">
+<body class="h-full gradient-bg text-slate-800 flex flex-col">
 
-    <header class="h-14 flex items-center justify-between px-4 shrink-0 z-10">
-        <a href="dashboard.html" class="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/20 active:scale-90 transition">
-            <i class="fas fa-arrow-left text-sm"></i>
-        </a>
-        <span class="text-xl font-bold uppercase tracking-wide">C & C Feed</span>
-        <div class="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center text-xs font-black border border-white/20">
-            <span id="total-count">0</span>
-        </div>
+    <header class="p-6 flex items-center justify-between">
+        <a href="dashboard.html" class="p-3 bg-white shadow-lg rounded-2xl text-teal-600"><i class="fas fa-arrow-left"></i></a>
+        <h1 class="text-lg font-black uppercase tracking-widest text-teal-800">C & C Feed</h1>
+        <div class="w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center font-black shadow-lg shadow-rose-500/20" id="total-count">0</div>
     </header>
 
-    <main id="main-feed-area" class="flex-1 bg-slate-50 text-slate-800 content-card-curve overflow-y-auto p-5 pb-12 relative timeline-line">
-        <div class="flex items-center justify-between mb-6 bg-slate-200/60 p-1 rounded-2xl max-w-xs mx-auto sticky top-0 z-20">
-            <button id="switch-timeline-view" class="flex-1 text-[11px] py-2.5 rounded-xl font-black uppercase bg-white text-teal-600 shadow-sm flex items-center justify-center gap-2">
-                <i class="fas fa-stream text-xs"></i> Timeline
-            </button>
-            <button id="switch-grid-view" class="flex-1 text-[11px] py-2.5 rounded-xl font-black uppercase text-slate-400 flex items-center justify-center gap-2">
-                <i class="fas fa-th-large text-xs"></i> Gallery
-            </button>
+    <main class="flex-1 overflow-y-auto px-6 pb-20 scrollbar-none">
+        <div class="flex p-1 bg-white shadow-inner rounded-2xl mb-8 border border-slate-100">
+            <button id="tl-btn" class="btn-active flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all">Timeline</button>
+            <button id="gl-btn" class="flex-1 py-3 rounded-xl font-black text-xs uppercase text-slate-400 transition-all">Gallery</button>
         </div>
 
-        <div id="timeline-feed-wrapper" class="space-y-6 relative z-10"><div id="timeline-group-container"></div></div>
-        <div id="gallery-grid-wrapper" class="grid grid-cols-2 gap-4 hidden z-10"></div>
+        <div id="timeline-box" class="timeline-line space-y-8"></div>
+        <div id="gallery-box" class="grid grid-cols-2 gap-3 hidden"></div>
     </main>
 
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4" onclick="this.classList.remove('active')">
+        <img id="lb-img" src="" class="max-w-full max-h-[85vh] rounded-3xl object-contain border-4 border-white shadow-2xl">
+    </div>
+
     <script>
-        // Init DB
-        function initDB() {
-            return new Promise((resolve) => {
-                const request = indexedDB.open('CC_Memories_DB', 1);
-                request.onsuccess = (e) => resolve(e.target.result);
+        async function render() {
+            const db = await new Promise(r => { const req = indexedDB.open('CC_Memories_DB', 1); req.onsuccess = () => r(req.result); });
+            const tx = db.transaction('memories', 'readonly');
+            let data = await new Promise(r => { const req = tx.objectStore('memories').getAll(); req.onsuccess = () => r(req.result); });
+            
+            // Check for shared memory from friend
+            const shared = localStorage.getItem('latest_shared_memory');
+            if(shared) {
+                const sMem = JSON.parse(shared);
+                if(!data.find(m => m.id === sMem.id)) data.push(sMem);
+            }
+            
+            data.sort((a,b) => b.id - a.id);
+            document.getElementById('total-count').textContent = data.length;
+            
+            const groups = {};
+            data.forEach(m => {
+                const date = new Date(m.id).toDateString();
+                const label = date === new Date().toDateString() ? "Today" : date;
+                if (!groups[label]) groups[label] = [];
+                groups[label].push(m);
             });
-        }
 
-        async function getAllMemoriesFromDB() {
-            const db = await initDB();
-            return new Promise((resolve) => {
-                const tx = db.transaction('memories', 'readonly');
-                const store = tx.objectStore('memories');
-                const req = store.getAll();
-                req.onsuccess = () => resolve(req.result.sort((a,b) => b.id - a.id));
-            });
-        }
-
-        async function renderAllLayouts() {
-            const groupContainer = document.getElementById('timeline-group-container');
-            const gridWrapper = document.getElementById('gallery-grid-wrapper');
-            globalMemoriesCache = await getAllMemoriesFromDB();
-            document.getElementById('total-count').textContent = globalMemoriesCache.length;
-
-            groupContainer.innerHTML = ''; gridWrapper.innerHTML = '';
-
-            globalMemoriesCache.forEach(m => {
-                const tag = m.tag || 'Memory';
-                const badgeColor = tag === 'Both' ? 'bg-rose-500' : tag === 'Friend' ? 'bg-purple-500' : 'bg-teal-500';
+            const tlBox = document.getElementById('timeline-box');
+            const glBox = document.getElementById('gallery-box');
+            tlBox.innerHTML = ''; glBox.innerHTML = '';
+            
+            Object.entries(groups).forEach(([date, mems]) => {
+                tlBox.innerHTML += `<div class="relative pl-10">
+                    <div class="absolute left-[20px] top-1 w-2 h-2 bg-rose-500 rounded-full"></div>
+                    <div class="text-[10px] font-black text-teal-600 mb-4 uppercase tracking-widest">${date}</div>
+                    <div class="space-y-4">` + mems.map(m => `
+                        <div class="card-glass p-2 rounded-2xl shadow-sm transition active:scale-95 relative" onclick="openLB('${m.image}')">
+                            <div class="absolute z-10 top-4 right-4 bg-black/50 backdrop-blur-md text-white text-[9px] px-2 py-1 rounded-lg font-bold">${m.time || '--:--'}</div>
+                            <img src="${m.image}" class="w-full aspect-[4/3] rounded-xl object-cover">
+                        </div>`).join('') + `</div></div>`;
                 
-                // Grid View
-                gridWrapper.innerHTML += `
-                    <div class="bg-white p-2 border rounded-2xl flex flex-col">
-                        <div class="absolute z-10 ${badgeColor} text-white font-black text-[8px] px-2 py-0.5 rounded-lg m-2">${tag}</div>
-                        <img src="${m.image}" class="aspect-square rounded-xl object-cover">
-                    </div>`;
-
-                // Timeline View
-                groupContainer.innerHTML += `
-                    <div class="bg-white rounded-2xl p-3.5 shadow-sm border space-y-3">
-                        <div class="relative rounded-xl overflow-hidden">
-                            <img src="${m.image}" class="w-full aspect-[4/3] object-cover">
-                            <div class="absolute top-2.5 left-2.5 ${badgeColor} text-white text-[9px] px-3 py-1 rounded-full font-black uppercase tracking-widest z-10">${tag}</div>
-                        </div>
-                    </div>`;
+                mems.forEach(m => glBox.innerHTML += `<img src="${m.image}" onclick="openLB('${m.image}')" class="aspect-square rounded-2xl object-cover shadow-md">`);
             });
         }
 
-        // Switching View Logic
-        document.getElementById('switch-grid-view').addEventListener('click', (e) => {
-            document.getElementById('timeline-feed-wrapper').classList.add('hidden');
-            document.getElementById('gallery-grid-wrapper').classList.remove('hidden');
-        });
-        document.getElementById('switch-timeline-view').addEventListener('click', (e) => {
-            document.getElementById('timeline-feed-wrapper').classList.remove('hidden');
-            document.getElementById('gallery-grid-wrapper').classList.add('hidden');
-        });
+        function openLB(src) { document.getElementById('lb-img').src = src; document.getElementById('lightbox').classList.add('active'); }
 
-        renderAllLayouts();
+        document.getElementById('tl-btn').onclick = function() {
+            document.getElementById('timeline-box').classList.remove('hidden');
+            document.getElementById('gallery-box').classList.add('hidden');
+            this.classList.add('btn-active');
+            document.getElementById('gl-btn').classList.remove('btn-active');
+        };
+        
+        document.getElementById('gl-btn').onclick = function() {
+            document.getElementById('timeline-box').classList.add('hidden');
+            document.getElementById('gallery-box').classList.remove('hidden');
+            this.classList.add('btn-active');
+            document.getElementById('tl-btn').classList.remove('btn-active');
+        };
+
+        render();
     </script>
 </body>
 </html>
