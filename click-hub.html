@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C&C - Click with Friend Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .moving-bg {
+            background: linear-gradient(-45deg, #2c8a83, #36a39b, #4fd1c5, #e64d5c, #b8323d);
+            background-size: 400% 400%;
+            animation: gradientMove 12s ease infinite;
+        }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="h-full moving-bg flex flex-col p-6 text-white overflow-hidden">
+    
+    <a href="dashboard.html" class="w-10 h-10 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/20 mb-6 active:scale-90 transition">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="flex-1 flex flex-col justify-center items-center text-center space-y-8">
+        <h1 class="text-3xl font-black uppercase tracking-widest">Select Mode</h1>
+        
+        <button onclick="window.location.href='create.html'" class="w-full glass-card p-6 rounded-3xl text-left active:scale-[0.98] transition">
+            <div class="flex items-center gap-4">
+                <div class="bg-teal-500 w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg">Create Room</h2>
+                    <p class="text-white/70 text-xs">Host bano, PIN aur QR generate karo</p>
+                </div>
+            </div>
+        </button>
+
+        <button onclick="window.location.href='join.html'" class="w-full glass-card p-6 rounded-3xl text-left active:scale-[0.98] transition">
+            <div class="flex items-center gap-4">
+                <div class="bg-rose-500 w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg">Join Room</h2>
+                    <p class="text-white/70 text-xs">PIN enter karo ya QR scan karo</p>
+                </div>
+            </div>
+        </button>
+    </div>
+</body>
+</html>
