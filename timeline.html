@@ -46,6 +46,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const pin = sessionStorage.getItem('cc_room_pin');
+        const myUserId = sessionStorage.getItem('cc_user_id');
 
         async function loadAllMemories() {
             // 1. Fetch Local Data
@@ -62,13 +63,35 @@
             if (pin) {
                 onValue(ref(db, 'rooms/' + pin + '/memories'), (snapshot) => {
                     const cloudData = snapshot.val();
-                    let allData = [...localData];
+                    let memoryMap = new Map();
+
+                    // Pehle local data map mein daalo
+                    localData.forEach(m => {
+                        memoryMap.set(m.id, { image: m.image, time: m.time, id: m.id, tag: m.tag, sender: m.sender });
+                    });
+
+                    // Phir cloud data daalo (taaki duplicates remove ho sakein)
                     if (cloudData) {
                         Object.values(cloudData).forEach(m => {
-                            allData.push({ image: m.url, time: m.time, id: m.timestamp });
+                            memoryMap.set(m.timestamp, { image: m.url, time: m.time, id: m.timestamp, tag: m.tag, sender: m.sender });
                         });
                     }
-                    renderGallery(allData);
+
+                    // Smart Filter Logic based on choice
+                    let finalFilteredData = Array.from(memoryMap.values()).filter(m => {
+                        if (m.tag === 'Me') {
+                            return m.sender === myUserId; // Sirf bhejney wale ko dikhe
+                        }
+                        if (m.tag === 'Friend') {
+                            return m.sender !== myUserId; // Sirf samne wale dost ko dikhe, bhejney wale ko nahi!
+                        }
+                        if (m.tag === 'Both') {
+                            return true; // Dono ko dikhe
+                        }
+                        return true;
+                    });
+
+                    renderGallery(finalFilteredData);
                 });
             } else {
                 renderGallery(localData);

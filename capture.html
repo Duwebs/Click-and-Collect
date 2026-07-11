@@ -42,25 +42,42 @@
         const db = getDatabase(app);
         const pin = sessionStorage.getItem('cc_room_pin');
 
+        // Har browser/user ke liye unique ID generate karo agar nahi hai toh
+        if (!sessionStorage.getItem('cc_user_id')) {
+            sessionStorage.setItem('cc_user_id', 'user_' + Math.random().toString(36).substr(2, 9));
+        }
+        const myUserId = sessionStorage.getItem('cc_user_id');
+
         window.finalize = async function(choice) {
             const sessionMemories = window.sessionMemories;
-            
-            // 1. Direct Cloud Sync in Database (No Storage needed)
-            for (let m of sessionMemories) {
-                push(ref(db, 'rooms/' + pin + '/memories'), {
-                    url: m.image, // Base64 string
-                    tag: choice,
-                    time: m.time,
-                    timestamp: Date.now()
-                });
-            }
-
-            // 2. Local Save (IndexedDB)
             const dbRequest = indexedDB.open('CC_Memories_DB', 1);
+            
             dbRequest.onupgradeneeded = (e) => e.target.result.createObjectStore('memories', { keyPath: 'id' });
-            dbRequest.onsuccess = (e) => {
+            
+            dbRequest.onsuccess = async (e) => {
                 const store = e.target.result.transaction('memories', 'readwrite').objectStore('memories');
-                sessionMemories.forEach(m => store.add({ id: Date.now(), image: m.image, time: m.time, tag: choice }));
+                
+                for (let m of sessionMemories) {
+                    const uniqueTimestamp = Date.now() + Math.floor(Math.random() * 1000);
+                    
+                    // 1. Cloud Sync with Sender ID
+                    push(ref(db, 'rooms/' + pin + '/memories'), {
+                        url: m.image,
+                        tag: choice,
+                        time: m.time,
+                        timestamp: uniqueTimestamp,
+                        sender: myUserId
+                    });
+
+                    // 2. Local Save with Sender ID
+                    store.add({ 
+                        id: uniqueTimestamp, 
+                        image: m.image, 
+                        time: m.time, 
+                        tag: choice,
+                        sender: myUserId 
+                    });
+                }
                 window.location.href = 'timeline.html';
             };
         };
