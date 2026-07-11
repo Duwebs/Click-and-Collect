@@ -72,6 +72,21 @@
         .animate-fade-hero { animation: sceneReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1.05s both; }
         .animate-fade-content { animation: layoutSlideUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 1.15s both; }
         .animate-heart { animation: heartbeat 1.6s infinite ease-in-out; }
+        
+        @keyframes horizontalScroll {
+    0% {
+        background-position-x: 0;
+    }
+    100% {
+        background-position-x: 1000px; /* Isse image Left se Right jayegi */
+    }
+}
+
+.animate-bg-scroll {
+    /* 30s matlab speed. Isko kam karoge (jaise 15s) toh tez chalega, badhaoge toh slow chalega */
+    animation: horizontalScroll 35s linear infinite; 
+}
+
     </style>
 </head>
 <body class="h-full max-h-screen flex flex-col overflow-hidden select-none relative premium-bg text-white">
@@ -216,19 +231,23 @@
     <div id="pwa-bottom-sheet" class="absolute bottom-0 inset-x-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.3)] p-6 pt-5 pb-10 transform translate-y-full text-slate-800 overflow-hidden max-w-md mx-auto" style="transition: transform 650ms cubic-bezier(0.19, 1, 0.22, 1); min-height: 52vh;">
         <!--Install Card Bg-->
         
-<div class="absolute inset-0 opacity-[0.08] pointer-events-none overflow-hidden z-0">
-    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+<div class="absolute inset-0 opacity-[0.06] pointer-events-none overflow-hidden z-0">
+    
+    <div class="absolute inset-0 animate-bg-scroll" 
+         style="background-image: url('/assets/InstallGraphic.png'); background-repeat: repeat-x; background-size: auto 60%; background-position: center;">
+    </div>
+    
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" class="absolute inset-0">
         <defs>
             <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
-                <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#06b6d4" stroke-width="1"/>
+                <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#06b6d4" stroke-width="0.5"/>
             </pattern>
         </defs>
-        
-        <image href="/assets/InstallGraphic.png" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
-        
         <rect width="100%" height="100%" fill="url(#grid)" />
     </svg>
 </div>
+
+<!--Install card bg end--->
 
         <!-- Moving Abstract Liquid Waves -->
         <div class="absolute inset-x-0 bottom-0 h-48 opacity-[0.12] pointer-events-none mix-blend-multiply animate-wave-float">
