@@ -233,41 +233,42 @@
     <div id="pwa-bottom-sheet" class="absolute bottom-0 inset-x-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.3)] p-6 pt-5 pb-10 transform translate-y-full text-slate-800 overflow-hidden max-w-md mx-auto" style="transition: transform 650ms cubic-bezier(0.19, 1, 0.22, 1); min-height: 52vh;">
         <!--Install Card Bg-->
         
-<!-- 🎨 Background Graphics Layers Start -->
-<div class="absolute inset-0 opacity-[0.05] pointer-events-none overflow-hidden z-0">
-    <div class="absolute inset-0 animate-bg-scroll" 
-         style="background-image: url('/assets/InstallGraphic.png'); background-repeat: repeat-x; background-size: auto 100%; background-position: center;">
-    </div>
-    
-    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" class="absolute inset-0">
+<div class="absolute inset-0 opacity-[0.08] pointer-events-none overflow-hidden z-0">
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" class="animate-bg-mesh">
         <defs>
             <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
-                <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#06b6d4" stroke-width="0.5"/>
+                <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#06b6d4" stroke-width="1"/>
             </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#grid)" />
     </svg>
 </div>
-<!-- Install card bg end --->
 
-<!-- Moving Abstract Liquid Waves -->
-<div class="absolute inset-x-0 bottom-0 h-48 opacity-[0.12] pointer-events-none mix-blend-multiply animate-wave-float">
-    <svg viewBox="0 0 1440 320" class="w-full h-full object-cover">
-        <path fill="#06b6d4" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,218.7C672,203,768,149,864,128C960,107,1056,117,1152,138.7C1248,160,1344,192,1392,208L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-    </svg>
-</div>
 
-<!-- Glow Orbs -->
-<div class="absolute top-12 left-1/4 w-36 h-36 bg-teal-400/20 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
-<div class="absolute top-24 right-1/4 w-36 h-36 bg-rose-400/15 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-delay: 1.5s;"></div>
+<!--Install card bg end--->
 
-<!-- 1. Sleek Drag Handle -->
-<div class="w-14 h-1.5 bg-slate-200 rounded-full mx-auto mb-5 relative z-10"></div>
+        <!-- Moving Abstract Liquid Waves -->
+        <div class="absolute inset-x-0 bottom-0 h-48 opacity-[0.12] pointer-events-none mix-blend-multiply animate-wave-float">
+            <svg viewBox="0 0 1440 320" class="w-full h-full object-cover">
+                <path fill="#06b6d4" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,218.7C672,203,768,149,864,128C960,107,1056,117,1152,138.7C1248,160,1344,192,1392,208L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            </svg>
+        </div>
+        
+        <!-- Glow Orbs -->
+        <div class="absolute top-12 left-1/4 w-36 h-36 bg-teal-400/20 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+        <div class="absolute top-24 right-1/4 w-36 h-36 bg-rose-400/15 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-delay: 1.5s;"></div>
 
-<!-- 2. Clean Header Section (Unified Row - No Nesting Bug) -->
-<div class="flex items-start justify-between w-full gap-3 mb-6 relative z-10">
+        <!-- Sleek Drag Handle -->
+        <div class="w-14 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 relative z-10"></div>
+        
+        <!-- 2. Header Section (Beautiful Name & Icon Stacking) -->
+        <div class="flex items-start justify-between mb-7 relative z-10">
+            <div class="flex items-center gap-4">
+                
+<!-- 📸 Bas Itna Hi Code Replace Karo (Sirf Header Section) -->
+<div class="flex items-start justify-between w-full gap-3 mb-4 relative z-50">
     
-    <!-- Camera Box Component (Fixed Size) -->
+    <!-- Camera Box (Fixed size, won't shrink) -->
     <div class="animate-camera-morph shrink-0 relative">
         <div class="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-[0_8px_24px_rgba(13,148,136,0.14)] border border-slate-100 transition-transform duration-300 hover:scale-105">
             
@@ -286,7 +287,7 @@
         </div>
     </div>
 
-    <!-- 🏷️ Brand Name & Description Block -->
+    <!-- 🏷️ Styled Premium Name & Description -->
     <div class="flex-1 min-w-0 pt-1">
         <h3 class="font-black text-slate-800 text-xl tracking-wide leading-tight flex items-center flex-wrap gap-1.5">
             <span>Click</span> 
@@ -299,82 +300,85 @@
         </p>
     </div>
     
-    <!-- Close Button Component -->
+    <!-- Close Button -->
     <button id="close-sheet-btn" class="w-8 h-8 bg-slate-100/80 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90 shadow-sm text-xs shrink-0 mt-1">✕</button>
+
 </div>
 
-<!-- 3. Glassmorphic Features Grid -->
-<div class="grid grid-cols-3 gap-3 mb-6 relative z-10">
-    <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
-        <div class="w-9 h-9 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-500">
-            <i class="fas fa-bolt text-sm"></i>
+        <!-- 3. Glassmorphic Features Grid -->
+        <div class="grid grid-cols-3 gap-3 mb-8 relative z-10">
+            <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
+                <div class="w-9 h-9 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-500">
+                    <i class="fas fa-bolt text-sm"></i>
+                </div>
+                <span class="text-[11px] font-extrabold text-slate-700">Super Fast</span>
+            </div>
+            <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <i class="fas fa-cloud-sun text-sm"></i>
+                </div>
+                <span class="text-[11px] font-extrabold text-slate-700">Offline Run</span>
+            </div>
+            <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
+                <div class="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
+                    <i class="fas fa-shield-alt text-sm"></i>
+                </div>
+                <span class="text-[11px] font-extrabold text-slate-700">100% Secure</span>
+            </div>
         </div>
-        <span class="text-[11px] font-extrabold text-slate-700">Super Fast</span>
-    </div>
-    <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
-        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-            <i class="fas fa-cloud-sun text-sm"></i>
+
+        <!-- 4. Android Action Button Section (Smooth High-Speed Shine) -->
+        <div id="android-action" class="hidden relative z-10">
+            <button id="action-install-btn" class="gpu-shine w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-4 rounded-2xl text-xs shadow-xl shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
+                Install App Now
+            </button>
         </div>
-        <span class="text-[11px] font-extrabold text-slate-700">Offline Run</span>
-    </div>
-    <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
-        <div class="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
-            <i class="fas fa-shield-alt text-sm"></i>
+
+        <!-- 5. iOS Instructions Layer -->
+        <div id="ios-action" class="hidden bg-white/80 border border-slate-200/60 p-4 rounded-2xl flex items-start gap-3 relative z-10 backdrop-blur-md shadow-sm">
+            <span class="text-lg mt-0.5 animate-bounce">💡</span>
+            <p class="text-[11px] text-slate-500 font-semibold leading-relaxed">
+                iPhone par install karne ke liye niche browser dashboard par <span class="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">Share icon <i class="text-xs far fa-share-square"></i></span> par click karein aur phir <span class="font-bold text-slate-800 bg-slate-200/50 px-1.5 py-0.5 rounded-md">"Add to Home Screen"</span> chunein.
+            </p>
         </div>
-        <span class="text-[11px] font-extrabold text-slate-700">100% Secure</span>
     </div>
+
+    <!-- 💎 Hardware Accelerated Smooth Animations -->
+    <style>
+        /* ⚡ Non-Laggy Smooth Shine Formula */
+        @keyframes fast-hardware-shine {
+            0% { transform: translateX(-150%) skewX(-30deg); }
+            40% { transform: translateX(200%) skewX(-30deg); }
+            100% { transform: translateX(200%) skewX(-30deg); }
+        }
+        .gpu-shine::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 40%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+            transform: skewX(-30deg);
+            will-change: transform;
+            animation: fast-hardware-shine 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 🌀 Graphic Floating Animations */
+        @keyframes mesh-drift {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.03) translateY(-4px); }
+        }
+        .animate-bg-mesh {
+            animation: mesh-drift 10s infinite ease-in-out;
+        }
+        @keyframes liquid-wave {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(-6px) scaleY(1.03); }
+        }
+        .animate-wave-float {
+            animation: liquid-wave 6s infinite ease-in-out;
+        }
+    </style>
 </div>
-
-<!-- 4. Android Action Button Section -->
-<div id="android-action" class="hidden relative z-10">
-    <button id="action-install-btn" class="gpu-shine w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-4 rounded-2xl text-xs shadow-xl shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
-        Install App Now
-    </button>
-</div>
-
-<!-- 5. iOS Instructions Layer -->
-<div id="ios-action" class="hidden bg-white/80 border border-slate-200/60 p-4 rounded-2xl flex items-start gap-3 relative z-10 backdrop-blur-md shadow-sm">
-    <span class="text-lg mt-0.5 animate-bounce">💡</span>
-    <p class="text-[11px] text-slate-500 font-semibold leading-relaxed">
-        iPhone par install karne ke liye niche browser dashboard par <span class="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">Share icon <i class="text-xs far fa-share-square"></i></span> par click karein aur phir <span class="font-bold text-slate-800 bg-slate-200/50 px-1.5 py-0.5 rounded-md">"Add to Home Screen"</span> chunein.
-    </p>
-</div>
-
-<!-- 💎 Animations Style Sheets -->
-<style>
-    /* Hardware Accelerated Smooth Shine Formula */
-    @keyframes fast-hardware-shine {
-        0% { transform: translateX(-150%) skewX(-30deg); }
-        40% { transform: translateX(200%) skewX(-30deg); }
-        100% { transform: translateX(200%) skewX(-30deg); }
-    }
-    .gpu-shine::after {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; width: 40%; height: 100%;
-        background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
-        transform: skewX(-30deg);
-        will-change: transform;
-        animation: fast-hardware-shine 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* Graphic Floating Animations */
-    @keyframes mesh-drift {
-        0%, 100% { transform: scale(1) translateY(0); }
-        50% { transform: scale(1.03) translateY(-4px); }
-    }
-    .animate-bg-mesh {
-        animation: mesh-drift 10s infinite ease-in-out;
-    }
-    @keyframes liquid-wave {
-        0%, 100% { transform: translateY(0) scaleY(1); }
-        50% { transform: translateY(-6px) scaleY(1.03); }
-    }
-    .animate-wave-float {
-        animation: liquid-wave 6s infinite ease-in-out;
-    }
-</style>
-
+   
    <!----pwa html code ending-->
     <script>
         const cameraPicker = document.getElementById('native-camera-picker');
