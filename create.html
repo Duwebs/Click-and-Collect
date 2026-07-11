@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C&C - Host Room</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+    </style>
+</head>
+<body class="h-full gradient-bg flex flex-col items-center p-6 text-white">
+
+    <div class="w-full max-w-sm flex flex-col items-center justify-center flex-1 space-y-6">
+        <h1 class="text-xl font-black uppercase tracking-widest text-teal-400">Scan to Connect</h1>
+        
+        <div id="qrcode" class="bg-white p-4 rounded-3xl shadow-2xl"></div>
+
+        <div class="bg-white/10 w-full py-4 rounded-2xl text-center border border-white/10">
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Or enter this PIN</p>
+            <h2 id="generated-pin" class="text-3xl font-black tracking-[0.2em] text-white">----</h2>
+        </div>
+
+        <div id="status" class="text-teal-400 font-bold text-xs animate-pulse">
+            <i class="fas fa-circle-notch fa-spin"></i> Waiting for partner...
+        </div>
+    </div>
+
+    <script>
+        const pin = Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('generated-pin').textContent = pin;
+
+        // QR Code generate karo (Data mein hum PIN bhej rahe hain)
+        new QRCode(document.getElementById("qrcode"), {
+            text: pin.toString(),
+            width: 200,
+            height: 200,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+        });
+
+        // Connection simulation
+        setTimeout(() => {
+            document.getElementById('status').innerHTML = '<i class="fas fa-check-circle"></i> Connected! Redirecting...';
+            if (navigator.vibrate) navigator.vibrate(200);
+            setTimeout(() => window.location.href = 'capture.html', 1000);
+        }, 5000);
+    </script>
+</body>
+</html>
