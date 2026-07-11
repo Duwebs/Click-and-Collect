@@ -18,9 +18,8 @@
         <p class="text-xs font-black uppercase">Not Connected! Redirecting in 3s...</p>
     </div>
 
-    <div class="absolute bottom-10 left-0 right-0 px-6 space-y-6">
+    <div class="absolute bottom-10 left-0 right-0 px-6 space-y-6 z-40">
         <div id="preview-strip" class="flex gap-3 overflow-x-auto pb-4 scrollbar-none"></div>
-
         <div class="flex justify-between items-center">
             <button onclick="takePhoto()" class="w-20 h-20 bg-white rounded-full border-8 border-white/20 btn-hover transition"></button>
             <button id="collect-btn" onclick="showCollector()" class="hidden bg-teal-500 px-8 py-4 rounded-3xl font-black text-sm btn-hover shadow-xl">COLLECT IT</button>
@@ -38,21 +37,29 @@
         </div>
     </div>
 
-    <script>
-        // 1. Connection Check
-        const isConnected = localStorage.getItem('cc_connected');
-        console.log("Connection status:", isConnected);
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        if (isConnected !== 'true') {
-            document.getElementById('debug-alert').classList.remove('hidden');
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 3000);
+        const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const pin = sessionStorage.getItem('cc_room_pin');
+
+        // Real-time Connection Check
+        if(pin) {
+            onValue(ref(db, 'rooms/' + pin + '/status'), (snapshot) => {
+                if (snapshot.val() !== 'connected') {
+                    document.getElementById('debug-alert').classList.remove('hidden');
+                    setTimeout(() => window.location.href = 'dashboard.html', 3000);
+                }
+            });
         }
+    </script>
 
-        // 2. Camera & Photo Logic
+    <script>
         let sessionMemories = [];
-
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
@@ -66,37 +73,26 @@
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            
             const img = canvas.toDataURL('image/jpeg');
             sessionMemories.push({ image: img, time: new Date().toLocaleTimeString() });
-            
             document.getElementById('preview-strip').innerHTML += `<img src="${img}" class="w-16 h-16 rounded-2xl border-2 border-white object-cover">`;
             document.getElementById('collect-btn').classList.remove('hidden');
-            if (navigator.vibrate) navigator.vibrate(50);
         }
 
         function showCollector() { document.getElementById('collector-modal').classList.remove('hidden'); }
 
         async function finalize(choice) {
+            // IndexedDB Logic
             const dbRequest = indexedDB.open('CC_Memories_DB', 1);
             dbRequest.onupgradeneeded = (e) => e.target.result.createObjectStore('memories', { keyPath: 'id' });
-            
             dbRequest.onsuccess = (e) => {
                 const db = e.target.result;
                 const tx = db.transaction('memories', 'readwrite');
                 const store = tx.objectStore('memories');
-                
                 sessionMemories.forEach(m => {
-                    store.add({ 
-                        id: Date.now(), 
-                        image: m.image, 
-                        time: m.time, 
-                        tag: choice, 
-                        date: new Date().toLocaleDateString() 
-                    });
+                    store.add({ id: Date.now(), image: m.image, time: m.time, tag: choice, date: new Date().toLocaleDateString() });
                 });
-                
-                alert("Memory Saved as: " + choice);
+                alert("Memory Saved!");
                 window.location.href = 'timeline.html';
             };
         }
