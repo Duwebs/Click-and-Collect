@@ -270,15 +270,22 @@
             <div class="flex items-center gap-4">
                 
                 <!-- 📸 Original Camera + Heart Icon Wrapper -->
-<div class="animate-camera-morph shrink-0">
-    <div class="relative w-14 h-14 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-[0_8px_24px_rgba(0,0,0,0.15)] overflow-hidden transition-transform duration-300 hover:scale-105">
+<!-- 📸 Updated Standalone Camera & Heart Badge Component -->
+<div class="animate-camera-morph shrink-0 relative">
+    <!-- Main Box (Overflow-hidden removed so heart can float outside safely) -->
+    <div class="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-[0_8px_24px_rgba(13,148,136,0.14)] border border-slate-100 transition-transform duration-300 hover:scale-105">
         
-        <i class="fas fa-camera text-xl text-white relative z-10"></i>
+        <!-- ⚡ Shine Effect Wrapper (Only this part is hidden at edges) -->
+        <div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/20 to-transparent -skew-x-12 animate-shine"></div>
+        </div>
         
-        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 animate-shine pointer-events-none"></div>
+        <!-- Camera Icon (Teal Color Fixed) -->
+        <i class="fas fa-camera text-xl text-teal-600 relative z-10"></i>
         
-        <div class="animate-heart absolute -top-1 -right-1 bg-white w-5 h-5 rounded-full flex items-center justify-center shadow-md border border-teal-50/10 z-20">
-            <i class="fas fa-heart text-[9px] text-[#E14D57]"></i>
+        <!-- ❤️ Floating Heart Badge (Perfectly Visible & Pop Design) -->
+        <div class="animate-heart absolute -top-1.5 -right-1.5 bg-[#E14D57] w-5 h-5 rounded-full flex items-center justify-center shadow-md border-2 border-white z-20">
+            <i class="fas fa-heart text-[8px] text-white"></i>
         </div>
     </div>
 </div>
