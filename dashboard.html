@@ -269,42 +269,46 @@
         <div class="flex items-start justify-between mb-7 relative z-10">
             <div class="flex items-center gap-4">
                 
-                <!-- 📸 Original Camera + Heart Icon Wrapper -->
-<!-- 📸 Updated Standalone Camera & Heart Badge Component -->
-<div class="animate-camera-morph shrink-0 relative">
-    <!-- Main Box (Overflow-hidden removed so heart can float outside safely) -->
-    <div class="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-[0_8px_24px_rgba(13,148,136,0.14)] border border-slate-100 transition-transform duration-300 hover:scale-105">
-        
-        <!-- ⚡ Shine Effect Wrapper (Only this part is hidden at edges) -->
-        <div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/20 to-transparent -skew-x-12 animate-shine"></div>
-        </div>
-        
-        <!-- Camera Icon (Teal Color Fixed) -->
-        <i class="fas fa-camera text-xl text-teal-600 relative z-10"></i>
-        
-        <!-- ❤️ Floating Heart Badge (Perfectly Visible & Pop Design) -->
-        <div class="animate-heart absolute -top-1.5 -right-1.5 bg-[#E14D57] w-5 h-5 rounded-full flex items-center justify-center shadow-md border-2 border-white z-20">
-            <i class="fas fa-heart text-[8px] text-white"></i>
-        </div>
-    </div>
-</div>
-
-
-                <!-- 🏷️ Styled Premium Name -->
-                <div>
-                    <h3 class="font-black text-slate-800 text-xl tracking-wide leading-tight">
-                        Click <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">&amp;</span> Collect <span class="text-xs font-bold uppercase tracking-widest bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md ml-1 border border-slate-200/60">App</span>
-                    </h3>
-                    <p class="text-[11px] text-slate-400 font-semibold mt-1">
-                        For Better Smooth and Fast Experience Install Now 
-                    </p>
-                </div>
+<!-- 📱 Consolidated Premium Header (No Overlap & Zero Extra Bottom Space) -->
+<div class="flex items-start justify-between w-full gap-3 p-0 m-0 relative z-50">
+    
+    <!-- 📸 1. Camera Box Container (Shrink-0 prevents text crashing) -->
+    <div class="animate-camera-morph shrink-0 relative">
+        <div class="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-[0_8px_24px_rgba(13,148,136,0.14)] border border-slate-100 transition-transform duration-300 hover:scale-105">
+            
+            <!-- ⚡ Shine Effect Wrapper -->
+            <div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/20 to-transparent -skew-x-12 animate-shine"></div>
             </div>
             
-            <!-- Close Button -->
-            <button id="close-sheet-btn" class="w-8 h-8 bg-slate-100/80 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90 shadow-sm text-xs">✕</button>
+            <!-- Camera Icon (Teal Color Fixed) -->
+            <i class="fas fa-camera text-xl text-teal-600 relative z-10"></i>
+            
+            <!-- ❤️ Floating Heart Badge (Perfectly Visible) -->
+            <div class="animate-heart absolute -top-1.5 -right-1.5 bg-[#E14D57] w-5 h-5 rounded-full flex items-center justify-center shadow-md border-2 border-white z-20">
+                <i class="fas fa-heart text-[8px] text-white"></i>
+            </div>
         </div>
+    </div>
+
+    <!-- 🏷️ 2. Styled Premium Text Name (Flex-1 safely handles text limits) -->
+    <div class="flex-1 min-w-0 pt-1">
+        <h3 class="font-black text-slate-800 text-xl tracking-wide leading-tight flex items-center flex-wrap gap-1.5">
+            <span>Click</span> 
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">&amp;</span> 
+            <span>Collect</span> 
+            <span class="text-xs font-bold uppercase tracking-widest bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md border border-slate-200/60 inline-block">App</span>
+        </h3>
+        <p class="text-[11px] text-slate-400 font-semibold mt-1 leading-snug">
+            For Better Smooth and Fast Experience Install Now 
+        </p>
+    </div>
+    
+    <!-- ✖️ 3. Close Button -->
+    <button id="close-sheet-btn" class="w-8 h-8 bg-slate-100/80 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90 shadow-sm text-xs shrink-0 mt-1">✕</button>
+
+</div>
+
 
         <!-- 3. Glassmorphic Features Grid -->
         <div class="grid grid-cols-3 gap-3 mb-8 relative z-10">
