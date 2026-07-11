@@ -15,7 +15,7 @@
     <link rel="apple-touch-icon" sizes="60x60" href="assets/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="assets/apple-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="76x76" href="assets/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="assets/apple-icon-114x114.png">
+    <link class="apple-touch-icon" sizes="114x114" href="assets/apple-icon-114x114.png">
     <link rel="apple-touch-icon" sizes="120x120" href="assets/apple-icon-120x120.png">
     <link rel="apple-touch-icon" sizes="144x144" href="assets/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="assets/apple-icon-152x152.png">
@@ -73,22 +73,11 @@
         .animate-fade-content { animation: layoutSlideUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 1.15s both; }
         .animate-heart { animation: heartbeat 1.6s infinite ease-in-out; }
         
-@keyframes horizontalScroll {
-    0% {
-        background-position-x: 0;
-    }
-    
-    100% {
-        /* Badi screens par bhi seamless dikhne ke liye pixel value thodi badha di hai */
-        background-position-x: 2000px;
-    }
-}
-
-.animate-bg-scroll {
-    /* 70s (seconds) kiya hai taaki movement ekdum shanti se aur slow ho, distracting na lage */
-    animation: horizontalScroll 70s linear infinite;
-}
-
+        @keyframes horizontalScroll {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 2000px; }
+        }
+        .animate-bg-scroll { animation: horizontalScroll 70s linear infinite; }
     </style>
 </head>
 <body class="h-full max-h-screen flex flex-col overflow-hidden select-none relative premium-bg text-white">
@@ -124,7 +113,6 @@
         </header>
 
         <div class="animate-fade-hero flex flex-col items-center text-center px-6 mt-2 relative">
-            
             <i class="fas fa-star absolute top-0 left-8 text-yellow-300/50 text-[10px] star-twinkle"></i>
             <i class="fas fa-star absolute top-12 right-10 text-yellow-300/40 text-[8px] star-twinkle" style="animation-delay: 0.6s;"></i>
             <i class="fas fa-star absolute top-24 left-14 text-yellow-300/40 text-[9px] star-twinkle" style="animation-delay: 1.3s;"></i>
@@ -178,15 +166,10 @@
                 </li>
                 <li class="flex items-start space-x-2 text-[11px] text-slate-500 font-medium leading-tight">
                     <i class="fas fa-check text-emerald-500 mt-0.5 text-[10px] shrink-0"></i>
-                    <span>Create custom albums & relive your precious life memories in the future
-                </span>
+                    <span>Create custom albums & relive your precious life memories in the future</span>
                 </li>
             </ul>
-            
-            
-            
         </div>
-        
     </main>
 
     <footer class="h-11 shimmer-footer text-white/90 text-[10px] flex items-center justify-center space-x-1.5 shrink-0 font-medium tracking-wide z-10 border-t border-white/5">
@@ -198,6 +181,7 @@
         <button id="main-fab-btn" class="bg-brand-coral w-12 h-12 rounded-full flex items-center justify-center text-white text-base shadow-lg shadow-rose-500/30 active:scale-90 transition border border-white/10"><i class="fas fa-camera"></i></button>
     </div>
 
+    <!-- Normal Actions Bottom Sheet Container -->
     <div id="bottom-sheet" class="fixed inset-0 z-50 invisible transition-all duration-300">
         <div id="sheet-backdrop" class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300"></div>
         <div id="sheet-content" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[24px] p-5 pb-8 transform translate-y-full transition-transform duration-300 ease-out text-slate-800 shadow-[0_-10px_32px_rgba(0,0,0,0.15)]">
@@ -222,157 +206,205 @@
         </div>
     </div>
 
-   <!---pwa html code ----->
-   
-<div id="pwa-wrapper" class="fixed inset-0 z-[100] opacity-0 pointer-events-none transition-all duration-500 ease-out">
-    
-    <!-- Ultra Blur Premium Backdrop -->
-    <div id="pwa-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-500"></div>
-    
-    <!-- 📱 Tall Futuristic Bottom Sheet (Slides Higher) -->
-    <div id="pwa-bottom-sheet" class="absolute bottom-0 inset-x-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.3)] p-6 pt-5 pb-10 transform translate-y-full text-slate-800 overflow-hidden max-w-md mx-auto" style="transition: transform 650ms cubic-bezier(0.19, 1, 0.22, 1); min-height: 52vh;">
-        <!--Install Card Bg-->
+    <!-- 📱 PWA WRAPPER CONTAINER -->
+    <div id="pwa-wrapper" class="fixed inset-0 z-[100] opacity-0 pointer-events-none transition-all duration-500 ease-out">
+        <div id="pwa-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-500"></div>
         
-<div class="absolute inset-0 opacity-[0.08] pointer-events-none bg-cover bg-center z-0 animate-bg-drift" 
-     style="background-image: url('/assets/InstallGraphic.png');">
-</div>
+        <div id="pwa-bottom-sheet" class="absolute bottom-0 inset-x-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.3)] p-6 pt-5 pb-10 transform translate-y-full text-slate-800 overflow-hidden max-w-md mx-auto" style="transition: transform 650ms cubic-bezier(0.19, 1, 0.22, 1); min-height: 52vh;">
+            
+            <!-- Install Card Graphic Background Element -->
+            <div class="absolute inset-0 opacity-[0.08] pointer-events-none bg-cover bg-center z-0" style="background-image: url('/assets/InstallGraphic.png');"></div>
 
+            <!-- Moving Abstract Liquid Waves Graphic -->
+            <div class="absolute inset-x-0 bottom-0 h-48 opacity-[0.12] pointer-events-none mix-blend-multiply animate-wave-float">
+                <svg viewBox="0 0 1440 320" class="w-full h-full object-cover">
+                    <path fill="#06b6d4" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,218.7C672,203,768,149,864,128C960,107,1056,117,1152,138.7C1248,160,1344,192,1392,208L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
+            </div>
+            
+            <!-- Glow Fluid Orbs -->
+            <div class="absolute top-12 left-1/4 w-36 h-36 bg-teal-400/20 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+            <div class="absolute top-24 right-1/4 w-36 h-36 bg-rose-400/15 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-delay: 1.5s;"></div>
 
-<!--Install card bg end--->
+            <!-- Sleek Top Center Drag Handle -->
+            <div class="w-14 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 relative z-10"></div>
+            
+            <!-- ✨ Clean Premium Brand Unified Header Block -->
+            <div class="flex items-start justify-between w-full gap-3 mb-6 relative z-10">
+                <!-- Camera Box Graphic Layout -->
+                <div class="animate-camera-morph shrink-0 relative">
+                    <div class="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-[0_8px_24px_rgba(13,148,136,0.14)] border border-slate-100 transition-transform duration-300 hover:scale-105">
+                        <div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/20 to-transparent -skew-x-12 animate-shine"></div>
+                        </div>
+                        <i class="fas fa-camera text-xl text-teal-600 relative z-10"></i>
+                        <div class="animate-heart absolute -top-1.5 -right-1.5 bg-[#E14D57] w-5 h-5 rounded-full flex items-center justify-center shadow-md border-2 border-white z-20">
+                            <i class="fas fa-heart text-[8px] text-white"></i>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Moving Abstract Liquid Waves -->
-        <div class="absolute inset-x-0 bottom-0 h-48 opacity-[0.12] pointer-events-none mix-blend-multiply animate-wave-float">
-            <svg viewBox="0 0 1440 320" class="w-full h-full object-cover">
-                <path fill="#06b6d4" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,218.7C672,203,768,149,864,128C960,107,1056,117,1152,138.7C1248,160,1344,192,1392,208L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-            </svg>
-        </div>
-        
-        <!-- Glow Orbs -->
-        <div class="absolute top-12 left-1/4 w-36 h-36 bg-teal-400/20 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
-        <div class="absolute top-24 right-1/4 w-36 h-36 bg-rose-400/15 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-delay: 1.5s;"></div>
-
-        <!-- Sleek Drag Handle -->
-        <div class="w-14 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 relative z-10"></div>
-        
-        <!-- 2. Header Section (Beautiful Name & Icon Stacking) -->
-        <div class="flex items-start justify-between mb-7 relative z-10">
-            <div class="flex items-center gap-4">
+                <!-- Premium Styled Dynamic Label Header Description -->
+                <div class="flex-1 min-w-0 pt-1">
+                    <h3 class="font-black text-slate-800 text-xl tracking-wide leading-tight flex items-center flex-wrap gap-1.5">
+                        <span>Click</span> 
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">&amp;</span> 
+                        <span>Collect</span> 
+                        <span class="text-xs font-bold uppercase tracking-widest bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md border border-slate-200/60 inline-block">App</span>
+                    </h3>
+                    <p class="text-[11px] text-slate-400 font-semibold mt-1 leading-tight">
+                        For Better Smooth and Fast Experience Install Now 
+                    </p>
+                </div>
                 
-<!-- 📸 Bas Itna Hi Code Replace Karo (Sirf Header Section) -->
-<div class="flex items-start justify-between w-full gap-3 mb-4 relative z-50">
-    
-    <!-- Camera Box (Fixed size, won't shrink) -->
-    <div class="animate-camera-morph shrink-0 relative">
-        <div class="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-[0_8px_24px_rgba(13,148,136,0.14)] border border-slate-100 transition-transform duration-300 hover:scale-105">
-            
-            <!-- Inner Shine -->
-            <div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/20 to-transparent -skew-x-12 animate-shine"></div>
+                <!-- Action Sheet Close Vector Button -->
+                <button id="close-sheet-btn" class="w-8 h-8 bg-slate-100/80 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90 shadow-sm text-xs shrink-0 mt-1">✕</button>
             </div>
-            
-            <!-- Camera Icon (Teal Color) -->
-            <i class="fas fa-camera text-xl text-teal-600 relative z-10"></i>
-            
-            <!-- Floating Heart Badge -->
-            <div class="animate-heart absolute -top-1.5 -right-1.5 bg-[#E14D57] w-5 h-5 rounded-full flex items-center justify-center shadow-md border-2 border-white z-20">
-                <i class="fas fa-heart text-[8px] text-white"></i>
+
+            <!-- Glassmorphic System Core Features Grid Grid -->
+            <div class="grid grid-cols-3 gap-3 mb-8 relative z-10">
+                <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
+                    <div class="w-9 h-9 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-500">
+                        <i class="fas fa-bolt text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-extrabold text-slate-700">Super Fast</span>
+                </div>
+                <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                        <i class="fas fa-cloud-sun text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-extrabold text-slate-700">Offline Run</span>
+                </div>
+                <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
+                    <div class="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
+                        <i class="fas fa-shield-alt text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-extrabold text-slate-700">100% Secure</span>
+                </div>
+            </div>
+
+            <!-- Android Installation Trigger Box Layer -->
+            <div id="android-action" class="hidden relative z-10">
+                <button id="action-install-btn" class="gpu-shine w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-4 rounded-2xl text-xs shadow-xl shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
+                    Install App Now
+                </button>
+            </div>
+
+            <!-- Custom Setup Guidelines Action Block For iOS Devices -->
+            <div id="ios-action" class="hidden bg-white/80 border border-slate-200/60 p-4 rounded-2xl flex items-start gap-3 relative z-10 backdrop-blur-md shadow-sm">
+                <span class="text-lg mt-0.5 animate-bounce">💡</span>
+                <p class="text-[11px] text-slate-500 font-semibold leading-relaxed">
+                    iPhone par install karne ke liye niche browser dashboard par <span class="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">Share icon <i class="text-xs far fa-share-square"></i></span> par click karein aur phir <span class="font-bold text-slate-800 bg-slate-200/50 px-1.5 py-0.5 rounded-md">"Add to Home Screen"</span> chunein.
+                </p>
             </div>
         </div>
+
+        <style>
+            @keyframes fast-hardware-shine {
+                0% { transform: translateX(-150%) skewX(-30deg); }
+                40% { transform: translateX(200%) skewX(-30deg); }
+                100% { transform: translateX(200%) skewX(-30deg); }
+            }
+            .gpu-shine::after {
+                content: '';
+                position: absolute;
+                top: 0; left: 0; width: 40%; height: 100%;
+                background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+                transform: skewX(-30deg);
+                will-change: transform;
+                animation: fast-hardware-shine 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            @keyframes mesh-drift {
+                0%, 100% { transform: scale(1) translateY(0); }
+                50% { transform: scale(1.03) translateY(-4px); }
+            }
+            .animate-bg-mesh { animation: mesh-drift 10s infinite ease-in-out; }
+            @keyframes liquid-wave {
+                0%, 100% { transform: translateY(0) scaleY(1); }
+                50% { transform: translateY(-6px) scaleY(1.03); }
+            }
+            .animate-wave-float { animation: liquid-wave 6s infinite ease-in-out; }
+        </style>
     </div>
 
-    <!-- 🏷️ Styled Premium Name & Description -->
-    <div class="flex-1 min-w-0 pt-1">
-        <h3 class="font-black text-slate-800 text-xl tracking-wide leading-tight flex items-center flex-wrap gap-1.5">
-            <span>Click</span> 
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">&amp;</span> 
-            <span>Collect</span> 
-            <span class="text-xs font-bold uppercase tracking-widest bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md border border-slate-200/60 inline-block">App</span>
-        </h3>
-        <p class="text-[11px] text-slate-400 font-semibold mt-1 leading-tight">
-            For Better Smooth and Fast Experience Install Now 
-        </p>
-    </div>
-    
-    <!-- Close Button -->
-    <button id="close-sheet-btn" class="w-8 h-8 bg-slate-100/80 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90 shadow-sm text-xs shrink-0 mt-1">✕</button>
-
-</div>
-
-        <!-- 3. Glassmorphic Features Grid -->
-        <div class="grid grid-cols-3 gap-3 mb-8 relative z-10">
-            <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
-                <div class="w-9 h-9 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-500">
-                    <i class="fas fa-bolt text-sm"></i>
-                </div>
-                <span class="text-[11px] font-extrabold text-slate-700">Super Fast</span>
-            </div>
-            <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
-                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                    <i class="fas fa-cloud-sun text-sm"></i>
-                </div>
-                <span class="text-[11px] font-extrabold text-slate-700">Offline Run</span>
-            </div>
-            <div class="bg-white/70 backdrop-blur-md border border-slate-100 p-4 rounded-2xl flex flex-col items-center text-center gap-2 shadow-sm transition-all hover:translate-y-[-2px]">
-                <div class="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
-                    <i class="fas fa-shield-alt text-sm"></i>
-                </div>
-                <span class="text-[11px] font-extrabold text-slate-700">100% Secure</span>
-            </div>
-        </div>
-
-        <!-- 4. Android Action Button Section (Smooth High-Speed Shine) -->
-        <div id="android-action" class="hidden relative z-10">
-            <button id="action-install-btn" class="gpu-shine w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-4 rounded-2xl text-xs shadow-xl shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
-                Install App Now
-            </button>
-        </div>
-
-        <!-- 5. iOS Instructions Layer -->
-        <div id="ios-action" class="hidden bg-white/80 border border-slate-200/60 p-4 rounded-2xl flex items-start gap-3 relative z-10 backdrop-blur-md shadow-sm">
-            <span class="text-lg mt-0.5 animate-bounce">💡</span>
-            <p class="text-[11px] text-slate-500 font-semibold leading-relaxed">
-                iPhone par install karne ke liye niche browser dashboard par <span class="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">Share icon <i class="text-xs far fa-share-square"></i></span> par click karein aur phir <span class="font-bold text-slate-800 bg-slate-200/50 px-1.5 py-0.5 rounded-md">"Add to Home Screen"</span> chunein.
-            </p>
-        </div>
-    </div>
-
-    <!-- 💎 Hardware Accelerated Smooth Animations -->
-    <style>
-        /* ⚡ Non-Laggy Smooth Shine Formula */
-        @keyframes fast-hardware-shine {
-            0% { transform: translateX(-150%) skewX(-30deg); }
-            40% { transform: translateX(200%) skewX(-30deg); }
-            100% { transform: translateX(200%) skewX(-30deg); }
-        }
-        .gpu-shine::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 40%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
-            transform: skewX(-30deg);
-            will-change: transform;
-            animation: fast-hardware-shine 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    <!-- 🚀 APPLICATION DYNAMIC CORE CORE UPDATE MODAL WINDOW SYSTEM -->
+    <div id="update-modal-wrapper" class="fixed inset-0 z-[200] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500 ease-out">
+        <div id="update-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-md"></div>
         
-        /* 🌀 Graphic Floating Animations */
-        @keyframes mesh-drift {
-            0%, 100% { transform: scale(1) translateY(0); }
-            50% { transform: scale(1.03) translateY(-4px); }
-        }
-        .animate-bg-mesh {
-            animation: mesh-drift 10s infinite ease-in-out;
-        }
-        @keyframes liquid-wave {
-            0%, 100% { transform: translateY(0) scaleY(1); }
-            50% { transform: translateY(-6px) scaleY(1.03); }
-        }
-        .animate-wave-float {
-            animation: liquid-wave 6s infinite ease-in-out;
-        }
-    </style>
-</div>
-   
-   <!----pwa html code ending-->
+        <div id="update-modal-box" class="relative bg-white w-full max-w-[350px] rounded-[30px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] overflow-hidden transform scale-90 opacity-0 transition-all duration-500 ease-out text-slate-800">
+            <div class="relative bg-gradient-to-br from-[#E14D57] via-[#f0626d] to-[#ff7681] h-48 flex flex-col items-center justify-center overflow-hidden">
+                <div class="absolute inset-0 opacity-20 pointer-events-none">
+                    <div class="absolute top-4 left-6 text-white text-xs animate-pulse"><i class="fas fa-sparkles"></i></div>
+                    <div class="absolute top-12 right-12 text-white text-lg animate-bounce" style="animation-duration: 4s;"><i class="fas fa-star"></i></div>
+                    <div class="absolute bottom-16 left-12 text-white text-sm opacity-50"><i class="fas fa-moon"></i></div>
+                </div>
+
+                <div class="relative z-10 w-24 h-24 flex items-center justify-center animate-rocket-float">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-20 h-20 text-white drop-shadow-[0_10px_15px_rgba(0,0,0,0.2)]">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.63 8.41m5.96 5.96a14.96 14.96 0 01-12.12 6.16 14.96 14.96 0 016.16-12.12m5.96 5.96l-5.96-5.96m0 0L3.92 3.92m0 0a1.5 1.5 0 012.122 0L10.5 8.5M3.92 3.92a1.5 1.5 0 000 2.122L8.5 10.5m4.5-4.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                    </svg>
+                </div>
+
+                <div class="absolute bottom-0 inset-x-0 w-full overflow-hidden leading-[0]">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-[25px] fill-white">
+                        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C26.9,4.75,55.05,8.58,83.19,12.44,170.9,24.31,259,33.15,321.39,56.44Z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="p-6 pt-4 pb-8 text-center">
+                <span class="inline-block bg-rose-50 text-[#E14D57] font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-full mb-3 border border-rose-100/50">
+                    ✨ App Update
+                </span>
+                
+                <h3 class="text-lg font-black text-slate-800 tracking-wide rounded-brand-font">Look What's New!</h3>
+                <p class="text-xs text-slate-400 font-medium mt-1 mb-5">Humne aapke experience ko aur behtar banaya hai</p>
+
+                <div class="text-left space-y-3.5 mb-6 max-w-[290px] mx-auto">
+                    <div class="flex items-start gap-3">
+                        <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5"><i class="fas fa-check"></i></div>
+                        <p class="text-[12px] text-slate-600 font-semibold leading-relaxed"><span class="font-bold text-slate-800">Super Fast Engine:</span> Photos load hone ki speed ab 2x tez ho gayi hai.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5"><i class="fas fa-check"></i></div>
+                        <p class="text-[12px] text-slate-600 font-semibold leading-relaxed"><span class="font-bold text-slate-800">Custom Albums:</span> Apne haseen palon ko alag-alag folders mein sajaein.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5"><i class="fas fa-check"></i></div>
+                        <p class="text-[12px] text-slate-600 font-semibold leading-relaxed"><span class="font-bold text-slate-800">Bug Fixes:</span> PWA install sheets aur animations ab bina lag ke makkhan chalengi.</p>
+                    </div>
+                </div>
+
+                <button id="close-update-modal-btn" class="clean-shine-btn w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-3.5 rounded-2xl text-xs shadow-lg shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
+                    Awesome, Got It!
+                </button>
+            </div>
+        </div>
+
+        <style>
+            @keyframes clean-hardware-shine {
+                0% { transform: translateX(-150%) skewX(-25deg); }
+                35% { transform: translateX(180%) skewX(-25deg); }
+                100% { transform: translateX(180%) skewX(-25deg); }
+            }
+            .clean-shine-btn::after {
+                content: '';
+                position: absolute;
+                top: 0; left: 0; width: 35%; height: 100%;
+                background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent);
+                transform: skewX(-25deg);
+                will-change: transform;
+                animation: clean-hardware-shine 2.2s infinite cubic-bezier(0.25, 1, 0.5, 1);
+            }
+            @keyframes rocket-float {
+                0%, 100% { transform: translateY(0) rotate(0deg); }
+                50% { transform: translateY(-6px) rotate(3deg); }
+            }
+            .animate-rocket-float { animation: rocket-float 4s infinite ease-in-out; }
+        </style>
+    </div>
+
+    <!-- System Core Interactive Logics Java Script -->
     <script>
         const cameraPicker = document.getElementById('native-camera-picker');
         const galleryPicker = document.getElementById('native-gallery-picker');
@@ -381,7 +413,6 @@
         const sheetBackdrop = document.getElementById('sheet-backdrop');
         const sheetContent = document.getElementById('sheet-content');
 
-        // Function to process image and redirect
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -443,11 +474,9 @@
             setTimeout(() => { bottomSheet.classList.add('invisible'); }, 300); 
         }
 
-        // Event listeners for file picking
         cameraPicker.addEventListener('change', handleFileSelect);
         galleryPicker.addEventListener('change', handleFileSelect);
 
-        // UI Interactions
         document.getElementById('card-click-camera').addEventListener('click', () => { dismissTooltip(); cameraPicker.click(); });
         document.getElementById('card-open-gallery').addEventListener('click', () => { dismissTooltip(); galleryPicker.click(); });
         document.getElementById('main-fab-btn').addEventListener('click', () => { dismissTooltip(); openBottomSheet(); });
@@ -457,163 +486,36 @@
         document.getElementById('sheet-open-gallery').addEventListener('click', () => { closeBottomSheet(); galleryPicker.click(); });
     </script>
     
-
-
-<div id="update-modal-wrapper" class="fixed inset-0 z-[200] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500 ease-out">
-    
-    <div id="update-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-md"></div>
-    
-    <div id="update-modal-box" class="relative bg-white w-full max-w-[350px] rounded-[30px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] overflow-hidden transform scale-90 opacity-0 transition-all duration-500 ease-out text-slate-800">
-        
-        <div class="relative bg-gradient-to-br from-[#E14D57] via-[#f0626d] to-[#ff7681] h-48 flex flex-col items-center justify-center overflow-hidden">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const DEPLOYED_APP_VERSION = '7.0'; 
+            const wrapper = document.getElementById('update-modal-wrapper');
+            const modalBox = document.getElementById('update-modal-box');
+            const closeBtn = document.getElementById('close-update-modal-btn');
+            let savedUserVersion = localStorage.getItem('app_last_seen_version');
             
-            <div class="absolute inset-0 opacity-20 pointer-events-none">
-                <div class="absolute top-4 left-6 text-white text-xs animate-pulse"><i class="fas fa-sparkles"></i></div>
-                <div class="absolute top-12 right-12 text-white text-lg animate-bounce" style="animation-duration: 4s;"><i class="fas fa-star"></i></div>
-                <div class="absolute bottom-16 left-12 text-white text-sm opacity-50"><i class="fas fa-moon"></i></div>
-            </div>
+            if (!wrapper || !modalBox || !closeBtn) return;
 
-            <div class="relative z-10 w-24 h-24 flex items-center justify-center animate-rocket-float">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-20 h-20 text-white drop-shadow-[0_10px_15px_rgba(0,0,0,0.2)]">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.63 8.41m5.96 5.96a14.96 14.96 0 01-12.12 6.16 14.96 14.96 0 016.16-12.12m5.96 5.96l-5.96-5.96m0 0L3.92 3.92m0 0a1.5 1.5 0 012.122 0L10.5 8.5M3.92 3.92a1.5 1.5 0 000 2.122L8.5 10.5m4.5-4.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                </svg>
-            </div>
+            if (!savedUserVersion) {
+                localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+            } else if (savedUserVersion !== DEPLOYED_APP_VERSION) {
+                setTimeout(() => {
+                    wrapper.classList.remove('opacity-0', 'pointer-events-none');
+                    wrapper.classList.add('opacity-100');
+                    modalBox.classList.remove('scale-90', 'opacity-0');
+                    modalBox.classList.add('scale-100', 'opacity-100');
+                }, 1200); 
+            }
 
-            <div class="absolute bottom-0 inset-x-0 w-full overflow-hidden leading-[0]">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-[25px] fill-white">
-                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C26.9,4.75,55.05,8.58,83.19,12.44,170.9,24.31,259,33.15,321.39,56.44Z"></path>
-                </svg>
-            </div>
-        </div>
-
-<!-----Update Cards Rocket---->
-
-        <div class="p-6 pt-4 pb-8 text-center">
-            
-            <span class="inline-block bg-rose-50 text-[#E14D57] font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-full mb-3 border border-rose-100/50">
-                ✨ App Update
-            </span>
-            
-            <h3 class="text-lg font-black text-slate-800 tracking-wide rounded-brand-font">
-                Look What's New!
-            </h3>
-            <p class="text-xs text-slate-400 font-medium mt-1 mb-5">
-                Humne aapke experience ko aur behtar banaya hai
-            </p>
-
-            <div class="text-left space-y-3.5 mb-6 max-w-[290px] mx-auto">
-                <div class="flex items-start gap-3">
-                    <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <p class="text-[12px] text-slate-600 font-semibold leading-relaxed">
-                        <span class="font-bold text-slate-800">Super Fast Engine:</span> Photos load hone ki speed ab 2x tez ho gayi hai.
-                    </p>
-                </div>
-
-                <div class="flex items-start gap-3">
-                    <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <p class="text-[12px] text-slate-600 font-semibold leading-relaxed">
-                        <span class="font-bold text-slate-800">Custom Albums:</span> Apne haseen palon ko alag-alag folders mein sajaein.
-                    </p>
-                </div>
-
-                <div class="flex items-start gap-3">
-                    <div class="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 text-[10px] shrink-0 mt-0.5">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <p class="text-[12px] text-slate-600 font-semibold leading-relaxed">
-                        <span class="font-bold text-slate-800">Bug Fixes:</span> PWA install sheets aur animations ab bina lag ke makkhan chalengi.
-                    </p>
-                </div>
-            </div>
-
-            <button id="close-update-modal-btn" class="clean-shine-btn w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-3.5 rounded-2xl text-xs shadow-lg shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
-                Awesome, Got It!
-            </button>
-        </div>
-    </div>
-
-    <style>
-        @keyframes clean-hardware-shine {
-            0% { transform: translateX(-150%) skewX(-25deg); }
-            35% { transform: translateX(180%) skewX(-25deg); }
-            100% { transform: translateX(180%) skewX(-25deg); }
-        }
-        .clean-shine-btn::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 35%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent);
-            transform: skewX(-25deg);
-            will-change: transform;
-            animation: clean-hardware-shine 2.2s infinite cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        @keyframes rocket-float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-6px) rotate(3deg); }
-        }
-        .animate-rocket-float {
-            animation: rocket-float 4s infinite ease-in-out;
-        }
-    </style>
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // 🏷️ PRODUCTION VERSION: Testing ke liye ise hum '5.0' kar rahe hain!
-        const DEPLOYED_APP_VERSION = '7.0'; 
-        
-        const wrapper = document.getElementById('update-modal-wrapper');
-        const modalBox = document.getElementById('update-modal-box');
-        const closeBtn = document.getElementById('close-update-modal-btn');
-        
-        let savedUserVersion = localStorage.getItem('app_last_seen_version');
-        
-        if (!wrapper || !modalBox || !closeBtn) {
-            console.error("HTML IDs nahi mili, kripya check karein!");
-            return;
-        }
-
-        // 🚀 SMART CHECKING LOGIC
-        if (!savedUserVersion) {
-            // CASE 1: Ekdum Naya User — chupchap memory save karo, popup mat dikhao
-            localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
-        } 
-        else if (savedUserVersion !== DEPLOYED_APP_VERSION) {
-            // CASE 2: Returning User + Naya Update Mila = BOOM! Popup Dikhao
-            setTimeout(() => {
-                // Wrapper show karo
-                wrapper.classList.remove('opacity-0', 'pointer-events-none');
-                wrapper.classList.add('opacity-100');
-                
-                // Modal scale aur opacity dynamic smoothly badhao
-                modalBox.classList.remove('scale-90', 'opacity-0');
-                modalBox.classList.add('scale-100', 'opacity-100');
-            }, 1200); 
-        }
-
-        // ⚡ Close button action (Sirf ek baar dikhane ke liye memory lock)
-        closeBtn.addEventListener('click', function () {
-            modalBox.classList.remove('scale-100', 'opacity-100');
-            modalBox.classList.add('scale-90', 'opacity-0');
-            
-            wrapper.classList.remove('opacity-100');
-            wrapper.classList.add('opacity-0', 'pointer-events-none');
-            
-            // Version secure lock karo taaki baar-baar pareshan na kare
-            localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+            closeBtn.addEventListener('click', function () {
+                modalBox.classList.remove('scale-100', 'opacity-100');
+                modalBox.classList.add('scale-90', 'opacity-0');
+                wrapper.classList.add('opacity-0', 'pointer-events-none');
+                localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+            });
         });
-    });
-</script>
+    </script>
 
-  <script src="script.js"></script>
-
-
-
-
-
+    <script src="script.js"></script>
 </body>
 </html>
