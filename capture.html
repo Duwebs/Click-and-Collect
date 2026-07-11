@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C&C - Smart Capture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .btn-hover:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="h-full bg-black text-white p-4 overflow-hidden">
+
+    <video id="video" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video>
+
+    <div class="absolute bottom-10 left-0 right-0 px-6 space-y-6">
+        <div id="preview-strip" class="flex gap-3 overflow-x-auto pb-4 scrollbar-none"></div>
+
+        <div class="flex justify-between items-center">
+            <button onclick="takePhoto()" class="w-20 h-20 bg-white rounded-full border-8 border-white/20 btn-hover transition"></button>
+            <button id="collect-btn" onclick="showCollector()" class="hidden bg-teal-500 px-8 py-4 rounded-3xl font-black text-sm btn-hover shadow-xl">COLLECT IT</button>
+        </div>
+    </div>
+
+    <div id="collector-modal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-6 z-50">
+        <div class="glass w-full rounded-[2rem] p-8 text-center space-y-6">
+            <h2 class="text-xl font-black uppercase tracking-widest">Share this memory?</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <button onclick="finalize('Me')" class="p-5 bg-teal-500/20 border border-teal-500/50 rounded-2xl font-bold">Only for Me 🧑‍🚀</button>
+                <button onclick="finalize('Friend')" class="p-5 bg-purple-500/20 border border-purple-500/50 rounded-2xl font-bold">For my Friend 👱‍♀️</button>
+                <button onclick="finalize('Both')" class="p-5 bg-rose-500/20 border border-rose-500/50 rounded-2xl font-bold">For Both of Us 👩‍❤️‍👨</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessionMemories = [];
+
+        async function startCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            document.getElementById('video').srcObject = stream;
+        }
+        startCamera();
+
+        function takePhoto() {
+            if (navigator.vibrate) navigator.vibrate(50);
+            const video = document.getElementById('video');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            const img = canvas.toDataURL('image/jpeg');
+            sessionMemories.push(img);
+            
+            document.getElementById('preview-strip').innerHTML += `<img src="${img}" class="w-16 h-16 rounded-2xl border-2 border-white object-cover">`;
+            document.getElementById('collect-btn').classList.remove('hidden');
+        }
+
+        function showCollector() { document.getElementById('collector-modal').classList.remove('hidden'); }
+
+        async function finalize(choice) {
+            // Smart Logic
+            console.log("Memory saved with preference:", choice);
+            // Yahan hum IndexedDB mein choice ke hisab se flag set karenge
+            // Agar choice 'Both' ya 'Friend' hai toh hum sync service call karenge
+            alert("Memory successfully saved for: " + choice);
+            window.location.href = 'timeline.html';
+        }
+    </script>
+</body>
+</html>
