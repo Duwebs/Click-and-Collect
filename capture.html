@@ -14,6 +14,10 @@
 
     <video id="video" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video>
 
+    <div id="debug-alert" class="absolute top-10 left-6 right-6 p-4 bg-rose-500/20 border border-rose-500 text-center rounded-xl hidden z-50">
+        <p class="text-xs font-black uppercase">Not Connected! Redirecting in 3s...</p>
+    </div>
+
     <div class="absolute bottom-10 left-0 right-0 px-6 space-y-6">
         <div id="preview-strip" class="flex gap-3 overflow-x-auto pb-4 scrollbar-none"></div>
 
@@ -35,37 +39,66 @@
     </div>
 
     <script>
+        // 1. Connection Check
+        const isConnected = localStorage.getItem('cc_connected');
+        console.log("Connection status:", isConnected);
+
+        if (isConnected !== 'true') {
+            document.getElementById('debug-alert').classList.remove('hidden');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 3000);
+        }
+
+        // 2. Camera & Photo Logic
         let sessionMemories = [];
 
         async function startCamera() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            document.getElementById('video').srcObject = stream;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                document.getElementById('video').srcObject = stream;
+            } catch(e) { console.error("Camera error:", e); }
         }
         startCamera();
 
         function takePhoto() {
-            if (navigator.vibrate) navigator.vibrate(50);
             const video = document.getElementById('video');
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
             
             const img = canvas.toDataURL('image/jpeg');
-            sessionMemories.push(img);
+            sessionMemories.push({ image: img, time: new Date().toLocaleTimeString() });
             
             document.getElementById('preview-strip').innerHTML += `<img src="${img}" class="w-16 h-16 rounded-2xl border-2 border-white object-cover">`;
             document.getElementById('collect-btn').classList.remove('hidden');
+            if (navigator.vibrate) navigator.vibrate(50);
         }
 
         function showCollector() { document.getElementById('collector-modal').classList.remove('hidden'); }
 
         async function finalize(choice) {
-            // Smart Logic
-            console.log("Memory saved with preference:", choice);
-            // Yahan hum IndexedDB mein choice ke hisab se flag set karenge
-            // Agar choice 'Both' ya 'Friend' hai toh hum sync service call karenge
-            alert("Memory successfully saved for: " + choice);
-            window.location.href = 'timeline.html';
+            const dbRequest = indexedDB.open('CC_Memories_DB', 1);
+            dbRequest.onupgradeneeded = (e) => e.target.result.createObjectStore('memories', { keyPath: 'id' });
+            
+            dbRequest.onsuccess = (e) => {
+                const db = e.target.result;
+                const tx = db.transaction('memories', 'readwrite');
+                const store = tx.objectStore('memories');
+                
+                sessionMemories.forEach(m => {
+                    store.add({ 
+                        id: Date.now(), 
+                        image: m.image, 
+                        time: m.time, 
+                        tag: choice, 
+                        date: new Date().toLocaleDateString() 
+                    });
+                });
+                
+                alert("Memory Saved as: " + choice);
+                window.location.href = 'timeline.html';
+            };
         }
     </script>
 </body>

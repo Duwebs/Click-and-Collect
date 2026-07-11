@@ -10,44 +10,58 @@
     
     <style>
         .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        @keyframes heartPulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .animate-heart { animation: heartPulse 0.8s ease-in-out infinite; }
     </style>
 </head>
-<body class="h-full gradient-bg flex flex-col items-center p-6 text-white">
+<body class="h-full gradient-bg flex flex-col items-center justify-center p-6 text-white overflow-hidden">
 
-    <div class="w-full max-w-sm flex flex-col items-center justify-center flex-1 space-y-6">
+    <div id="wait-screen" class="w-full max-w-sm flex flex-col items-center space-y-8 animate-in fade-in duration-500">
         <h1 class="text-xl font-black uppercase tracking-widest text-teal-400">Scan to Connect</h1>
-        
         <div id="qrcode" class="bg-white p-4 rounded-3xl shadow-2xl"></div>
-
         <div class="bg-white/10 w-full py-4 rounded-2xl text-center border border-white/10">
             <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Or enter this PIN</p>
-            <h2 id="generated-pin" class="text-3xl font-black tracking-[0.2em] text-white">----</h2>
+            <h2 id="generated-pin" class="text-4xl font-black tracking-[0.2em] text-white">----</h2>
         </div>
-
-        <div id="status" class="text-teal-400 font-bold text-xs animate-pulse">
-            <i class="fas fa-circle-notch fa-spin"></i> Waiting for partner...
+        <div class="text-teal-400 font-bold text-xs animate-pulse">
+            <i class="fas fa-circle-notch fa-spin mr-2"></i> Waiting for partner...
         </div>
     </div>
 
+    <div id="success-screen" class="hidden flex flex-col items-center">
+        <i class="fas fa-heart text-7xl text-rose-500 animate-heart"></i>
+        <h1 class="text-3xl font-black mt-6 tracking-widest uppercase">Linked!</h1>
+    </div>
+
     <script>
-        const pin = Math.floor(1000 + Math.random() * 9000);
+        const pin = Math.floor(1000 + Math.random() * 9000).toString();
         document.getElementById('generated-pin').textContent = pin;
 
-        // QR Code generate karo (Data mein hum PIN bhej rahe hain)
-        new QRCode(document.getElementById("qrcode"), {
-            text: pin.toString(),
-            width: 200,
-            height: 200,
-            colorDark : "#000000",
-            colorLight : "#ffffff",
-        });
+        // Init LocalStorage Flags
+        localStorage.setItem('cc_room_pin', pin);
+        localStorage.setItem('cc_connected', 'false');
 
-        // Connection simulation
-        setTimeout(() => {
-            document.getElementById('status').innerHTML = '<i class="fas fa-check-circle"></i> Connected! Redirecting...';
-            if (navigator.vibrate) navigator.vibrate(200);
-            setTimeout(() => window.location.href = 'capture.html', 1000);
-        }, 5000);
+        // Generate QR
+        new QRCode(document.getElementById("qrcode"), { text: pin, width: 200, height: 200 });
+
+        // Polling logic: Check if guest connected
+        const checkInterval = setInterval(() => {
+            if(localStorage.getItem('cc_connected') === 'true') {
+                clearInterval(checkInterval);
+                showSuccess();
+            }
+        }, 1000);
+
+        function showSuccess() {
+            document.getElementById('wait-screen').classList.add('hidden');
+            document.getElementById('success-screen').classList.remove('hidden');
+            if (navigator.vibrate) navigator.vibrate(500);
+            
+            // Redirect after animation
+            setTimeout(() => {
+                window.location.href = 'capture.html';
+            }, 2500);
+        }
     </script>
 </body>
 </html>
