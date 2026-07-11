@@ -38,28 +38,52 @@
         <img id="lb-img" src="" class="max-w-full max-h-[85vh] rounded-3xl object-contain border-4 border-white shadow-2xl">
     </div>
 
-    <script>
-        async function render() {
-            const db = await new Promise(r => { const req = indexedDB.open('CC_Memories_DB', 1); req.onsuccess = () => r(req.result); });
-            const tx = db.transaction('memories', 'readonly');
-            let data = await new Promise(r => { const req = tx.objectStore('memories').getAll(); req.onsuccess = () => r(req.result); });
-            
-            // Check for shared memory from friend
-            const shared = localStorage.getItem('latest_shared_memory');
-            if(shared) {
-                const sMem = JSON.parse(shared);
-                if(!data.find(m => m.id === sMem.id)) data.push(sMem);
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const pin = sessionStorage.getItem('cc_room_pin');
+
+        async function loadAllMemories() {
+            // 1. Fetch Local Data
+            const localData = await new Promise(r => {
+                const req = indexedDB.open('CC_Memories_DB', 1);
+                req.onsuccess = () => {
+                    const tx = req.result.transaction('memories', 'readonly');
+                    tx.objectStore('memories').getAll().onsuccess = (e) => r(e.target.result);
+                };
+                req.onerror = () => r([]);
+            });
+
+            // 2. Fetch Firebase & Merge
+            if (pin) {
+                onValue(ref(db, 'rooms/' + pin + '/memories'), (snapshot) => {
+                    const cloudData = snapshot.val();
+                    let allData = [...localData];
+                    if (cloudData) {
+                        Object.values(cloudData).forEach(m => {
+                            allData.push({ image: m.url, time: m.time, id: m.timestamp });
+                        });
+                    }
+                    renderGallery(allData);
+                });
+            } else {
+                renderGallery(localData);
             }
-            
+        }
+
+        function renderGallery(data) {
             data.sort((a,b) => b.id - a.id);
             document.getElementById('total-count').textContent = data.length;
             
             const groups = {};
             data.forEach(m => {
                 const date = new Date(m.id).toDateString();
-                const label = date === new Date().toDateString() ? "Today" : date;
-                if (!groups[label]) groups[label] = [];
-                groups[label].push(m);
+                if (!groups[date]) groups[date] = [];
+                groups[date].push(m);
             });
 
             const tlBox = document.getElementById('timeline-box');
@@ -80,7 +104,7 @@
             });
         }
 
-        function openLB(src) { document.getElementById('lb-img').src = src; document.getElementById('lightbox').classList.add('active'); }
+        window.openLB = function(src) { document.getElementById('lb-img').src = src; document.getElementById('lightbox').classList.add('active'); }
 
         document.getElementById('tl-btn').onclick = function() {
             document.getElementById('timeline-box').classList.remove('hidden');
@@ -96,7 +120,7 @@
             document.getElementById('tl-btn').classList.remove('btn-active');
         };
 
-        render();
+        loadAllMemories();
     </script>
 </body>
 </html>

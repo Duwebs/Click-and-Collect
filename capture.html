@@ -7,22 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .btn-hover:active { transform: scale(0.95); }
     </style>
 </head>
 <body class="h-full bg-black text-white p-4 overflow-hidden">
 
     <video id="video" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video>
 
-    <div id="debug-alert" class="absolute top-10 left-6 right-6 p-4 bg-rose-500/20 border border-rose-500 text-center rounded-xl hidden z-50">
-        <p class="text-xs font-black uppercase">Not Connected! Redirecting in 3s...</p>
-    </div>
-
-    <div class="absolute bottom-10 left-0 right-0 px-6 space-y-6 z-40">
-        <div id="preview-strip" class="flex gap-3 overflow-x-auto pb-4 scrollbar-none"></div>
+    <div class="absolute bottom-10 left-0 right-0 px-6 z-40">
+        <div id="preview-strip" class="flex gap-3 overflow-x-auto pb-4"></div>
         <div class="flex justify-between items-center">
-            <button onclick="takePhoto()" class="w-20 h-20 bg-white rounded-full border-8 border-white/20 btn-hover transition"></button>
-            <button id="collect-btn" onclick="showCollector()" class="hidden bg-teal-500 px-8 py-4 rounded-3xl font-black text-sm btn-hover shadow-xl">COLLECT IT</button>
+            <button onclick="takePhoto()" class="w-20 h-20 bg-white rounded-full border-8 border-white/20"></button>
+            <button id="collect-btn" onclick="showCollector()" class="hidden bg-teal-500 px-8 py-4 rounded-3xl font-black text-sm">COLLECT IT</button>
         </div>
     </div>
 
@@ -30,16 +25,16 @@
         <div class="glass w-full rounded-[2rem] p-8 text-center space-y-6">
             <h2 class="text-xl font-black uppercase tracking-widest">Share this memory?</h2>
             <div class="grid grid-cols-1 gap-4">
-                <button onclick="finalize('Me')" class="p-5 bg-teal-500/20 border border-teal-500/50 rounded-2xl font-bold">Only for Me 🧑‍🚀</button>
-                <button onclick="finalize('Friend')" class="p-5 bg-purple-500/20 border border-purple-500/50 rounded-2xl font-bold">For my Friend 👱‍♀️</button>
-                <button onclick="finalize('Both')" class="p-5 bg-rose-500/20 border border-rose-500/50 rounded-2xl font-bold">For Both of Us 👩‍❤️‍👨</button>
+                <button onclick="finalize('Me')" class="p-5 bg-teal-500/20 rounded-2xl font-bold">Only for Me 🧑‍🚀</button>
+                <button onclick="finalize('Friend')" class="p-5 bg-purple-500/20 rounded-2xl font-bold">For my Friend 👱‍♀️</button>
+                <button onclick="finalize('Both')" class="p-5 bg-rose-500/20 rounded-2xl font-bold">For Both of Us 👩‍❤️‍👨</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
         
@@ -47,55 +42,50 @@
         const db = getDatabase(app);
         const pin = sessionStorage.getItem('cc_room_pin');
 
-        // Real-time Connection Check
-        if(pin) {
-            onValue(ref(db, 'rooms/' + pin + '/status'), (snapshot) => {
-                if (snapshot.val() !== 'connected') {
-                    document.getElementById('debug-alert').classList.remove('hidden');
-                    setTimeout(() => window.location.href = 'dashboard.html', 3000);
-                }
-            });
-        }
-    </script>
+        window.finalize = async function(choice) {
+            const sessionMemories = window.sessionMemories;
+            
+            // 1. Direct Cloud Sync in Database (No Storage needed)
+            for (let m of sessionMemories) {
+                push(ref(db, 'rooms/' + pin + '/memories'), {
+                    url: m.image, // Base64 string
+                    tag: choice,
+                    time: m.time,
+                    timestamp: Date.now()
+                });
+            }
 
-    <script>
-        let sessionMemories = [];
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                document.getElementById('video').srcObject = stream;
-            } catch(e) { console.error("Camera error:", e); }
-        }
-        startCamera();
-
-        function takePhoto() {
-            const video = document.getElementById('video');
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            const img = canvas.toDataURL('image/jpeg');
-            sessionMemories.push({ image: img, time: new Date().toLocaleTimeString() });
-            document.getElementById('preview-strip').innerHTML += `<img src="${img}" class="w-16 h-16 rounded-2xl border-2 border-white object-cover">`;
-            document.getElementById('collect-btn').classList.remove('hidden');
-        }
-
-        function showCollector() { document.getElementById('collector-modal').classList.remove('hidden'); }
-
-        async function finalize(choice) {
-            // IndexedDB Logic
+            // 2. Local Save (IndexedDB)
             const dbRequest = indexedDB.open('CC_Memories_DB', 1);
             dbRequest.onupgradeneeded = (e) => e.target.result.createObjectStore('memories', { keyPath: 'id' });
             dbRequest.onsuccess = (e) => {
-                const db = e.target.result;
-                const tx = db.transaction('memories', 'readwrite');
-                const store = tx.objectStore('memories');
-                sessionMemories.forEach(m => {
-                    store.add({ id: Date.now(), image: m.image, time: m.time, tag: choice, date: new Date().toLocaleDateString() });
-                });
-                alert("Memory Saved!");
+                const store = e.target.result.transaction('memories', 'readwrite').objectStore('memories');
+                sessionMemories.forEach(m => store.add({ id: Date.now(), image: m.image, time: m.time, tag: choice }));
                 window.location.href = 'timeline.html';
             };
+        };
+    </script>
+
+    <script>
+        window.sessionMemories = [];
+        async function startCamera() { 
+            try {
+                const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }); 
+                document.getElementById('video').srcObject = s; 
+            } catch(e) { console.error(e); }
         }
+        startCamera();
+        function takePhoto() {
+            const v = document.getElementById('video'); 
+            const c = document.createElement('canvas'); 
+            c.width = v.videoWidth; c.height = v.videoHeight; 
+            c.getContext('2d').drawImage(v, 0, 0);
+            const img = c.toDataURL('image/jpeg'); 
+            window.sessionMemories.push({ image: img, time: new Date().toLocaleTimeString() });
+            document.getElementById('preview-strip').innerHTML += `<img src="${img}" class="w-16 h-16 rounded-2xl object-cover">`;
+            document.getElementById('collect-btn').classList.remove('hidden');
+        }
+        function showCollector() { document.getElementById('collector-modal').classList.remove('hidden'); }
     </script>
 </body>
 </html>
