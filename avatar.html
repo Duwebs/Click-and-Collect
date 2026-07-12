@@ -8,44 +8,63 @@
     <style>
         :root { --neon: #38b2ac; --bg: #050505; --surface: #121212; --border: #252525; --text: #ffffff; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
-        body { height: 100vh; overflow: hidden; background: var(--bg); display: flex; justify-content: center; align-items: center; }
+        
+        body { 
+            height: 100dvh; 
+            width: 100%;
+            background: var(--bg); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden; 
+        }
 
-        /* Updated Background Animation */
+        /* Background - Faster and Reversed (Right to Left) */
         .bg-layer { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-image: url('/assets/InstallGraphic.png'); 
-            background-size: 150% 100%; 
-            background-position: 0% 50%;
-            z-index: 0; 
-            animation: panBg 60s linear infinite; 
+            background-size: 200% 100%; 
+            background-position: 100% 50%; /* Start at right */
+            z-index: -1; 
+            animation: panBg 20s linear infinite; /* Faster speed */
             filter: brightness(0.2); 
         }
         @keyframes panBg { 
-            0% { background-position: 0% 50%; } 
-            100% { background-position: 100% 50%; } 
+            0% { background-position: 100% 50%; } 
+            100% { background-position: 0% 50%; } 
         }
 
-        .app-shell { width: 100%; max-width: 400px; height: 100%; display: flex; flex-direction: column; padding: 25px; position: relative; z-index: 1; }
+        /* Lifted the whole section up using extra bottom padding */
+        .app-shell { 
+            width: 100%; 
+            max-width: 400px; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            padding: 25px 25px 50px 25px; /* Added 50px padding-bottom to push content up */
+            background: rgba(0,0,0,0.5);
+        }
 
+        .top-content { padding-top: 10px; }
         .title-box { padding-bottom: 20px; color: #fff; }
-        .hero-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .hero-section { display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        .avatar-pod { width: 200px; height: 200px; background: var(--surface); border: 3px solid var(--border); border-radius: 32px; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-bottom: 30px; }
-        .avatar-pod img { width: 85%; height: 85%; object-fit: cover; border-radius: 20px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .avatar-pod { width: 180px; height: 180px; background: var(--surface); border: 3px solid var(--border); border-radius: 32px; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-bottom: 20px; }
+        .avatar-pod img { width: 85%; height: 85%; object-fit: cover; border-radius: 20px; transition: all 0.4s; }
         .avatar-pod img.move { transform: scale(1.1); opacity: 0.8; }
 
-        .name-input-box { width: 100%; display: flex; align-items: center; gap: 10px; }
-        input { flex: 1; background: var(--surface); border: 2px solid var(--border); padding: 18px; color: white; border-radius: 16px; outline: none; }
-        .shuffle-btn { background: var(--surface); border: 2px solid var(--border); padding: 18px; border-radius: 16px; cursor: pointer; color: white; }
+        .name-input-box { width: 100%; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; background: var(--surface); border: 2px solid var(--border); padding: 15px; color: white; border-radius: 16px; outline: none; }
+        .shuffle-btn { background: var(--surface); border: 2px solid var(--border); padding: 15px; border-radius: 16px; cursor: pointer; color: white; }
 
-        .selection-strip { height: 100px; background: var(--surface); border-radius: 24px; display: flex; align-items: center; padding: 10px 20px; gap: 15px; overflow-x: auto; border: 2px solid var(--border); scroll-behavior: smooth; }
-        .sel-item { width: 65px; height: 65px; background: #1a1a1a; border-radius: 16px; flex-shrink: 0; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.3s; border: 2px solid transparent; }
-        .sel-item.active { border-color: var(--neon); transform: scale(1.1); }
+        .selection-strip { height: 90px; background: var(--surface); border-radius: 24px; display: flex; align-items: center; padding: 10px 15px; gap: 10px; overflow-x: auto; border: 2px solid var(--border); }
+        .sel-item { width: 60px; height: 60px; background: #1a1a1a; border-radius: 16px; flex-shrink: 0; cursor: pointer; display: flex; justify-content: center; align-items: center; border: 2px solid transparent; }
+        .sel-item.active { border-color: var(--neon); transform: scale(1.05); }
         .sel-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; pointer-events: none; }
         .upload-slot { border: 2px dashed var(--border); color: #666; font-size: 20px; flex-shrink: 0; }
 
-        /* Button moved up by reducing margin-top */
-        .launch-btn { margin-top: 15px; width: 100%; padding: 20px; background: var(--neon); color: black; border: none; border-radius: 16px; font-weight: 700; cursor: pointer; }
+        .launch-btn { width: 100%; padding: 18px; background: var(--neon); color: black; border: none; border-radius: 16px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -53,25 +72,27 @@
     <div class="bg-layer"></div>
 
     <div class="app-shell">
-        <div class="title-box">
-            <h2>Select Your Avatar</h2>
-            <p>Define your digital presence</p>
-        </div>
-
-        <div class="hero-section">
-            <div class="avatar-pod" id="avatarBox">
-                <img id="mainAvatar" src="/assets/avatars/1.png">
+        <div class="top-content">
+            <div class="title-box">
+                <h2>Select Your Avatar</h2>
+                <p>Define your digital presence</p>
             </div>
-            
-            <div class="name-input-box">
-                <input type="text" id="userName" placeholder="Your Alias...">
-                <button class="shuffle-btn" onclick="randomizeName()">🎲</button>
-            </div>
-        </div>
 
-        <div class="selection-strip" id="carousel">
-            <input type="file" id="fileInput" accept="image/*" hidden onchange="handleUpload(event)">
-            <div class="sel-item upload-slot" onclick="document.getElementById('fileInput').click()">+</div>
+            <div class="hero-section">
+                <div class="avatar-pod">
+                    <img id="mainAvatar" src="/assets/avatar/avatar1.jpg">
+                </div>
+                
+                <div class="name-input-box">
+                    <input type="text" id="userName" placeholder="Your Alias...">
+                    <button class="shuffle-btn" onclick="randomizeName()">🎲</button>
+                </div>
+            </div>
+
+            <div class="selection-strip" id="carousel">
+                <input type="file" id="fileInput" accept="image/*" hidden onchange="handleUpload(event)">
+                <div class="sel-item upload-slot" onclick="document.getElementById('fileInput').click()">+</div>
+            </div>
         </div>
 
         <button class="launch-btn" onclick="goToHub()">ENTER HUB</button>
@@ -79,17 +100,16 @@
 
     <script>
         const localAvatars = [
-            "/assets/avatar/avatar1.jpg",
-            "/assets/avatar/avatar2.jpg",
-            "/assets/avatar/avatar3.jpg",
-            "/assets/avatar/avatar4.jpg",
-            "/assets/avatar/avatar5.jpg"
+            "/assets/avatar/avatar1.jpg", "/assets/avatar/avatar2.jpg", 
+            "/assets/avatar/avatar3.jpg", "/assets/avatar/avatar4.jpg", "/assets/avatar/avatar5.jpg"
         ];
 
         window.onload = () => {
             localAvatars.forEach(src => addAvatarToUI(src));
             const saved = JSON.parse(localStorage.getItem('myCustomAvatars') || '[]');
             saved.forEach(src => addAvatarToUI(src));
+            const firstAvatar = document.querySelector('.sel-item:not(.upload-slot)');
+            if (firstAvatar) select(firstAvatar);
         };
 
         function addAvatarToUI(src) {
@@ -121,6 +141,7 @@
             document.querySelectorAll('.sel-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
             el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            
             const img = document.getElementById('mainAvatar');
             img.classList.add('move');
             setTimeout(() => {
