@@ -86,8 +86,9 @@
             dbRequest.onupgradeneeded = (e) => e.target.result.createObjectStore('memories', { keyPath: 'id' });
             
             dbRequest.onsuccess = async (e) => {
-                const db = e.target.result;
-                const transaction = db.transaction('memories', 'readwrite');
+                // FIXED: Rename this variable to localDB so it doesn't shadow the Firebase 'db'
+                const localDB = e.target.result; 
+                const transaction = localDB.transaction('memories', 'readwrite');
                 const store = transaction.objectStore('memories');
                 
                 for (let m of sessionMemories) {
@@ -100,6 +101,7 @@
 
                     // LOGIC: Friend or Both -> Send to Firebase
                     if (choice === 'Friend' || choice === 'Both') {
+                        // This now correctly uses the global 'db' (Firebase)
                         push(ref(db, 'rooms/' + pin + '/memories'), {
                             url: m.image,
                             tag: choice,
@@ -126,12 +128,10 @@
         startCamera();
 
         function takePhoto() {
-            // Flash
             const flash = document.getElementById('flash');
             flash.classList.add('flash-active');
             setTimeout(() => flash.classList.remove('flash-active'), 300);
 
-            // Capture
             const c = document.createElement('canvas'); 
             c.width = video.videoWidth; 
             c.height = video.videoHeight; 
@@ -141,7 +141,6 @@
             const photoId = Date.now();
             window.sessionMemories.push({ id: photoId, image: img, time: new Date().toLocaleTimeString() });
             
-            // UI Strip
             const strip = document.getElementById('preview-strip');
             strip.innerHTML += `
                 <div class="relative snap-start flex-shrink-0" id="photo-${photoId}">
