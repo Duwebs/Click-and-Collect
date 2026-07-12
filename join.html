@@ -21,6 +21,12 @@
             from { background-position: 100% 50%; }
             to { background-position: 0% 50%; }
         }
+
+        /* Avatar Slide Animations */
+        @keyframes slideLeft { 0% { transform: translateX(-200%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        @keyframes slideRight { 0% { transform: translateX(200%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        .animate-avatar-left { animation: slideLeft 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-avatar-right { animation: slideRight 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     </style>
 </head>
 
@@ -28,7 +34,7 @@
     
     <div class="bg-scroll"></div>
 
-    <div class="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full gap-4">
+    <div id="join-screen" class="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full gap-4">
         
         <div id="profileBadge" class="flex items-center gap-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 self-center">
             <img id="navAvatar" src="" class="w-8 h-8 rounded-full object-cover border border-white/20">
@@ -45,9 +51,17 @@
         </div>
     </div>
     
+    <div id="success-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl">
+        <div class="flex items-center gap-6">
+            <img id="left-avatar" src="" class="animate-avatar-left w-24 h-24 rounded-full border-4 border-white shadow-2xl object-cover opacity-0">
+            <h1 class="text-3xl font-black uppercase tracking-widest text-white animate-pulse">Linked!</h1>
+            <img id="right-avatar" src="" class="animate-avatar-right w-24 h-24 rounded-full border-4 border-white shadow-2xl object-cover opacity-0">
+        </div>
+    </div>
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI",
@@ -61,14 +75,13 @@
         };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const userData = JSON.parse(localStorage.getItem('userData'));
         
         window.onload = () => {
             startScanner();
-            const savedData = localStorage.getItem('userData');
-            if(savedData) {
-                const user = JSON.parse(savedData);
-                document.getElementById('navAvatar').src = user.avatar;
-                document.getElementById('navName').innerText = user.name;
+            if(userData) {
+                document.getElementById('navAvatar').src = userData.avatar;
+                document.getElementById('navName').innerText = userData.name;
             }
         };
         
@@ -80,8 +93,27 @@
             const snapshot = await get(roomRef);
             
             if (snapshot.exists()) {
-                await update(roomRef, { status: 'connected' });
-                window.location.href = 'capture.html';
+                // Update Firebase with Status and Guest Avatar
+                await update(roomRef, { 
+                    status: 'connected',
+                    guestAvatar: userData.avatar 
+                });
+                
+                // Start listening to the room for animation trigger
+                onValue(roomRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if (data.status === 'connected') {
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                        
+                        document.getElementById('left-avatar').src = data.hostAvatar;
+                        document.getElementById('right-avatar').src = data.guestAvatar;
+                        
+                        document.getElementById('join-screen').classList.add('hidden');
+                        document.getElementById('success-screen').classList.remove('hidden');
+                        
+                        setTimeout(() => window.location.href = 'capture.html', 3000);
+                    }
+                });
             } else {
                 alert("❌ Galat PIN!");
             }
@@ -93,7 +125,6 @@
     <script>
         function startScanner() {
             const html5QrCode = new Html5Qrcode("reader");
-            // qrbox chota kar diya hai taaki scanner screen pe fit rahe
             html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 200 },
                 (decodedText) => {
                     html5QrCode.stop();

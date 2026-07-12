@@ -21,8 +21,12 @@
             from { background-position: 100% 50%; }
             to { background-position: 0% 50%; }
         }
-        @keyframes heartPulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-        .animate-heart { animation: heartPulse 0.8s ease-in-out infinite; }
+
+        /* Avatar Slide Animations */
+        @keyframes slideLeft { 0% { transform: translateX(-200%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        @keyframes slideRight { 0% { transform: translateX(200%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        .animate-avatar-left { animation: slideLeft 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-avatar-right { animation: slideRight 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     </style>
 </head>
 <body class="h-full flex flex-col items-center justify-center p-6 text-white overflow-hidden">
@@ -55,9 +59,12 @@
         </div>
     </div>
 
-    <div id="success-screen" class="hidden flex flex-col items-center">
-        <i class="fas fa-heart text-7xl text-rose-500 animate-heart"></i>
-        <h1 class="text-3xl font-black mt-6 tracking-widest uppercase">Linked!</h1>
+    <div id="success-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl">
+        <div class="flex items-center gap-6">
+            <img id="left-avatar" src="" class="animate-avatar-left w-24 h-24 rounded-full border-4 border-white shadow-2xl object-cover opacity-0">
+            <h1 class="text-3xl font-black uppercase tracking-widest text-white animate-pulse">Linked!</h1>
+            <img id="right-avatar" src="" class="animate-avatar-right w-24 h-24 rounded-full border-4 border-white shadow-2xl object-cover opacity-0">
+        </div>
     </div>
 
     <script type="module">
@@ -78,13 +85,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
+        // Load User Data
+        const userData = JSON.parse(localStorage.getItem('userData'));
+
         window.onload = () => {
-            const savedData = localStorage.getItem('userData');
-            if(savedData) {
-                const user = JSON.parse(savedData);
-                document.getElementById('navAvatar').src = user.avatar;
-                document.getElementById('navName').innerText = user.name;
-                document.getElementById('qr-avatar').src = user.avatar;
+            if(userData) {
+                document.getElementById('navAvatar').src = userData.avatar;
+                document.getElementById('navName').innerText = userData.name;
+                document.getElementById('qr-avatar').src = userData.avatar;
             }
         };
 
@@ -92,14 +100,28 @@
         document.getElementById('generated-pin').textContent = pin;
         new QRCode(document.getElementById("qrcode"), { text: pin, width: 200, height: 200 });
 
-        set(ref(db, 'rooms/' + pin), { status: 'waiting' });
+        // Room Create
+        set(ref(db, 'rooms/' + pin), { 
+            status: 'waiting', 
+            hostAvatar: userData.avatar 
+        });
 
-        onValue(ref(db, 'rooms/' + pin + '/status'), (snapshot) => {
-            if (snapshot.val() === 'connected') {
+        // Connection Listener
+        onValue(ref(db, 'rooms/' + pin), (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.status === 'connected') {
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                
+                // Set Avatars
+                document.getElementById('left-avatar').src = data.hostAvatar;
+                document.getElementById('right-avatar').src = data.guestAvatar;
+                
+                // UI Switch
                 document.getElementById('wait-screen').classList.add('hidden');
                 document.getElementById('success-screen').classList.remove('hidden');
-                if (navigator.vibrate) navigator.vibrate(500);
-                setTimeout(() => window.location.href = 'capture.html', 2000);
+                
+                // Redirect
+                setTimeout(() => window.location.href = 'capture.html', 3000);
             }
         });
     </script>
