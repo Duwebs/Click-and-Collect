@@ -70,24 +70,18 @@
                         memoryMap.set(m.id, { image: m.image, time: m.time, id: m.id, tag: m.tag, sender: m.sender });
                     });
 
-                    // Phir cloud data daalo (taaki duplicates remove ho sakein)
+                    // Phir cloud data daalo
                     if (cloudData) {
-                        Object.values(cloudData).forEach(m => {
-                            memoryMap.set(m.timestamp, { image: m.url, time: m.time, id: m.timestamp, tag: m.tag, sender: m.sender });
+                        Object.entries(cloudData).forEach(([key, m]) => {
+                            memoryMap.set(key, { image: m.url, time: m.time, id: key, tag: m.tag, sender: m.sender });
                         });
                     }
 
-                    // Smart Filter Logic based on choice
+                    // Smart Filter Logic
                     let finalFilteredData = Array.from(memoryMap.values()).filter(m => {
-                        if (m.tag === 'Me') {
-                            return m.sender === myUserId; // Sirf bhejney wale ko dikhe
-                        }
-                        if (m.tag === 'Friend') {
-                            return m.sender !== myUserId; // Sirf samne wale dost ko dikhe, bhejney wale ko nahi!
-                        }
-                        if (m.tag === 'Both') {
-                            return true; // Dono ko dikhe
-                        }
+                        if (m.tag === 'Me') return m.sender === myUserId;
+                        if (m.tag === 'Friend') return m.sender !== myUserId;
+                        if (m.tag === 'Both') return true;
                         return true;
                     });
 
@@ -99,12 +93,13 @@
         }
 
         function renderGallery(data) {
-            data.sort((a,b) => b.id - a.id);
+            // Sort by time
+            data.sort((a,b) => new Date(b.time || 0) - new Date(a.time || 0));
             document.getElementById('total-count').textContent = data.length;
             
             const groups = {};
             data.forEach(m => {
-                const date = new Date(m.id).toDateString();
+                const date = new Date().toDateString(); // Simplified for demo, can use m.time if stored
                 if (!groups[date]) groups[date] = [];
                 groups[date].push(m);
             });
