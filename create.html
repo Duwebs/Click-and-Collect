@@ -9,20 +9,47 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .bg-scroll {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('/assets/InstallGraphic.png');
+            background-size: 200% 100%;
+            z-index: -1;
+            animation: scrollBg 40s linear infinite;
+            filter: brightness(0.3);
+        }
+        @keyframes scrollBg {
+            from { background-position: 100% 50%; }
+            to { background-position: 0% 50%; }
+        }
         @keyframes heartPulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
         .animate-heart { animation: heartPulse 0.8s ease-in-out infinite; }
     </style>
 </head>
-<body class="h-full gradient-bg flex flex-col items-center justify-center p-6 text-white overflow-hidden">
+<body class="h-full flex flex-col items-center justify-center p-6 text-white overflow-hidden">
 
-    <div id="wait-screen" class="w-full max-w-sm flex flex-col items-center space-y-8 animate-in fade-in duration-500">
-        <h1 class="text-xl font-black uppercase tracking-widest text-teal-400">Scan to Connect</h1>
-        <div id="qrcode" class="bg-white p-4 rounded-3xl shadow-2xl"></div>
-        <div class="bg-white/10 w-full py-4 rounded-2xl text-center border border-white/10">
+    <div class="bg-scroll"></div>
+
+    <div id="wait-screen" class="w-full max-w-sm flex flex-col items-center animate-in fade-in duration-500">
+        
+        <div id="profileBadge" class="flex items-center gap-4 bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 shadow-xl mb-6">
+            <img id="navAvatar" src="" class="w-12 h-12 rounded-full object-cover border-2 border-white/20">
+            <span id="navName" class="text-base font-bold tracking-wider">...</span>
+        </div>
+
+        <h1 class="text-xl font-black uppercase tracking-widest text-teal-400 mb-8">Scan to Connect</h1>
+        
+        <div id="qr-wrapper" class="relative inline-block mb-8">
+            <div id="qrcode" class="bg-white p-4 rounded-3xl shadow-2xl"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full border-4 border-white bg-white overflow-hidden shadow-xl">
+                <img id="qr-avatar" src="" class="w-full h-full object-cover">
+            </div>
+        </div>
+        
+        <div class="bg-black/30 backdrop-blur-md w-full py-4 rounded-2xl text-center border border-white/10 mb-6">
             <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Or enter this PIN</p>
             <h2 id="generated-pin" class="text-4xl font-black tracking-[0.2em] text-white">----</h2>
         </div>
+        
         <div class="text-teal-400 font-bold text-xs animate-pulse">
             <i class="fas fa-circle-notch fa-spin mr-2"></i> Waiting for partner...
         </div>
@@ -37,7 +64,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        // Firebase Config
         const firebaseConfig = {
           apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI",
           authDomain: "clickandcollect-6c5d4.firebaseapp.com",
@@ -52,14 +78,22 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
+        window.onload = () => {
+            const savedData = localStorage.getItem('userData');
+            if(savedData) {
+                const user = JSON.parse(savedData);
+                document.getElementById('navAvatar').src = user.avatar;
+                document.getElementById('navName').innerText = user.name;
+                document.getElementById('qr-avatar').src = user.avatar;
+            }
+        };
+
         const pin = Math.floor(1000 + Math.random() * 9000).toString();
         document.getElementById('generated-pin').textContent = pin;
         new QRCode(document.getElementById("qrcode"), { text: pin, width: 200, height: 200 });
 
-        // Firebase par room banao
         set(ref(db, 'rooms/' + pin), { status: 'waiting' });
 
-        // Real-time listener: Guest ka wait karo
         onValue(ref(db, 'rooms/' + pin + '/status'), (snapshot) => {
             if (snapshot.val() === 'connected') {
                 document.getElementById('wait-screen').classList.add('hidden');
