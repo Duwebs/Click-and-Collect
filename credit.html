@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Credit & Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Reset & Base Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* --- Constant Direction Animated Background --- */
+        .bg-animation {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+            background-image: url('/assets/skydown.jpg');
+            background-size: 200% 100%; 
+            background-position: 0% 50%;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        /* Overlay opacity kam kar di (0.85 -> 0.5) taaki image dikhe */
+        .bg-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(11, 15, 25, 0.5); 
+        }
+
+        /* --- Main Content Wrapper --- */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* --- Hero Section --- */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Glassmorphism style cards */
+        .credit-card {
+            background: rgba(255, 255, 255, 0.1); /* Halka light background */
+            backdrop-filter: blur(15px); /* Blur badhaya taaki content clear rahe */
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 50px 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .credit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 35px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .profile-pic {
+            width: 110px; height: 110px;
+            margin: 0 auto 25px auto;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .profile-pic img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .dev-name {
+            color: #ffffff;
+            font-size: 1.6rem;
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+
+        .dev-name strong {
+            background: linear-gradient(45deg, #00d2ff, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .heart {
+            color: #ff3366;
+            animation: pulse 1.5s infinite;
+            display: inline-block;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-primary {
+            text-decoration: none;
+            color: #000;
+            padding: 12px 35px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: #ffffff;
+            border: none;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-bottom: 25px;
+        }
+        .btn-primary:hover {
+            background: #00d2ff;
+            color: #fff;
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.6);
+        }
+
+        .footer-note {
+            color: #ccc;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            font-style: italic;
+        }
+
+        /* --- Other Works Section --- */
+        .works-section {
+            width: 100%;
+            max-width: 1100px;
+            padding: 60px 20px 100px 20px;
+            text-align: center;
+        }
+
+        .works-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 50px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .hidden-el {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .show-el {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .work-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .work-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-10px);
+        }
+
+        .site-logo {
+            width: 80px; height: 80px;
+            border-radius: 12px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+        }
+
+        .site-name { font-size: 1.3rem; color: #fff; margin-bottom: 10px; }
+        .site-desc { font-size: 0.9rem; color: #eee; margin-bottom: 25px; line-height: 1.5; }
+
+        .visit-btn {
+            text-decoration: none;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .visit-btn:hover { background: #fff; color: #000; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-animation">
+        <div class="bg-overlay"></div>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="hero-section">
+            <div class="credit-card">
+                <div class="profile-pic">
+                    <img src="/assets/credit.jpg" alt="Developer Avatar">
+                </div>
+                <h1 class="dev-name">Crafted with <span class="heart">❤</span> by <strong>Durgesh</strong></h1>
+                <a href="#other-works" class="btn-primary">Explore Our Other Works 🚀</a>
+                <p class="footer-note">"Just Think it, Design it."</p>
+            </div>
+        </div>
+
+        <div id="other-works" class="works-section">
+            <h2 class="hidden-el">Our Top Projects</h2>
+            <div class="works-grid">
+                <div class="work-card hidden-el">
+                    <img src="https://api.dicebear.com/7.x/icons/svg?seed=Store" alt="Site Logo" class="site-logo">
+                    <h3 class="site-name">E-Commerce Store</h3>
+                    <p class="site-desc">A fully functional online shopping website with modern UI.</p>
+                    <a href="#" class="visit-btn">Visit Site</a>
+                </div>
+                <div class="work-card hidden-el">
+                    <img src="https://api.dicebear.com/7.x/icons/svg?seed=Portfolio" alt="Site Logo" class="site-logo">
+                    <h3 class="site-name">Agency Portfolio</h3>
+                    <p class="site-desc">Creative portfolio for a digital marketing agency.</p>
+                    <a href="#" class="visit-btn">Visit Site</a>
+                </div>
+                <div class="work-card hidden-el">
+                    <img src="https://api.dicebear.com/7.x/icons/svg?seed=Blog" alt="Site Logo" class="site-logo">
+                    <h3 class="site-name">Tech Blog</h3>
+                    <p class="site-desc">A clean and fast blog site for latest tech news.</p>
+                    <a href="#" class="visit-btn">Visit Site</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('show-el'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.hidden-el').forEach((el) => observer.observe(el));
+    </script>
+</body>
+</html>
