@@ -10,105 +10,87 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .snap-x { scroll-snap-type: x mandatory; }
         .snap-start { scroll-snap-align: start; }
-        
-        /* Shutter flash */
         @keyframes flashAnim { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
         .flash-active { animation: flashAnim 0.3s ease-out; }
     </style>
 </head>
 <body class="h-full bg-black text-white p-4 overflow-hidden">
 
+    <div id="loader" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-[100]">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+    </div>
+
+    <div class="absolute top-6 left-0 right-0 z-40 text-center">
+        <div id="live-counter" class="inline-block bg-black/30 px-4 py-1 rounded-full backdrop-blur-md text-[10px] font-black text-white/70 uppercase tracking-widest hidden">
+            Friend has captured <span id="friend-count" class="text-white">0</span> photos
+        </div>
+        <div class="mt-2 text-[10px] font-bold text-teal-400">My session: <span id="my-count">0</span></div>
+    </div>
+
     <video id="video" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video>
-    
     <div id="flash" class="absolute inset-0 bg-white opacity-0 z-50 pointer-events-none"></div>
 
     <div class="absolute bottom-10 left-0 right-0 px-6 z-40">
-        <div id="preview-strip" class="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x">
-            </div>
+        <div id="preview-strip" class="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x"></div>
 
         <div class="flex justify-between items-center bg-black/50 p-4 rounded-3xl backdrop-blur-md border border-white/10">
-            <div class="w-16"></div> <button onclick="takePhoto()" class="w-16 h-16 bg-white rounded-full border-4 border-white/20 active:scale-90 transition-all"></button>
+            <button onclick="switchCamera()" class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
+            <button onclick="takePhoto()" class="w-16 h-16 bg-white rounded-full border-4 border-white/20 active:scale-90 transition-all"></button>
             <button id="collect-btn" onclick="showCollector()" class="hidden bg-teal-500 px-6 py-3 rounded-2xl font-black text-xs animate-bounce">COLLECT</button>
         </div>
     </div>
 
     <div id="collector-modal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-6 z-50 backdrop-blur-md">
-        <div class="glass-dark w-full max-w-sm rounded-[2.5rem] p-8 text-center space-y-6">
+        <div class="glass-dark w-full max-w-sm rounded-[2.5rem] p-8 text-center space-y-6 relative">
+            <button onclick="document.getElementById('collector-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white/50 hover:text-white p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
             <h2 class="text-lg font-black uppercase tracking-widest text-white/50">Where to send?</h2>
-            
             <div class="space-y-4">
-                <button onclick="finalize('Me')" class="w-full p-4 bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 rounded-2xl text-left transition">
-                    <div class="font-bold text-teal-400">🧑‍🚀 Only for Me</div>
-                    <div class="text-[10px] text-teal-400/60">Saved locally to your private timeline.</div>
-                </button>
-                
-                <button onclick="finalize('Friend')" class="w-full p-4 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-2xl text-left transition">
-                    <div class="font-bold text-purple-400">👱‍♀️ For my Friend</div>
-                    <div class="text-[10px] text-purple-400/60">Sent to their device. Hidden from yours.</div>
-                </button>
-                
-                <button onclick="finalize('Both')" class="w-full p-4 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-2xl text-left transition">
-                    <div class="font-bold text-rose-400">👩‍❤️‍👨 For Both of Us</div>
-                    <div class="text-[10px] text-rose-400/60">Synced to both timelines instantly.</div>
-                </button>
+                <button onclick="finalize('Me')" class="w-full p-4 bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 rounded-2xl text-left"><div class="font-bold text-teal-400">🧑‍🚀 Only for Me</div></button>
+                <button onclick="finalize('Friend')" class="w-full p-4 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-2xl text-left"><div class="font-bold text-purple-400">👱‍♀️ For my Friend</div></button>
+                <button onclick="finalize('Both')" class="w-full p-4 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-2xl text-left"><div class="font-bold text-rose-400">👩‍❤️‍👨 For Both of Us</div></button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI",
-          authDomain: "clickandcollect-6c5d4.firebaseapp.com",
-          databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "clickandcollect-6c5d4",
-          storageBucket: "clickandcollect-6c5d4.firebasestorage.app",
-          messagingSenderId: "739076323619",
-          appId: "1:739076323619:web:9f75d0012923c0b44bb496",
-          measurementId: "G-8V0CJ0ZJVM"
-        };
-        
+        const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        
-        // Ensure Pin exists
         const pin = sessionStorage.getItem('cc_room_pin');
         const myUserId = sessionStorage.getItem('cc_user_id') || 'user_' + Math.random().toString(36).substr(2, 9);
         sessionStorage.setItem('cc_user_id', myUserId);
 
-        window.finalize = async function(choice) {
-            const sessionMemories = window.sessionMemories;
-            if (sessionMemories.length === 0) return;
+        if (pin) {
+            onValue(ref(db, 'rooms/' + pin + '/memories'), (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const friendPhotos = Object.values(data).filter(m => m.sender !== myUserId);
+                    if (friendPhotos.length > 0) {
+                        document.getElementById('live-counter').classList.remove('hidden');
+                        document.getElementById('friend-count').textContent = friendPhotos.length;
+                    }
+                }
+            });
+        }
 
+        window.finalize = async function(choice) {
+            if (!navigator.onLine && (choice === 'Friend' || choice === 'Both')) { alert("Internet connection nahi hai!"); return; }
+            document.getElementById('loader').classList.remove('hidden');
             const dbRequest = indexedDB.open('CC_Memories_DB', 1);
             dbRequest.onupgradeneeded = (e) => e.target.result.createObjectStore('memories', { keyPath: 'id' });
-            
             dbRequest.onsuccess = async (e) => {
-                // FIXED: Rename this variable to localDB so it doesn't shadow the Firebase 'db'
-                const localDB = e.target.result; 
-                const transaction = localDB.transaction('memories', 'readwrite');
-                const store = transaction.objectStore('memories');
-                
-                for (let m of sessionMemories) {
+                const store = e.target.result.transaction('memories', 'readwrite').objectStore('memories');
+                for (let m of window.sessionMemories) {
                     const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
-
-                    // LOGIC: Me or Both -> Save Locally
-                    if (choice === 'Me' || choice === 'Both') {
-                        store.add({ id: uniqueId, image: m.image, time: m.time, tag: choice, sender: myUserId });
-                    }
-
-                    // LOGIC: Friend or Both -> Send to Firebase
-                    if (choice === 'Friend' || choice === 'Both') {
-                        // This now correctly uses the global 'db' (Firebase)
-                        push(ref(db, 'rooms/' + pin + '/memories'), {
-                            url: m.image,
-                            tag: choice,
-                            time: m.time,
-                            sender: myUserId
-                        });
-                    }
+                    if (choice === 'Me' || choice === 'Both') store.add({ id: uniqueId, image: m.image, time: m.time, tag: choice, sender: myUserId });
+                    if (choice === 'Friend' || choice === 'Both') push(ref(db, 'rooms/' + pin + '/memories'), { url: m.image, tag: choice, time: m.time, sender: myUserId });
                 }
                 window.location.href = 'timeline.html';
             };
@@ -117,46 +99,35 @@
 
     <script>
         window.sessionMemories = [];
+        let currentFacingMode = "environment";
         const video = document.getElementById('video');
-
-        async function startCamera() { 
-            try {
-                const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }); 
-                video.srcObject = s; 
-            } catch(e) { console.error(e); }
-        }
+        async function startCamera() { try { const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } }); video.srcObject = s; } catch(e) { alert("Camera access needed!"); } }
         startCamera();
-
+        function switchCamera() { currentFacingMode = currentFacingMode === "environment" ? "user" : "environment"; startCamera(); }
         function takePhoto() {
-            const flash = document.getElementById('flash');
-            flash.classList.add('flash-active');
-            setTimeout(() => flash.classList.remove('flash-active'), 300);
-
+            document.getElementById('flash').classList.add('flash-active');
+            setTimeout(() => document.getElementById('flash').classList.remove('flash-active'), 300);
             const c = document.createElement('canvas'); 
-            c.width = video.videoWidth; 
-            c.height = video.videoHeight; 
-            c.getContext('2d').drawImage(video, 0, 0);
-            const img = c.toDataURL('image/jpeg'); 
-            
+            c.width = video.videoWidth; c.height = video.videoHeight; c.getContext('2d').drawImage(video, 0, 0);
+            const img = c.toDataURL('image/jpeg', 0.6); 
             const photoId = Date.now();
             window.sessionMemories.push({ id: photoId, image: img, time: new Date().toLocaleTimeString() });
-            
-            const strip = document.getElementById('preview-strip');
-            strip.innerHTML += `
-                <div class="relative snap-start flex-shrink-0" id="photo-${photoId}">
-                    <img src="${img}" class="w-16 h-16 rounded-xl object-cover border-2 border-white/20">
-                    <button onclick="removePhoto(${photoId})" class="absolute -top-1 -right-1 bg-red-500 rounded-full w-5 h-5 text-[10px] font-bold">×</button>
-                </div>
-            `;
+            document.getElementById('my-count').textContent = window.sessionMemories.length;
+            document.getElementById('preview-strip').innerHTML += `<div class="relative snap-start flex-shrink-0" id="photo-${photoId}"><img src="${img}" class="w-16 h-16 rounded-xl object-cover border-2 border-white/20"><button onclick="removePhoto(${photoId})" class="absolute -top-1 -right-1 bg-red-500 rounded-full w-5 h-5 text-[10px] font-bold">×</button></div>`;
             document.getElementById('collect-btn').classList.remove('hidden');
         }
-
         function removePhoto(id) {
             window.sessionMemories = window.sessionMemories.filter(m => m.id !== id);
             document.getElementById(`photo-${id}`).remove();
+            document.getElementById('my-count').textContent = window.sessionMemories.length;
             if (window.sessionMemories.length === 0) document.getElementById('collect-btn').classList.add('hidden');
         }
-
+        window.addEventListener('click', (e) => {
+            const ind = document.createElement('div');
+            ind.className = 'absolute w-12 h-12 border-2 border-white rounded-lg pointer-events-none animate-ping';
+            ind.style.left = (e.clientX - 24) + 'px'; ind.style.top = (e.clientY - 24) + 'px';
+            document.body.appendChild(ind); setTimeout(() => ind.remove(), 500);
+        });
         function showCollector() { document.getElementById('collector-modal').classList.remove('hidden'); }
     </script>
 </body>
