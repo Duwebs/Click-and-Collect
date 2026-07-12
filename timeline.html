@@ -45,8 +45,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        const pin = sessionStorage.getItem('cc_room_pin');
-        let myUserId = sessionStorage.getItem('cc_user_id');
+        // SWITCHED TO LOCALSTORAGE WITH FALLBACK
+        const pin = localStorage.getItem('cc_room_pin');
+        let myUserId = localStorage.getItem('cc_user_id');
+        if (!myUserId) {
+            myUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('cc_user_id', myUserId);
+        }
 
         async function loadAllMemories() {
             const localData = await new Promise(r => {
@@ -71,7 +76,7 @@
                         });
                     }
 
-                    // ROBUST FILTER: Sirf tag aur sender check karo
+                    // FIXED ROBUST FILTER
                     let finalData = Array.from(memoryMap.values()).filter(m => {
                         if (m.sender === myUserId) return (m.tag === 'Me' || m.tag === 'Both');
                         return (m.tag === 'Friend' || m.tag === 'Both');
@@ -85,7 +90,8 @@
         }
 
         function renderGallery(data) {
-            data.sort((a,b) => new Date(b.time || 0) - new Date(a.time || 0));
+            // FIXED: Numeric sorting based on timestamps
+            data.sort((a,b) => (b.time || 0) - (a.time || 0));
             document.getElementById('total-count').textContent = data.length;
             
             const tlBox = document.getElementById('timeline-box');
@@ -93,11 +99,14 @@
             tlBox.innerHTML = ''; glBox.innerHTML = '';
             
             data.forEach(m => {
-                const date = new Date().toDateString();
+                const dateStr = new Date(m.time).toDateString();
+                const timeStr = new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
                 tlBox.innerHTML += `
                     <div class="relative pl-10">
                         <div class="absolute left-[20px] top-1 w-2 h-2 bg-rose-500 rounded-full"></div>
-                        <div class="card-glass p-2 rounded-2xl shadow-sm transition active:scale-95" onclick="openLB('${m.image}')">
+                        <div class="text-[9px] font-bold text-teal-600 mb-1 tracking-wider uppercase">${dateStr} - ${timeStr}</div>
+                        <div class="card-glass p-2 rounded-2xl shadow-sm transition active:scale-95 mb-4" onclick="openLB('${m.image}')">
                             <img src="${m.image}" class="w-full aspect-[4/3] rounded-xl object-cover">
                         </div>
                     </div>`;

@@ -63,9 +63,11 @@
         const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const pin = sessionStorage.getItem('cc_room_pin');
-        const myUserId = sessionStorage.getItem('cc_user_id') || 'user_' + Math.random().toString(36).substr(2, 9);
-        sessionStorage.setItem('cc_user_id', myUserId);
+        
+        // SWITCHED TO LOCALSTORAGE
+        const pin = localStorage.getItem('cc_room_pin');
+        const myUserId = localStorage.getItem('cc_user_id') || 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('cc_user_id', myUserId);
 
         if (pin) {
             onValue(ref(db, 'rooms/' + pin + '/memories'), (snapshot) => {
@@ -104,14 +106,19 @@
         async function startCamera() { try { const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } }); video.srcObject = s; } catch(e) { alert("Camera access needed!"); } }
         startCamera();
         function switchCamera() { currentFacingMode = currentFacingMode === "environment" ? "user" : "environment"; startCamera(); }
+        
         function takePhoto() {
             document.getElementById('flash').classList.add('flash-active');
             setTimeout(() => document.getElementById('flash').classList.remove('flash-active'), 300);
             const c = document.createElement('canvas'); 
-            c.width = video.videoWidth; c.height = video.videoHeight; c.getContext('2d').drawImage(video, 0, 0);
+            c.width = video.videoWidth; c.height = video.videoHeight; 
+            c.getContext('2d').drawImage(video, 0, 0);
             const img = c.toDataURL('image/jpeg', 0.6); 
             const photoId = Date.now();
-            window.sessionMemories.push({ id: photoId, image: img, time: new Date().toLocaleTimeString() });
+            
+            // FIXED: Using Timestamp instead of String
+            window.sessionMemories.push({ id: photoId, image: img, time: Date.now() });
+            
             document.getElementById('my-count').textContent = window.sessionMemories.length;
             document.getElementById('preview-strip').innerHTML += `<div class="relative snap-start flex-shrink-0" id="photo-${photoId}"><img src="${img}" class="w-16 h-16 rounded-xl object-cover border-2 border-white/20"><button onclick="removePhoto(${photoId})" class="absolute -top-1 -right-1 bg-red-500 rounded-full w-5 h-5 text-[10px] font-bold">×</button></div>`;
             document.getElementById('collect-btn').classList.remove('hidden');
