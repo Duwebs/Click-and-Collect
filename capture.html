@@ -3,31 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C&C - Smart Capture</title>
+    <title>C&C - Capture</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .glass-dark { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .snap-x { scroll-snap-type: x mandatory; }
+        .snap-start { scroll-snap-align: start; }
+        
+        /* Shutter flash */
+        @keyframes flashAnim { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+        .flash-active { animation: flashAnim 0.3s ease-out; }
     </style>
 </head>
 <body class="h-full bg-black text-white p-4 overflow-hidden">
 
     <video id="video" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video>
+    
+    <div id="flash" class="absolute inset-0 bg-white opacity-0 z-50 pointer-events-none"></div>
 
     <div class="absolute bottom-10 left-0 right-0 px-6 z-40">
-        <div id="preview-strip" class="flex gap-3 overflow-x-auto pb-4"></div>
-        <div class="flex justify-between items-center">
-            <button onclick="takePhoto()" class="w-20 h-20 bg-white rounded-full border-8 border-white/20"></button>
-            <button id="collect-btn" onclick="showCollector()" class="hidden bg-teal-500 px-8 py-4 rounded-3xl font-black text-sm">COLLECT IT</button>
+        <div id="preview-strip" class="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x">
+            </div>
+
+        <div class="flex justify-between items-center bg-black/50 p-4 rounded-3xl backdrop-blur-md border border-white/10">
+            <div class="w-16"></div> <button onclick="takePhoto()" class="w-16 h-16 bg-white rounded-full border-4 border-white/20 active:scale-90 transition-all"></button>
+            <button id="collect-btn" onclick="showCollector()" class="hidden bg-teal-500 px-6 py-3 rounded-2xl font-black text-xs animate-bounce">COLLECT</button>
         </div>
     </div>
 
-    <div id="collector-modal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-6 z-50">
-        <div class="glass w-full rounded-[2rem] p-8 text-center space-y-6">
-            <h2 class="text-xl font-black uppercase tracking-widest">Share this memory?</h2>
-            <div class="grid grid-cols-1 gap-4">
-                <button onclick="finalize('Me')" class="p-5 bg-teal-500/20 rounded-2xl font-bold">Only for Me 🧑‍🚀</button>
-                <button onclick="finalize('Friend')" class="p-5 bg-purple-500/20 rounded-2xl font-bold">For my Friend 👱‍♀️</button>
-                <button onclick="finalize('Both')" class="p-5 bg-rose-500/20 rounded-2xl font-bold">For Both of Us 👩‍❤️‍👨</button>
+    <div id="collector-modal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-6 z-50 backdrop-blur-md">
+        <div class="glass-dark w-full max-w-sm rounded-[2.5rem] p-8 text-center space-y-6">
+            <h2 class="text-lg font-black uppercase tracking-widest text-white/50">Where to send?</h2>
+            
+            <div class="space-y-4">
+                <button onclick="finalize('Me')" class="w-full p-4 bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 rounded-2xl text-left transition">
+                    <div class="font-bold text-teal-400">🧑‍🚀 Only for Me</div>
+                    <div class="text-[10px] text-teal-400/60">Saved locally to your private timeline.</div>
+                </button>
+                
+                <button onclick="finalize('Friend')" class="w-full p-4 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-2xl text-left transition">
+                    <div class="font-bold text-purple-400">👱‍♀️ For my Friend</div>
+                    <div class="text-[10px] text-purple-400/60">Sent to their device. Hidden from yours.</div>
+                </button>
+                
+                <button onclick="finalize('Both')" class="w-full p-4 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-2xl text-left transition">
+                    <div class="font-bold text-rose-400">👩‍❤️‍👨 For Both of Us</div>
+                    <div class="text-[10px] text-rose-400/60">Synced to both timelines instantly.</div>
+                </button>
             </div>
         </div>
     </div>
@@ -36,47 +59,54 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
+        const firebaseConfig = {
+          apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI",
+          authDomain: "clickandcollect-6c5d4.firebaseapp.com",
+          databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "clickandcollect-6c5d4",
+          storageBucket: "clickandcollect-6c5d4.firebasestorage.app",
+          messagingSenderId: "739076323619",
+          appId: "1:739076323619:web:9f75d0012923c0b44bb496",
+          measurementId: "G-8V0CJ0ZJVM"
+        };
         
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        
+        // Ensure Pin exists
         const pin = sessionStorage.getItem('cc_room_pin');
-
-        // Har browser/user ke liye unique ID generate karo agar nahi hai toh
-        if (!sessionStorage.getItem('cc_user_id')) {
-            sessionStorage.setItem('cc_user_id', 'user_' + Math.random().toString(36).substr(2, 9));
-        }
-        const myUserId = sessionStorage.getItem('cc_user_id');
+        const myUserId = sessionStorage.getItem('cc_user_id') || 'user_' + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('cc_user_id', myUserId);
 
         window.finalize = async function(choice) {
             const sessionMemories = window.sessionMemories;
+            if (sessionMemories.length === 0) return;
+
             const dbRequest = indexedDB.open('CC_Memories_DB', 1);
-            
             dbRequest.onupgradeneeded = (e) => e.target.result.createObjectStore('memories', { keyPath: 'id' });
             
             dbRequest.onsuccess = async (e) => {
-                const store = e.target.result.transaction('memories', 'readwrite').objectStore('memories');
+                const db = e.target.result;
+                const transaction = db.transaction('memories', 'readwrite');
+                const store = transaction.objectStore('memories');
                 
                 for (let m of sessionMemories) {
-                    const uniqueTimestamp = Date.now() + Math.floor(Math.random() * 1000);
-                    
-                    // 1. Cloud Sync with Sender ID
-                    push(ref(db, 'rooms/' + pin + '/memories'), {
-                        url: m.image,
-                        tag: choice,
-                        time: m.time,
-                        timestamp: uniqueTimestamp,
-                        sender: myUserId
-                    });
+                    const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
 
-                    // 2. Local Save with Sender ID
-                    store.add({ 
-                        id: uniqueTimestamp, 
-                        image: m.image, 
-                        time: m.time, 
-                        tag: choice,
-                        sender: myUserId 
-                    });
+                    // LOGIC: Me or Both -> Save Locally
+                    if (choice === 'Me' || choice === 'Both') {
+                        store.add({ id: uniqueId, image: m.image, time: m.time, tag: choice, sender: myUserId });
+                    }
+
+                    // LOGIC: Friend or Both -> Send to Firebase
+                    if (choice === 'Friend' || choice === 'Both') {
+                        push(ref(db, 'rooms/' + pin + '/memories'), {
+                            url: m.image,
+                            tag: choice,
+                            time: m.time,
+                            sender: myUserId
+                        });
+                    }
                 }
                 window.location.href = 'timeline.html';
             };
@@ -85,23 +115,49 @@
 
     <script>
         window.sessionMemories = [];
+        const video = document.getElementById('video');
+
         async function startCamera() { 
             try {
                 const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }); 
-                document.getElementById('video').srcObject = s; 
+                video.srcObject = s; 
             } catch(e) { console.error(e); }
         }
         startCamera();
+
         function takePhoto() {
-            const v = document.getElementById('video'); 
+            // Flash
+            const flash = document.getElementById('flash');
+            flash.classList.add('flash-active');
+            setTimeout(() => flash.classList.remove('flash-active'), 300);
+
+            // Capture
             const c = document.createElement('canvas'); 
-            c.width = v.videoWidth; c.height = v.videoHeight; 
-            c.getContext('2d').drawImage(v, 0, 0);
+            c.width = video.videoWidth; 
+            c.height = video.videoHeight; 
+            c.getContext('2d').drawImage(video, 0, 0);
             const img = c.toDataURL('image/jpeg'); 
-            window.sessionMemories.push({ image: img, time: new Date().toLocaleTimeString() });
-            document.getElementById('preview-strip').innerHTML += `<img src="${img}" class="w-16 h-16 rounded-2xl object-cover">`;
+            
+            const photoId = Date.now();
+            window.sessionMemories.push({ id: photoId, image: img, time: new Date().toLocaleTimeString() });
+            
+            // UI Strip
+            const strip = document.getElementById('preview-strip');
+            strip.innerHTML += `
+                <div class="relative snap-start flex-shrink-0" id="photo-${photoId}">
+                    <img src="${img}" class="w-16 h-16 rounded-xl object-cover border-2 border-white/20">
+                    <button onclick="removePhoto(${photoId})" class="absolute -top-1 -right-1 bg-red-500 rounded-full w-5 h-5 text-[10px] font-bold">×</button>
+                </div>
+            `;
             document.getElementById('collect-btn').classList.remove('hidden');
         }
+
+        function removePhoto(id) {
+            window.sessionMemories = window.sessionMemories.filter(m => m.id !== id);
+            document.getElementById(`photo-${id}`).remove();
+            if (window.sessionMemories.length === 0) document.getElementById('collect-btn').classList.add('hidden');
+        }
+
         function showCollector() { document.getElementById('collector-modal').classList.remove('hidden'); }
     </script>
 </body>
