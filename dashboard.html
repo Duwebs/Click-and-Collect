@@ -2,20 +2,23 @@
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="msapplication-config" content="assets/browserconfig.xml">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <title>C&C Dashboard</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <link rel="apple-touch-icon" sizes="57x57" href="assets/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="assets/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="assets/apple-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="76x76" href="assets/apple-icon-76x76.png">
-    <link class="apple-touch-icon" sizes="114x114" href="assets/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="assets/apple-icon-114x114.png">
     <link rel="apple-touch-icon" sizes="120x120" href="assets/apple-icon-120x120.png">
     <link rel="apple-touch-icon" sizes="144x144" href="assets/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="assets/apple-icon-152x152.png">
@@ -30,9 +33,10 @@
     <meta name="theme-color" content="#ffffff">
 
     <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
         .rounded-brand-font { font-family: 'Fredoka', sans-serif; }
-        
+
         .premium-bg {
             background: radial-gradient(circle at center, #4fd1c5 0%, #36a39b 70%, #2c8a83 100%);
             animation: ambient-shift 6s ease-in-out infinite;
@@ -44,7 +48,7 @@
 
         .polaroid-tip::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); border-width: 8px 8px 0; border-style: solid; border-color: #ffffff transparent; display: block; }
         .fab-tooltip::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent #e64d5c; display: block; }
-        
+
         .content-card-curve { border-top-left-radius: 32px; border-top-right-radius: 32px; }
 
         @keyframes shine-swipe { 0% { transform: translateX(-100%) skewX(-15deg); } 25%, 100% { transform: translateX(200%) skewX(-15deg); } }
@@ -54,13 +58,11 @@
         .shimmer-footer::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%); transform: translateX(-100%); animation: footerSweep 3.8s infinite ease-in-out; }
         @keyframes footerSweep { 0% { transform: translateX(-100%); } 40%, 100% { transform: translateX(100%); } }
 
-        /* Twinkling Stars Animation */
         @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 0.9; transform: scale(1.1); } }
         .star-twinkle { animation: twinkle 3s infinite ease-in-out; }
 
-        /* Camera Animation */
-        @keyframes cameraMorph { 0% { position: fixed; left: 44%; top: 40%; transform: translate(-50%, -50%) scale(2.4); z-index: 100; } 25% { position: fixed; left: 44%; top: 40%; transform: translate(-50%, -50%) scale(2.4); z-index: 100; } 100% { position: fixed; left: 16px; top: 10px; transform: translate(0, 0) scale(1); z-index: 50; } }
-        @keyframes textMorph { 0% { position: fixed; left: 48%; top: 55%; transform: translate(-50%, -50%) scale(1.4); z-index: 100; } 25% { position: fixed; left: 48%; top: 55%; transform: translate(-50%, -50%) scale(1.4); z-index: 100; } 100% { position: fixed; left: 68px; top: 13px; transform: translate(0, 0) scale(1); z-index: 50; } }
+        @keyframes cameraMorph { 0% { position: fixed; left: 44%; top: 40%; transform: translate(-50%, -50%) scale(2.4); z-index: 100; } 25% { position: fixed; left: 44%; top: 40%; transform: translate(-50%, -50%) scale(2.4); z-index: 100; } 100% { position: fixed; left: var(--header-icon-x, 16px); top: var(--header-icon-y, 10px); transform: translate(0, 0) scale(1); z-index: 50; } }
+        @keyframes textMorph { 0% { position: fixed; left: 48%; top: 55%; transform: translate(-50%, -50%) scale(1.4); z-index: 100; } 25% { position: fixed; left: 48%; top: 55%; transform: translate(-50%, -50%) scale(1.4); z-index: 100; } 100% { position: fixed; left: var(--header-text-x, 68px); top: var(--header-text-y, 13px); transform: translate(0, 0) scale(1); z-index: 50; } }
         .animate-camera-morph { animation: cameraMorph 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards; transform-origin: left top; will-change: transform, left, top; }
         .animate-text-morph { animation: textMorph 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards; transform-origin: left top; will-change: transform, left, top; }
 
@@ -72,20 +74,36 @@
         .animate-fade-hero { animation: sceneReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1.05s both; }
         .animate-fade-content { animation: layoutSlideUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 1.15s both; }
         .animate-heart { animation: heartbeat 1.6s infinite ease-in-out; }
-        
-        @keyframes horizontalScroll {
-            0% { background-position-x: 0; }
-            100% { background-position-x: 2000px; }
-        }
-        .animate-bg-scroll { animation: horizontalScroll 70s linear infinite; }
 
-        /* Smooth Infinite Loop for PWA Graphic Background */
-        @keyframes scrollBackground {
-            0% { background-position: 0 0; }
-            100% { background-position: 800px 0; }
+        @keyframes scrollBackground { 0% { background-position: 0 0; } 100% { background-position: 800px 0; } }
+        .animate-pwa-bg-loop { animation: scrollBackground 55s linear infinite !important; }
+
+        /* App shell now caps at a sane width on tablets/desktop instead of stretching edge to edge */
+        .app-shell { max-width: 480px; margin-left: auto; margin-right: auto; width: 100%; }
+
+        /* Safe-area padding so header/footer/FAB never sit under a notch or gesture bar */
+        header.app-header { padding-top: env(safe-area-inset-top); }
+        footer.app-footer { padding-bottom: env(safe-area-inset-bottom); }
+        #main-fab-btn-wrap { bottom: calc(4rem + env(safe-area-inset-bottom)); }
+        #sheet-content, #pwa-bottom-sheet { padding-bottom: calc(2rem + env(safe-area-inset-bottom)); }
+
+        /* Photo strip: shrink gracefully instead of overflowing on very narrow phones */
+        @media (max-width: 340px) {
+            .polaroid-lg { width: 6.5rem; }
+            .polaroid-sm { width: 5rem; }
         }
-        .animate-pwa-bg-loop {
-            animation: scrollBackground 55s linear infinite !important;
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .animate-camera-morph, .animate-text-morph {
+                animation: none !important;
+                position: static !important;
+                transform: none !important;
+            }
         }
     </style>
 </head>
@@ -94,9 +112,11 @@
     <input type="file" id="native-camera-picker" accept="image/*" capture="environment" class="hidden">
     <input type="file" id="native-gallery-picker" accept="image/*" class="hidden">
 
+    <div class="app-shell h-full flex flex-col overflow-hidden mx-auto relative">
+
     <div class="shrink-0 flex flex-col pb-6 relative">
-        <header class="h-14 flex items-center px-4 shrink-0 bg-transparent relative">
-            <div class="animate-camera-morph">
+        <header class="app-header h-14 flex items-center px-4 shrink-0 bg-transparent relative">
+            <div class="animate-camera-morph" id="morph-camera">
                 <div class="relative flex-shrink-0">
                     <div class="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center text-white border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.1)] relative overflow-hidden">
                         <i class="fas fa-camera text-base"></i>
@@ -107,8 +127,8 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="animate-text-morph flex items-baseline whitespace-nowrap">
+
+            <div class="animate-text-morph flex items-baseline whitespace-nowrap" id="morph-text">
                 <span class="text-2xl font-bold tracking-wide text-white rounded-brand-font uppercase">C &amp; C</span>
             </div>
 
@@ -128,19 +148,19 @@
             <i class="fas fa-star absolute top-4 right-20 text-yellow-300/30 text-[7px] star-twinkle" style="animation-delay: 1.9s;"></i>
 
             <div class="flex items-end justify-center space-x-[-12px] mb-4 w-full max-w-sm relative z-10">
-                <div class="bg-white p-1.5 pb-4 rounded shadow-lg transform -rotate-12 w-24 border border-white/40">
-                    <img src="/assets/selfie.jpg" alt="Vector Human 1" class="aspect-square w-full object-cover rounded-sm">
+                <div class="polaroid-lg bg-white p-1.5 pb-4 rounded shadow-lg transform -rotate-12 w-24 border border-white/40">
+                    <img src="assets/selfie.jpg" alt="Family photo" class="aspect-square w-full object-cover rounded-sm" loading="lazy">
                 </div>
-                
-                <div class="bg-white p-2 pb-5 rounded-md shadow-2xl transform scale-110 z-20 w-32 border border-white relative polaroid-tip mb-1">
-                    <img src="/assets/girl.svg" alt="Vector Family Center" class="aspect-square w-full object-cover rounded-sm">
+
+                <div class="polaroid-lg bg-white p-2 pb-5 rounded-md shadow-2xl transform scale-110 z-20 w-32 border border-white relative polaroid-tip mb-1">
+                    <img src="assets/girl.svg" alt="Family photo" class="aspect-square w-full object-cover rounded-sm" loading="lazy">
                 </div>
-                
-                <div class="bg-white p-1.5 pb-4 rounded shadow-lg transform rotate-12 w-24 border border-white/40">
-                    <img src="/assets/friends.jpg" alt="Vector Human 3" class="aspect-square w-full object-cover rounded-sm">
+
+                <div class="polaroid-sm bg-white p-1.5 pb-4 rounded shadow-lg transform rotate-12 w-24 border border-white/40">
+                    <img src="assets/friends.jpg" alt="Friends photo" class="aspect-square w-full object-cover rounded-sm" loading="lazy">
                 </div>
             </div>
-            
+
             <h2 class="text-[10px] uppercase tracking-[0.15em] text-teal-100/90 font-extrabold mb-0.5">Save Your Precious</h2>
             <h3 class="text-3xl font-extrabold text-white tracking-wide mb-0.5">Memories</h3>
             <h4 class="text-[10px] uppercase tracking-[0.2em] text-teal-50/80 font-bold">FOREVER</h4>
@@ -157,25 +177,21 @@
                 <button id="card-click-camera" class="text-brand-coral border border-brand-coral rounded-xl py-2.5 text-xs font-bold flex items-center justify-center space-x-1.5 active:scale-95 transition bg-white"><i class="fas fa-camera text-xs"></i><span>Click a Photo</span></button>
                 <button id="card-open-gallery" class="text-brand-coral border border-brand-coral rounded-xl py-2.5 text-xs font-bold flex items-center justify-center space-x-1.5 active:scale-95 transition bg-white"><i class="fas fa-image text-xs"></i><span>Select a Photo</span></button>
             </div>
-            <!---Click with frnd button start---->
-            <div onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='click-hub.html'" class="flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
-    <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20">
-        <i class="fas fa-user-friends text-sm"></i>
-    </div>
-    <div class="text-left flex-1">
-        <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-            Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
-        </p>
-        <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
-    </div>
-    <i class="fas fa-chevron-right text-xs text-slate-300"></i>
-</div>
 
-<!---click with frnd button ending--->
-
-
+            <button type="button" id="click-with-friend-card" class="w-full text-left flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
+                <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20 shrink-0">
+                    <i class="fas fa-user-friends text-sm"></i>
+                </div>
+                <div class="text-left flex-1 min-w-0">
+                    <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                        Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
+                    </p>
+                    <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
+                </div>
+                <i class="fas fa-chevron-right text-xs text-slate-300 shrink-0"></i>
+            </button>
         </div>
-        
+
         <div class="w-full pl-1">
             <ul class="space-y-3.5 text-left">
                 <li class="flex items-start space-x-2 text-[11px] text-slate-500 font-medium leading-tight">
@@ -198,18 +214,18 @@
         </div>
     </main>
 
-    <footer class="h-11 shimmer-footer text-white/90 text-[10px] flex items-center justify-center space-x-1.5 shrink-0 font-medium tracking-wide z-10 border-t border-white/5">
+    <footer class="app-footer h-11 shimmer-footer text-white/90 text-[10px] flex items-center justify-center space-x-1.5 shrink-0 font-medium tracking-wide z-10 border-t border-white/5">
         <i class="fas fa-lock text-[10px]"></i><span>Your memories are saved privately, only you can see these</span>
     </footer>
 
-    <div class="animate-fade-content absolute bottom-16 right-4 z-40 flex items-center space-x-1.5">
+    <div id="main-fab-btn-wrap" class="animate-fade-content absolute right-4 z-40 flex items-center space-x-1.5">
         <div id="tutorial-tooltip" class="animate-nudge bg-brand-coral text-white text-[10.5px] font-semibold px-2.5 py-1.5 rounded shadow-md relative fab-tooltip tracking-wide flex items-center space-x-1 transition-all duration-300 ease-out origin-right"><i class="fas fa-hand-point-right text-xs mr-0.5 animate-pulse"></i><span>Add your First Photo</span></div>
         <button id="main-fab-btn" class="bg-brand-coral w-12 h-12 rounded-full flex items-center justify-center text-white text-base shadow-lg shadow-rose-500/30 active:scale-90 transition border border-white/10"><i class="fas fa-camera"></i></button>
     </div>
 
     <div id="bottom-sheet" class="fixed inset-0 z-50 invisible transition-all duration-300">
         <div id="sheet-backdrop" class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300"></div>
-        <div id="sheet-content" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[24px] p-5 pb-8 transform translate-y-full transition-transform duration-300 ease-out text-slate-800 shadow-[0_-10px_32px_rgba(0,0,0,0.15)]">
+        <div id="sheet-content" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[24px] p-5 pb-8 transform translate-y-full transition-transform duration-300 ease-out text-slate-800 shadow-[0_-10px_32px_rgba(0,0,0,0.15)] app-shell mx-auto">
             <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
             <h3 class="text-xs font-bold text-gray-400 mb-4 text-center tracking-wide uppercase">Choose Action</h3>
             <div class="space-y-3">
@@ -226,46 +242,41 @@
                         <p class="text-xs font-bold text-slate-800">Upload from Gallery</p>
                         <p class="text-[10px] text-slate-400 mt-0.5">Open phone gallery to pick a picture</p>
                     </div>
-                    
-
-                    
-                    
                 </button>
-                <div onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='click-hub.html'" class="flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
-    <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20">
-        <i class="fas fa-user-friends text-sm"></i>
-    </div>
-    <div class="text-left flex-1">
-        <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-            Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
-        </p>
-        <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
-    </div>
-    <i class="fas fa-chevron-right text-xs text-slate-300"></i>
-</div>
-
+                <button type="button" id="sheet-click-with-friend" class="w-full text-left flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
+                    <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20 shrink-0">
+                        <i class="fas fa-user-friends text-sm"></i>
+                    </div>
+                    <div class="text-left flex-1 min-w-0">
+                        <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                            Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
+                        </p>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-xs text-slate-300 shrink-0"></i>
+                </button>
             </div>
         </div>
     </div>
 
     <div id="pwa-wrapper" class="fixed inset-0 z-[100] opacity-0 pointer-events-none transition-all duration-500 ease-out">
         <div id="pwa-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-500"></div>
-        
-        <div id="pwa-bottom-sheet" class="absolute bottom-0 inset-x-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.3)] p-6 pt-5 pb-10 transform translate-y-full text-slate-800 overflow-hidden max-w-md mx-auto flex flex-col" style="transition: transform 650ms cubic-bezier(0.19, 1, 0.22, 1); min-height: 52vh;">
-            
-            <div class="absolute inset-0 opacity-[0.08] pointer-events-none bg-repeat bg-center z-0 animate-pwa-bg-loop" style="background-image: url('/assets/InstallGraphic.png'); background-size: 260px;"></div>
+
+        <div id="pwa-bottom-sheet" class="absolute bottom-0 inset-x-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.3)] p-6 pt-5 transform translate-y-full text-slate-800 overflow-hidden max-w-md mx-auto flex flex-col" style="transition: transform 650ms cubic-bezier(0.19, 1, 0.22, 1); min-height: 52vh;">
+
+            <div class="absolute inset-0 opacity-[0.08] pointer-events-none bg-repeat bg-center z-0 animate-pwa-bg-loop" style="background-image: url('assets/InstallGraphic.png'); background-size: 260px;"></div>
 
             <div class="absolute inset-x-0 bottom-0 h-48 opacity-[0.12] pointer-events-none mix-blend-multiply animate-wave-float">
                 <svg viewBox="0 0 1440 320" class="w-full h-full object-cover">
                     <path fill="#06b6d4" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,218.7C672,203,768,149,864,128C960,107,1056,117,1152,138.7C1248,160,1344,192,1392,208L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
                 </svg>
             </div>
-            
+
             <div class="absolute top-12 left-1/4 w-36 h-36 bg-teal-400/20 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
             <div class="absolute top-24 right-1/4 w-36 h-36 bg-rose-400/15 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-delay: 1.5s;"></div>
 
             <div class="w-14 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 relative z-10"></div>
-            
+
             <div class="flex items-start justify-between w-full gap-3 mb-6 relative z-10">
                 <div class="shrink-0 relative">
                     <div class="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-[0_8px_24px_rgba(13,148,136,0.14)] border border-slate-100 transition-transform duration-300 hover:scale-105">
@@ -281,15 +292,15 @@
 
                 <div class="flex-1 min-w-0 pt-1">
                     <h3 class="font-black text-slate-800 text-xl tracking-wide leading-tight flex items-center flex-wrap gap-1.5">
-                        <span class="whitespace-nowrap">Click &amp; Collect</span> 
+                        <span class="whitespace-nowrap">Click &amp; Collect</span>
                         <span class="text-xs font-bold uppercase tracking-widest bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md border border-slate-200/60 inline-block">App</span>
                     </h3>
                     <p class="text-[11px] text-slate-400 font-semibold mt-1 leading-tight">
-                        For Better Smooth and Fast Experience Install Now 
+                        For Better Smooth and Fast Experience Install Now
                     </p>
                 </div>
-                
-                <button id="close-sheet-btn" class="w-8 h-8 bg-slate-100/80 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90 shadow-sm text-xs shrink-0 mt-1">✕</button>
+
+                <button id="close-sheet-btn" type="button" aria-label="Close" class="w-8 h-8 bg-slate-100/80 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90 shadow-sm text-xs shrink-0 mt-1">✕</button>
             </div>
 
             <div class="grid grid-cols-3 gap-3 mb-8 relative z-10">
@@ -315,7 +326,7 @@
 
             <div class="mt-auto pt-4 pb-2 relative z-10 w-full">
                 <div id="android-action" class="hidden">
-                    <button id="action-install-btn" class="gpu-shine w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-4 rounded-2xl text-xs shadow-xl shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
+                    <button id="action-install-btn" type="button" class="gpu-shine w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-4 rounded-2xl text-xs shadow-xl shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
                         Install App Now
                     </button>
                 </div>
@@ -325,6 +336,11 @@
                     <p class="text-[11px] text-slate-500 font-semibold leading-relaxed">
                         iPhone par install karne ke liye niche browser dashboard par <span class="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">Share icon <i class="text-xs far fa-share-square"></i></span> par click karein aur phir <span class="font-bold text-slate-800 bg-slate-200/50 px-1.5 py-0.5 rounded-md">"Add to Home Screen"</span> chunein.
                     </p>
+                </div>
+
+                <div id="already-installed-action" class="hidden bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-center gap-3">
+                    <i class="fas fa-check-circle text-emerald-500"></i>
+                    <p class="text-[11px] text-emerald-700 font-semibold">App already installed on this device.</p>
                 </div>
             </div>
         </div>
@@ -344,11 +360,6 @@
                 will-change: transform;
                 animation: fast-hardware-shine 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
             }
-            @keyframes mesh-drift {
-                0%, 100% { transform: scale(1) translateY(0); }
-                50% { transform: scale(1.03) translateY(-4px); }
-            }
-            .animate-bg-mesh { animation: mesh-drift 10s infinite ease-in-out; }
             @keyframes liquid-wave {
                 0%, 100% { transform: translateY(0) scaleY(1); }
                 50% { transform: translateY(-6px) scaleY(1.03); }
@@ -359,7 +370,7 @@
 
     <div id="update-modal-wrapper" class="fixed inset-0 z-[200] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500 ease-out">
         <div id="update-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-md"></div>
-        
+
         <div id="update-modal-box" class="relative bg-white w-full max-w-[350px] rounded-[30px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] overflow-hidden transform scale-90 opacity-0 transition-all duration-500 ease-out text-slate-800">
             <div class="relative bg-gradient-to-br from-[#E14D57] via-[#f0626d] to-[#ff7681] h-48 flex flex-col items-center justify-center overflow-hidden">
                 <div class="absolute inset-0 opacity-20 pointer-events-none">
@@ -385,7 +396,7 @@
                 <span class="inline-block bg-rose-50 text-[#E14D57] font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-full mb-3 border border-rose-100/50">
                     ✨ App Update
                 </span>
-                
+
                 <h3 class="text-lg font-black text-slate-800 tracking-wide rounded-brand-font">Look What's New!</h3>
                 <p class="text-xs text-slate-400 font-medium mt-1 mb-5">Humne aapke experience ko aur behtar banaya hai</p>
 
@@ -404,7 +415,7 @@
                     </div>
                 </div>
 
-                <button id="close-update-modal-btn" class="clean-shine-btn w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-3.5 rounded-2xl text-xs shadow-lg shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
+                <button id="close-update-modal-btn" type="button" class="clean-shine-btn w-full bg-gradient-to-r from-[#E14D57] via-[#f0626d] to-[#E14D57] text-white font-black py-3.5 rounded-2xl text-xs shadow-lg shadow-rose-500/20 transition-all active:scale-[0.97] uppercase tracking-widest relative overflow-hidden">
                     Awesome, Got It!
                 </button>
             </div>
@@ -433,6 +444,8 @@
         </style>
     </div>
 
+    </div><!-- /.app-shell -->
+
     <script>
         const cameraPicker = document.getElementById('native-camera-picker');
         const galleryPicker = document.getElementById('native-gallery-picker');
@@ -450,7 +463,7 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 800; 
+                    const MAX_WIDTH = 800;
                     let width = img.width;
                     let height = img.height;
 
@@ -460,10 +473,10 @@
                     }
                     canvas.width = width;
                     canvas.height = height;
-                    
+
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    
+
                     try {
                         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
                         sessionStorage.setItem('recent_memory_image', compressedBase64);
@@ -476,30 +489,37 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+            // Reset value so selecting the same file twice still fires 'change'
+            event.target.value = '';
         }
 
-        function dismissTooltip() { 
-            if (tooltip) { 
-                tooltip.style.opacity = '0'; 
-                tooltip.style.transform = 'translateX(12px) scale(0.85)'; 
-                setTimeout(() => tooltip.remove(), 300); 
-            } 
+        function dismissTooltip() {
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+                tooltip.style.transform = 'translateX(12px) scale(0.85)';
+                setTimeout(() => tooltip.remove(), 300);
+            }
         }
-        
-        function openBottomSheet() { 
-            bottomSheet.classList.remove('invisible'); 
-            sheetBackdrop.classList.remove('opacity-0'); 
-            sheetBackdrop.classList.add('opacity-100'); 
-            sheetContent.classList.remove('translate-y-full'); 
-            sheetContent.classList.add('translate-y-0'); 
+
+        function openBottomSheet() {
+            bottomSheet.classList.remove('invisible');
+            sheetBackdrop.classList.remove('opacity-0');
+            sheetBackdrop.classList.add('opacity-100');
+            sheetContent.classList.remove('translate-y-full');
+            sheetContent.classList.add('translate-y-0');
         }
-        
-        function closeBottomSheet() { 
-            sheetBackdrop.classList.remove('opacity-100'); 
-            sheetBackdrop.classList.add('opacity-0'); 
-            sheetContent.classList.remove('translate-y-0'); 
-            sheetContent.classList.add('translate-y-full'); 
-            setTimeout(() => { bottomSheet.classList.add('invisible'); }, 300); 
+
+        function closeBottomSheet() {
+            sheetBackdrop.classList.remove('opacity-100');
+            sheetBackdrop.classList.add('opacity-0');
+            sheetContent.classList.remove('translate-y-0');
+            sheetContent.classList.add('translate-y-full');
+            setTimeout(() => { bottomSheet.classList.add('invisible'); }, 300);
+        }
+
+        function goToClickHub() {
+            if (navigator.vibrate) navigator.vibrate(40);
+            window.location.href = 'click-hub.html';
         }
 
         cameraPicker.addEventListener('change', handleFileSelect);
@@ -507,21 +527,118 @@
 
         document.getElementById('card-click-camera').addEventListener('click', () => { dismissTooltip(); cameraPicker.click(); });
         document.getElementById('card-open-gallery').addEventListener('click', () => { dismissTooltip(); galleryPicker.click(); });
+        document.getElementById('click-with-friend-card').addEventListener('click', goToClickHub);
+        document.getElementById('sheet-click-with-friend').addEventListener('click', goToClickHub);
         document.getElementById('main-fab-btn').addEventListener('click', () => { dismissTooltip(); openBottomSheet(); });
         sheetBackdrop.addEventListener('click', closeBottomSheet);
-        
+
         document.getElementById('sheet-click-camera').addEventListener('click', () => { closeBottomSheet(); cameraPicker.click(); });
         document.getElementById('sheet-open-gallery').addEventListener('click', () => { closeBottomSheet(); galleryPicker.click(); });
+
+        // Align the header camera icon / wordmark landing spot for the intro morph animation
+        // dynamically, so it lines up correctly no matter the device width/DPI.
+        (function alignMorphTargets() {
+            const cameraEl = document.getElementById('morph-camera');
+            const textEl = document.getElementById('morph-text');
+            const header = document.querySelector('.app-header');
+            if (!cameraEl || !textEl || !header) return;
+            const headerRect = header.getBoundingClientRect();
+            const px4 = 16; // matches header's px-4 padding
+            document.documentElement.style.setProperty('--header-icon-x', px4 + 'px');
+            document.documentElement.style.setProperty('--header-icon-y', Math.round((headerRect.height - 40) / 2) + 'px');
+            document.documentElement.style.setProperty('--header-text-x', (px4 + 40 + 12) + 'px');
+            document.documentElement.style.setProperty('--header-text-y', Math.round((headerRect.height - 32) / 2 + 3) + 'px');
+        })();
     </script>
-    
+
+    <script>
+        // ---- PWA install sheet wiring ----
+        (function () {
+            const pwaWrapper = document.getElementById('pwa-wrapper');
+            const pwaBackdrop = document.getElementById('pwa-backdrop');
+            const pwaSheet = document.getElementById('pwa-bottom-sheet');
+            const headerInstallBtn = document.getElementById('header-install-btn');
+            const closeSheetBtn = document.getElementById('close-sheet-btn');
+            const actionInstallBtn = document.getElementById('action-install-btn');
+            const androidAction = document.getElementById('android-action');
+            const iosAction = document.getElementById('ios-action');
+            const alreadyInstalledAction = document.getElementById('already-installed-action');
+
+            let deferredPrompt = null;
+
+            function isStandalone() {
+                return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            }
+
+            function isIOS() {
+                return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+            }
+
+            function openPwaSheet() {
+                pwaWrapper.classList.remove('opacity-0', 'pointer-events-none');
+                pwaWrapper.classList.add('opacity-100');
+                pwaSheet.classList.remove('translate-y-full');
+
+                androidAction.classList.add('hidden');
+                iosAction.classList.add('hidden');
+                alreadyInstalledAction.classList.add('hidden');
+
+                if (isStandalone()) {
+                    alreadyInstalledAction.classList.remove('hidden');
+                } else if (isIOS()) {
+                    iosAction.classList.remove('hidden');
+                } else {
+                    androidAction.classList.remove('hidden');
+                }
+            }
+
+            function closePwaSheet() {
+                pwaSheet.classList.add('translate-y-full');
+                pwaWrapper.classList.remove('opacity-100');
+                pwaWrapper.classList.add('opacity-0');
+                setTimeout(() => pwaWrapper.classList.add('pointer-events-none'), 500);
+            }
+
+            if (!isStandalone()) {
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    headerInstallBtn.classList.remove('hidden');
+                });
+
+                // iOS never fires beforeinstallprompt, so surface the button manually there too
+                if (isIOS()) {
+                    headerInstallBtn.classList.remove('hidden');
+                }
+            }
+
+            headerInstallBtn?.addEventListener('click', openPwaSheet);
+            closeSheetBtn?.addEventListener('click', closePwaSheet);
+            pwaBackdrop?.addEventListener('click', closePwaSheet);
+
+            actionInstallBtn?.addEventListener('click', async () => {
+                if (!deferredPrompt) { closePwaSheet(); return; }
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                closePwaSheet();
+                headerInstallBtn.classList.add('hidden');
+            });
+
+            window.addEventListener('appinstalled', () => {
+                headerInstallBtn.classList.add('hidden');
+            });
+        })();
+    </script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const DEPLOYED_APP_VERSION = '7.0'; 
+            const DEPLOYED_APP_VERSION = '7.0';
             const wrapper = document.getElementById('update-modal-wrapper');
             const modalBox = document.getElementById('update-modal-box');
             const closeBtn = document.getElementById('close-update-modal-btn');
             let savedUserVersion = localStorage.getItem('app_last_seen_version');
-            
+
             if (!wrapper || !modalBox || !closeBtn) return;
 
             if (!savedUserVersion) {
@@ -532,7 +649,7 @@
                     wrapper.classList.add('opacity-100');
                     modalBox.classList.remove('scale-90', 'opacity-0');
                     modalBox.classList.add('scale-100', 'opacity-100');
-                }, 1200); 
+                }, 1200);
             }
 
             closeBtn.addEventListener('click', function () {
@@ -543,7 +660,5 @@
             });
         });
     </script>
-
-    <script src="script.js"></script>
 </body>
 </html>
