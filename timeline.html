@@ -29,7 +29,6 @@
             <button id="tl-btn" class="btn-active flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all">Timeline</button>
             <button id="gl-btn" class="flex-1 py-3 rounded-xl font-black text-xs uppercase text-slate-400 transition-all">Gallery</button>
         </div>
-
         <div id="timeline-box" class="timeline-line space-y-8"></div>
         <div id="gallery-box" class="grid grid-cols-2 gap-3 hidden"></div>
     </main>
@@ -45,11 +44,11 @@
         const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        
         const pin = sessionStorage.getItem('cc_room_pin');
-        const myUserId = sessionStorage.getItem('cc_user_id');
+        let myUserId = sessionStorage.getItem('cc_user_id');
 
         async function loadAllMemories() {
-            // 1. Fetch Local Data
             const localData = await new Promise(r => {
                 const req = indexedDB.open('CC_Memories_DB', 1);
                 req.onsuccess = () => {
@@ -59,33 +58,26 @@
                 req.onerror = () => r([]);
             });
 
-            // 2. Fetch Firebase & Merge
             if (pin) {
                 onValue(ref(db, 'rooms/' + pin + '/memories'), (snapshot) => {
                     const cloudData = snapshot.val();
                     let memoryMap = new Map();
 
-                    // Pehle local data map mein daalo
-                    localData.forEach(m => {
-                        memoryMap.set(m.id, { image: m.image, time: m.time, id: m.id, tag: m.tag, sender: m.sender });
-                    });
-
-                    // Phir cloud data daalo
+                    localData.forEach(m => memoryMap.set(m.id, m));
+                    
                     if (cloudData) {
                         Object.entries(cloudData).forEach(([key, m]) => {
-                            memoryMap.set(key, { image: m.url, time: m.time, id: key, tag: m.tag, sender: m.sender });
+                            memoryMap.set(key, { id: key, image: m.url, time: m.time, tag: m.tag, sender: m.sender });
                         });
                     }
 
-                    // Smart Filter Logic
-                    let finalFilteredData = Array.from(memoryMap.values()).filter(m => {
-                        if (m.tag === 'Me') return m.sender === myUserId;
-                        if (m.tag === 'Friend') return m.sender !== myUserId;
-                        if (m.tag === 'Both') return true;
-                        return true;
+                    // ROBUST FILTER: Sirf tag aur sender check karo
+                    let finalData = Array.from(memoryMap.values()).filter(m => {
+                        if (m.sender === myUserId) return (m.tag === 'Me' || m.tag === 'Both');
+                        return (m.tag === 'Friend' || m.tag === 'Both');
                     });
 
-                    renderGallery(finalFilteredData);
+                    renderGallery(finalData);
                 });
             } else {
                 renderGallery(localData);
@@ -93,37 +85,28 @@
         }
 
         function renderGallery(data) {
-            // Sort by time
             data.sort((a,b) => new Date(b.time || 0) - new Date(a.time || 0));
             document.getElementById('total-count').textContent = data.length;
             
-            const groups = {};
-            data.forEach(m => {
-                const date = new Date().toDateString(); // Simplified for demo, can use m.time if stored
-                if (!groups[date]) groups[date] = [];
-                groups[date].push(m);
-            });
-
             const tlBox = document.getElementById('timeline-box');
             const glBox = document.getElementById('gallery-box');
             tlBox.innerHTML = ''; glBox.innerHTML = '';
             
-            Object.entries(groups).forEach(([date, mems]) => {
-                tlBox.innerHTML += `<div class="relative pl-10">
-                    <div class="absolute left-[20px] top-1 w-2 h-2 bg-rose-500 rounded-full"></div>
-                    <div class="text-[10px] font-black text-teal-600 mb-4 uppercase tracking-widest">${date}</div>
-                    <div class="space-y-4">` + mems.map(m => `
-                        <div class="card-glass p-2 rounded-2xl shadow-sm transition active:scale-95 relative" onclick="openLB('${m.image}')">
-                            <div class="absolute z-10 top-4 right-4 bg-black/50 backdrop-blur-md text-white text-[9px] px-2 py-1 rounded-lg font-bold">${m.time || '--:--'}</div>
+            data.forEach(m => {
+                const date = new Date().toDateString();
+                tlBox.innerHTML += `
+                    <div class="relative pl-10">
+                        <div class="absolute left-[20px] top-1 w-2 h-2 bg-rose-500 rounded-full"></div>
+                        <div class="card-glass p-2 rounded-2xl shadow-sm transition active:scale-95" onclick="openLB('${m.image}')">
                             <img src="${m.image}" class="w-full aspect-[4/3] rounded-xl object-cover">
-                        </div>`).join('') + `</div></div>`;
-                
-                mems.forEach(m => glBox.innerHTML += `<img src="${m.image}" onclick="openLB('${m.image}')" class="aspect-square rounded-2xl object-cover shadow-md">`);
+                        </div>
+                    </div>`;
+                glBox.innerHTML += `<img src="${m.image}" onclick="openLB('${m.image}')" class="aspect-square rounded-2xl object-cover shadow-md">`;
             });
         }
 
         window.openLB = function(src) { document.getElementById('lb-img').src = src; document.getElementById('lightbox').classList.add('active'); }
-
+        
         document.getElementById('tl-btn').onclick = function() {
             document.getElementById('timeline-box').classList.remove('hidden');
             document.getElementById('gallery-box').classList.add('hidden');
