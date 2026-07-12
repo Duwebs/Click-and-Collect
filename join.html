@@ -3,20 +3,45 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>C&C - Secure Join</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    
+    <style>
+        .bg-scroll {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('/assets/InstallGraphic.png');
+            background-size: 200% 100%;
+            z-index: -1;
+            animation: scrollBg 40s linear infinite;
+            filter: brightness(0.3);
+        }
+        @keyframes scrollBg {
+            from { background-position: 100% 50%; }
+            to { background-position: 0% 50%; }
+        }
+    </style>
 </head>
 
-<body class="h-full bg-slate-900 text-white p-6">
-    <div class="max-w-sm mx-auto space-y-6">
-        <h1 class="text-xl font-black uppercase tracking-widest text-rose-400">Secure Join</h1>
-        <div id="reader" class="w-full bg-black rounded-3xl overflow-hidden border-2 border-white/10" style="min-height: 300px;"></div>
+<body class="h-[100dvh] text-white p-4 flex flex-col overflow-hidden">
+    
+    <div class="bg-scroll"></div>
+
+    <div class="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full gap-4">
         
-        <div class="bg-white/5 p-6 rounded-3xl border border-white/10">
-            <input type="number" id="pin-input" placeholder="Enter PIN" class="w-full bg-transparent text-center text-3xl font-black tracking-[0.5em] outline-none">
-            <button id="connect-btn" class="w-full mt-4 bg-rose-500 py-3 rounded-xl font-bold uppercase text-xs">Connect Now</button>
+        <div id="profileBadge" class="flex items-center gap-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 self-center">
+            <img id="navAvatar" src="" class="w-8 h-8 rounded-full object-cover border border-white/20">
+            <span id="navName" class="text-xs font-bold tracking-wider">...</span>
+        </div>
+
+        <h1 class="text-lg font-black uppercase tracking-widest text-rose-400 text-center">Secure Join</h1>
+        
+        <div id="reader" class="w-full flex-1 bg-black/50 rounded-3xl overflow-hidden border-2 border-white/10 backdrop-blur-sm min-h-[200px]"></div>
+        
+        <div class="bg-black/30 backdrop-blur-md p-4 rounded-3xl border border-white/10 w-full">
+            <input type="number" id="pin-input" placeholder="Enter PIN" class="w-full bg-transparent text-center text-2xl font-black tracking-[0.5em] outline-none placeholder-white/20">
+            <button id="connect-btn" class="w-full mt-2 bg-rose-500 py-3 rounded-xl font-bold uppercase text-xs hover:bg-rose-600 transition">Connect Now</button>
         </div>
     </div>
     
@@ -37,7 +62,16 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        // Global function banaya taaki button click access kar sake
+        window.onload = () => {
+            startScanner();
+            const savedData = localStorage.getItem('userData');
+            if(savedData) {
+                const user = JSON.parse(savedData);
+                document.getElementById('navAvatar').src = user.avatar;
+                document.getElementById('navName').innerText = user.name;
+            }
+        };
+        
         window.verifyAndConnect = async function(pin) {
             const inputPin = pin || document.getElementById('pin-input').value;
             if (!inputPin) { alert("PIN daalo!"); return; }
@@ -59,7 +93,8 @@
     <script>
         function startScanner() {
             const html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+            // qrbox chota kar diya hai taaki scanner screen pe fit rahe
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 200 },
                 (decodedText) => {
                     html5QrCode.stop();
                     window.verifyAndConnect(decodedText);
@@ -68,9 +103,6 @@
                 console.log("Camera error:", err);
             });
         }
-        // Page load hote hi camera start
-        window.onload = startScanner;
     </script>
 </body>
-
 </html>
