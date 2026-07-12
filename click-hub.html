@@ -27,12 +27,19 @@
 </head>
 <body class="h-full moving-bg flex flex-col p-6 text-white overflow-hidden">
     
-    <a href="dashboard.html" class="w-10 h-10 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/20 mb-6 active:scale-90 transition">
+    <a href="avatar.html" class="w-10 h-10 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/20 mb-4 active:scale-90 transition">
         <i class="fas fa-arrow-left"></i>
     </a>
 
-    <div class="flex-1 flex flex-col justify-center items-center text-center space-y-8">
-        <h1 class="text-3xl font-black uppercase tracking-widest">Select Mode</h1>
+    <div id="profileSection" class="flex flex-col items-center mb-6">
+        <div class="w-32 h-32 rounded-full border-4 border-white/30 overflow-hidden shadow-2xl mb-3">
+            <img id="displayAvatar" src="" class="w-full h-full object-cover">
+        </div>
+        <h2 id="displayName" class="text-2xl font-black uppercase tracking-widest text-white drop-shadow-md">...</h2>
+    </div>
+
+    <div class="flex-1 flex flex-col justify-center items-center text-center space-y-6">
+        <h1 class="text-2xl font-bold opacity-80 uppercase tracking-widest mb-2">Select Mode</h1>
         
         <button onclick="window.location.href='create.html'" class="w-full glass-card p-6 rounded-3xl text-left active:scale-[0.98] transition">
             <div class="flex items-center gap-4">
@@ -58,5 +65,21 @@
             </div>
         </button>
     </div>
+
+    <script>
+        window.onload = function() {
+            const savedData = localStorage.getItem('userData');
+            
+            if (savedData) {
+                const user = JSON.parse(savedData);
+                document.getElementById('displayAvatar').src = user.avatar;
+                document.getElementById('displayName').innerText = user.name;
+            } else {
+                // Fallback agar data na mile
+                document.getElementById('displayName').innerText = "Guest Player";
+                document.getElementById('displayAvatar').src = "https://via.placeholder.com/150"; 
+            }
+        };
+    </script>
 </body>
 </html>
