@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            background: #0a0a0a; 
+            font-family: 'Inter', sans-serif; 
+            min-height: 100vh;
+        }
+        
+        /* The Background Glow - Cinematic feel */
+        .glow {
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #3b82f633 0%, transparent 70%);
+            top: -200px; right: -100px;
+            filter: blur(80px);
+        }
+
+        /* Avatar Spring Animation */
+        .avatar-node {
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            filter: grayscale(1) brightness(0.5);
+            transform: scale(0.8);
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .avatar-node.active {
+            filter: grayscale(0) brightness(1);
+            transform: scale(1.4) translateY(-10px);
+            opacity: 1;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+
+        /* Text Input Styling */
+        .input-glow:focus {
+            box-shadow: 0 4px 0 -2px #3b82f6;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-8 overflow-hidden">
+
+    <div class="glow"></div>
+
+    <h2 class="text-white text-xs font-bold tracking-[0.4em] uppercase opacity-40 mb-16">Choose Your Persona</h2>
+
+    <div class="flex items-center justify-center gap-10 mb-20">
+        <script>
+            // Simple array loop for logic
+            [1, 2, 3].forEach(i => {
+                document.write(`
+                    <div class="avatar-node w-24 h-24 rounded-full bg-slate-800 border-2 border-white/5 overflow-hidden" 
+                         onclick="activate(this)">
+                        <img src="https://i.pravatar.cc/150?u=${i}" class="w-full h-full object-cover">
+                    </div>
+                `);
+            });
+        </script>
+    </div>
+
+    <div class="flex flex-col items-center gap-6 w-full max-w-sm">
+        <input type="text" placeholder="Enter your name" 
+               class="input-glow w-full bg-transparent border-b-2 border-white/10 p-3 text-white text-center text-xl outline-none transition-all placeholder:text-white/20">
+        
+        <button class="w-full py-4 bg-white text-black font-black rounded-full hover:bg-blue-500 hover:text-white transition-all duration-300">
+            CONNECT
+        </button>
+    </div>
+
+    <script>
+        function activate(el) {
+            // Remove active from all
+            document.querySelectorAll('.avatar-node').forEach(n => n.classList.remove('active'));
+            // Add active to clicked
+            el.classList.add('active');
+        }
+    </script>
+</body>
+</html>

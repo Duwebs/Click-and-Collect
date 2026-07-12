@@ -2,397 +2,743 @@
 <html lang="en" class="h-full w-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>C&C - Immersive Canvas Studio</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#3bb2a7">
+    <title>C&C - Canvas Studio</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
-        .rounded-brand-font { font-family: 'Fredoka', sans-serif; }
+        :root {
+            /* Updated to your requested Teal Theme */
+            --ink: #3bb2a7; 
+            --ink2: #2a8a81; 
+            --paper: #faf5ee;
+            --wine: #ef4444; 
+            --wine2: #dc2626; 
+            --gold: #F2C94C; 
+            --sage: #7c9885;
+        }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        html, body { overscroll-behavior: none; }
         
-        .premium-bg { background-color: #247e77; position: relative; }
-        .content-card-curve { border-top-left-radius: 32px; border-top-right-radius: 32px; }
-        
-        .skin-active { 
-            transform: scale(1.08); 
-            box-shadow: 0 0 0 3px rgba(36, 126, 119, 0.4), 0 4px 10px rgba(0,0,0,0.15);
-            border-width: 3px !important;
+        /* Applied theme gradient background */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, var(--ink), var(--ink2)); 
+            color: #fff; 
         }
         
-        .skin-white { background-color: #ffffff; color: #334155; border-color: #f1f5f9 !important; }
-        .skin-pink { background-color: #ffe4e6; color: #9f1239; border-color: #fecdd3 !important; }
-        .skin-kraft { background-color: #f4ebd0; color: #5c3d2e; border-color: #e6dac0 !important; }
-        .skin-dark { background-color: #121824; color: #f8fafc; border-color: #20293a !important; }
-        .skin-lavender { background-color: #f3e8ff; color: #6b21a8; border-color: #e9d5ff !important; }
-        .skin-matcha { background-color: #f0fdf4; color: #166534; border-color: #dcfce7 !important; }
+        .font-display { font-family: 'Fraunces', serif; }
+        .safe-top { padding-top: env(safe-area-inset-top); }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
-        .draggable-sticker {
-            position: absolute;
-            cursor: move;
-            touch-action: none;
-            user-select: none;
-            z-index: 40;
-            padding: 6px;
-            border: 1px dashed transparent;
-            display: inline-block;
-            transform-origin: center center;
-        }
-        
-        .draggable-sticker.selected {
-            border-color: #3caea3;
-            background: rgba(255,255,255,0.2);
-            border-radius: 8px;
-        }
+        .grain { position: fixed; inset: 0; pointer-events: none; opacity: .05; z-index: 0; mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
-        .sticker-delete-btn {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 20px;
-            height: 20px;
-            background: #e64d5c;
-            color: white;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            z-index: 50;
-        }
+        .glass { background: rgba(255,255,255,.08); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); border: 1px solid rgba(255,255,255,.12); }
+        .glass-btn { background: rgba(255,255,255,.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.14); }
+        .glass-btn:active { background: rgba(255,255,255,.2); transform: scale(.92); }
 
-        .draggable-sticker.selected .sticker-delete-btn { display: flex; }
+        .ambient-glow { position: absolute; inset: -10%; filter: blur(70px); opacity: .55; z-index: 0; transition: background 0.6s ease; }
+
+        .skin-white { background: #ffffff; color: #334155; }
+        .skin-pink { background: #ffe4e6; color: #9f1239; }
+        .skin-kraft { background: #f4ebd0; color: #5c3d2e; }
+        .skin-dark { background: #121824; color: #f8fafc; }
+        .skin-lavender { background: #f3e8ff; color: #6b21a8; }
+        .skin-matcha { background: #f0fdf4; color: #166534; }
+
+        .swatch-active { transform: scale(1.12); box-shadow: 0 0 0 3px var(--gold), 0 4px 10px rgba(0,0,0,.3); }
+
+        .draggable-sticker { position: absolute; touch-action: none; user-select: none; z-index: 40;
+            transform-origin: center center; display: flex; align-items: center; justify-content: center; }
+        .draggable-sticker .sticker-body { pointer-events: none; white-space: nowrap; }
+        .draggable-sticker.selected::after { content: ''; position: absolute; inset: -10px; border: 1.5px dashed rgba(255,255,255,.85); border-radius: 10px; pointer-events: none; }
+        .sticker-handle { position: absolute; width: 22px; height: 22px; border-radius: 50%; background: var(--wine);
+            border: 2px solid #fff; display: none; align-items: center; justify-content: center; color: #fff; font-size: 9px; z-index: 60; box-shadow: 0 2px 6px rgba(0,0,0,.35); touch-action: none; }
+        .draggable-sticker.selected .sticker-handle { display: flex; }
+        .handle-delete { top: -11px; right: -11px; background: #e64d5c; }
+        .handle-resize { bottom: -11px; right: -11px; cursor: nwse-resize; }
+
+        #trash-zone { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%) scale(.85); opacity: 0;
+            width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: all .2s ease; z-index: 80; pointer-events: none; }
+        #trash-zone.show { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
+        #trash-zone.hover { transform: translateX(-50%) scale(1.2); background: rgba(230,77,92,.9) !important; }
+
+        .dock-icon { transition: all .2s ease; }
+        .dock-icon.active { color: var(--gold); }
+        .dock-icon.active .dock-dot { opacity: 1; transform: scale(1); }
+        .dock-dot { opacity: 0; transform: scale(0); transition: all .2s ease; }
+
+        .tray { transform: translateY(110%); opacity: 0; transition: transform .32s cubic-bezier(.32,.72,0,1), opacity .25s ease; pointer-events: none; }
+        .tray.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+        .filter-chip { width: 56px; height: 56px; border-radius: 16px; background-size: cover; background-position: center; flex-shrink: 0; position: relative; transition: transform .15s ease; border: 2px solid transparent; }
+        .filter-chip.active { border-color: var(--gold); transform: scale(1.05); }
+        .filter-chip span { position: absolute; bottom: 2px; left: 0; right: 0; text-align: center; font-size: 8px; font-weight: 700; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.8); text-transform: uppercase; letter-spacing: .03em; }
+
+        .color-dot { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); flex-shrink: 0; }
+        .color-dot.active { box-shadow: 0 0 0 2px var(--ink), 0 0 0 4px var(--gold); }
+
+        /* Prevents the browser from swiping when drawing */
+        #doodle-canvas { touch-action: none; } 
+
+        .spin { animation: spin .7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .pop-in { animation: popIn .35s cubic-bezier(.34,1.56,.64,1); }
+        @keyframes popIn { from { transform: scale(0) rotate(-15deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+
+        @keyframes checkDraw { from { stroke-dashoffset: 60; } to { stroke-dashoffset: 0; } }
+        .check-path { stroke-dasharray: 60; stroke-dashoffset: 60; animation: checkDraw .5s ease forwards .15s; }
+
+        #big-preview-modal { display: none; }
+        #big-preview-modal.active { display: flex; }
+
+        ::-webkit-scrollbar { display: none; }
+        @media (prefers-reduced-motion: reduce) { * { animation-duration: .001s !important; transition-duration: .001s !important; } }
     </style>
 </head>
-<body class="h-full w-full max-h-screen flex flex-col overflow-hidden select-none premium-bg text-white">
+<body class="h-full w-full max-h-screen flex flex-col overflow-hidden select-none">
+    <div class="grain"></div>
 
-    <header class="h-16 flex items-center justify-between px-4 shrink-0 bg-black/15 backdrop-blur-xl relative z-20 border-b border-white/5">
-        <button id="back-guard-trigger" class="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/10 active:scale-90 transition">
+    <header class="safe-top h-16 flex items-center justify-between px-4 shrink-0 relative z-30">
+        <button id="back-guard-trigger" class="glass-btn w-10 h-10 rounded-xl flex items-center justify-center text-white active:scale-90 transition">
             <i class="fas fa-arrow-left text-sm"></i>
         </button>
-        <div class="text-center flex-1">
-            <span class="text-lg font-black tracking-widest text-white rounded-brand-font uppercase block">C&amp;C CANVAS</span>
-            <span class="text-[9px] text-teal-200 tracking-wider font-bold uppercase block opacity-80">Studio Mode</span>
+        <div class="text-center">
+            <span class="font-display font-bold text-base tracking-wide block">C&amp;C Canvas</span>
+            <span class="text-[9px] text-white/80 tracking-widest font-semibold uppercase block">Studio mode</span>
         </div>
-        <div class="w-10 h-10 opacity-0 pointer-events-none"></div>
+        <button id="undo-btn" class="glass-btn w-10 h-10 rounded-xl flex items-center justify-center text-white active:scale-90 transition disabled:opacity-30" disabled>
+            <i class="fas fa-rotate-left text-sm"></i>
+        </button>
     </header>
 
-    <div class="flex-1 flex flex-col overflow-hidden relative z-10">
-        <div class="px-6 pt-4 pb-6 flex-1 flex items-center justify-center">
-            
-            <div id="polaroid-card" class="skin-white p-3 pb-6 rounded-2xl shadow-2xl max-w-xs w-full relative transition-all">
-                <div id="sticker-dropzone" class="aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-200 relative shadow-inner cursor-zoom-in">
-                    <img id="image-preview" src="" alt="Captured Moment" class="w-full h-full object-cover hidden pointer-events-none">
+    <div class="flex-1 flex flex-col overflow-hidden relative z-10 min-h-0">
+        <div class="px-6 pt-1 pb-3 flex-1 flex items-center justify-center relative min-h-0">
+            <div id="ambient" class="ambient-glow rounded-full" style="background:radial-gradient(circle, rgba(255,255,255,.5), transparent 65%);"></div>
+
+            <div id="polaroid-card" class="skin-white p-3 pb-6 rounded-2xl shadow-2xl max-w-xs w-full relative transition-colors z-10">
+                <div id="sticker-dropzone" class="aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-200 relative shadow-inner">
+                    <img id="image-preview" src="" alt="Captured moment" class="w-full h-full object-cover hidden pointer-events-none" crossorigin="anonymous">
                     <div id="loading-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
-                        <i class="fas fa-spinner animate-spin text-xl"></i>
+                        <i class="fas fa-spinner spin text-xl"></i>
                     </div>
-                    <div id="active-stickers-layer" class="absolute inset-0 pointer-events-auto overflow-hidden"></div>
+                    <canvas id="doodle-canvas" class="absolute inset-0 w-full h-full touch-none"></canvas>
+                    <div id="active-stickers-layer" class="absolute inset-0 overflow-hidden"></div>
+                    <button id="fullscreen-tap-catcher" class="absolute inset-0 z-30" style="background:transparent;"></button>
                 </div>
                 <div class="mt-3 flex justify-between items-center px-1">
-                    <span id="current-date-stamp" class="text-[10px] font-bold uppercase tracking-wider opacity-60">Today, 11 July 2026</span>
+                    <span id="current-date-stamp" class="text-[10px] font-bold uppercase tracking-wider opacity-60">Today</span>
                     <i class="fas fa-heart text-xs text-rose-400"></i>
                 </div>
             </div>
 
+            <div id="trash-zone" class="glass-btn"><i class="fas fa-trash text-white text-lg"></i></div>
         </div>
 
-        <main class="shrink-0 bg-white text-slate-800 content-card-curve p-5 pb-6 shadow-[0_-10px_32px_rgba(0,0,0,0.15)] flex flex-col space-y-4 overflow-y-auto max-h-[46vh] scrollbar-none relative z-20">
-            
-            <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Tap To Add Sticker</label>
-                    <span class="text-[9px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md">Tap photo for REAL Fullscreen!</span>
-                </div>
-                <div class="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
-                    <button class="emoji-selector-btn text-2xl p-1.5 bg-slate-50 border border-slate-100 rounded-xl active:scale-90 transition-all">❤️</button>
-                    <button class="emoji-selector-btn text-2xl p-1.5 bg-slate-50 border border-slate-100 rounded-xl active:scale-90 transition-all">✨</button>
-                    <button class="emoji-selector-btn text-2xl p-1.5 bg-slate-50 border border-slate-100 rounded-xl active:scale-90 transition-all">🔥</button>
-                    <button class="emoji-selector-btn text-2xl p-1.5 bg-slate-50 border border-slate-100 rounded-xl active:scale-90 transition-all">😎</button>
-                    <button class="emoji-selector-btn text-2xl p-1.5 bg-slate-50 border border-slate-100 rounded-xl active:scale-90 transition-all">👑</button>
-                    <button class="emoji-selector-btn text-2xl p-1.5 bg-slate-50 border border-slate-100 rounded-xl active:scale-90 transition-all">📸</button>
+        <div class="relative z-20 shrink-0 px-3">
+            <div id="tray-emoji" class="tray glass rounded-2xl p-4 mb-2 absolute bottom-0 left-3 right-3">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-2">Tap to add sticker</p>
+                <div class="flex gap-2.5 overflow-x-auto pb-1">
+                    <button class="emoji-selector-btn text-2xl p-2 glass-btn rounded-xl">❤️</button>
+                    <button class="emoji-selector-btn text-2xl p-2 glass-btn rounded-xl">✨</button>
+                    <button class="emoji-selector-btn text-2xl p-2 glass-btn rounded-xl">🔥</button>
+                    <button class="emoji-selector-btn text-2xl p-2 glass-btn rounded-xl">😎</button>
+                    <button class="emoji-selector-btn text-2xl p-2 glass-btn rounded-xl">👑</button>
+                    <button class="emoji-selector-btn text-2xl p-2 glass-btn rounded-xl">📸</button>
+                    <button class="emoji-selector-btn text-2xl p-2 glass-btn rounded-xl">🌙</button>
+                    <button class="emoji-selector-btn text-2xl p-2 glass-btn rounded-xl">🎉</button>
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Polaroid Border Palette</label>
-                <div class="flex gap-4 items-center overflow-x-auto py-1.5 px-1 scrollbar-none">
-                    <button data-skin="skin-white" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-white border-2 border-slate-200 skin-active shadow-sm transition-all"></button>
-                    <button data-skin="skin-pink" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-rose-100 border-2 border-rose-200 shadow-sm transition-all"></button>
-                    <button data-skin="skin-kraft" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-[#f4ebd0] border-2 border-amber-200 shadow-sm transition-all"></button>
-                    <button data-skin="skin-dark" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-slate-900 border-2 border-slate-950 shadow-sm transition-all"></button>
-                    <button data-skin="skin-lavender" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-purple-100 border-2 border-purple-200 shadow-sm transition-all"></button>
-                    <button data-skin="skin-matcha" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-emerald-50 border-2 border-emerald-100 shadow-sm transition-all"></button>
+            <div id="tray-text" class="tray glass rounded-2xl p-4 mb-2 absolute bottom-0 left-3 right-3">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-2">Add text sticker</p>
+                <div class="flex gap-2 mb-3">
+                    <input id="text-sticker-input" maxlength="24" placeholder="Type something..." class="flex-1 bg-white/10 border border-white/15 rounded-xl px-3 py-2.5 text-sm font-semibold text-white placeholder-white/40 focus:outline-none focus:border-white/40">
+                    <button id="add-text-sticker-btn" class="glass-btn w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0"><i class="fas fa-plus"></i></button>
+                </div>
+                <div class="flex gap-2.5 overflow-x-auto pb-1" id="text-color-row">
+                    <button data-color="#ffffff" class="color-dot active" style="background:#ffffff"></button>
+                    <button data-color="#ef4444" class="color-dot" style="background:#ef4444"></button>
+                    <button data-color="#F2C94C" class="color-dot" style="background:#F2C94C"></button>
+                    <button data-color="#7c9885" class="color-dot" style="background:#7c9885"></button>
+                    <button data-color="#121824" class="color-dot" style="background:#121824"></button>
+                    <button data-color="#f3e8ff" class="color-dot" style="background:#f3e8ff"></button>
                 </div>
             </div>
 
-            <div class="space-y-1.5">
-                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex justify-between">
-                    <span>Add Caption</span>
-                    <span id="char-counter" class="text-slate-300">0/60</span>
-                </label>
-                <div class="relative flex items-center">
-                    <i class="far fa-comment-dots absolute left-3.5 text-slate-400 text-sm"></i>
-                    <input type="text" id="caption-input" maxlength="60" placeholder="Write a beautiful memory..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-teal-500 focus:bg-white transition-all">
+            <div id="tray-draw" class="tray glass rounded-2xl p-4 mb-2 absolute bottom-0 left-3 right-3">
+                <div class="flex justify-between items-center mb-3">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/50">Doodle</p>
+                    <div class="flex gap-2">
+                        <button id="draw-toggle-btn" class="glass-btn px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase">Draw: Off</button>
+                        <button id="draw-clear-btn" class="glass-btn px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase text-rose-300">Clear</button>
+                    </div>
+                </div>
+                <div class="flex gap-2.5 overflow-x-auto pb-1 items-center" id="draw-color-row">
+                    <button data-color="#ffffff" class="color-dot active" style="background:#ffffff"></button>
+                    <button data-color="#ef4444" class="color-dot" style="background:#ef4444"></button>
+                    <button data-color="#F2C94C" class="color-dot" style="background:#F2C94C"></button>
+                    <button data-color="#7c9885" class="color-dot" style="background:#7c9885"></button>
+                    <button data-color="#121824" class="color-dot" style="background:#121824"></button>
+                    <input id="draw-size" type="range" min="2" max="14" value="5" class="ml-2 w-24 accent-[var(--gold)]">
                 </div>
             </div>
 
-            <div class="pt-1">
-                <button id="save-memory-btn" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black py-4 rounded-xl text-xs tracking-wider uppercase flex items-center justify-center space-x-2 shadow-lg transition active:scale-95 shadow-emerald-500/20">
-                    <i class="fas fa-lock text-sm"></i>
-                    <span>Lock In Timeline</span>
+            <div id="tray-filter" class="tray glass rounded-2xl p-4 mb-2 absolute bottom-0 left-3 right-3">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-2">Filters</p>
+                <div id="filter-row" class="flex gap-2.5 overflow-x-auto pb-1"></div>
+            </div>
+
+            <div id="tray-border" class="tray glass rounded-2xl p-4 mb-2 absolute bottom-0 left-3 right-3">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-2">Polaroid border</p>
+                <div class="flex gap-3.5 overflow-x-auto pb-1 px-0.5">
+                    <button data-skin="skin-white" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-white swatch-active"></button>
+                    <button data-skin="skin-pink" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-rose-100"></button>
+                    <button data-skin="skin-kraft" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-[#f4ebd0]"></button>
+                    <button data-skin="skin-dark" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-slate-900"></button>
+                    <button data-skin="skin-lavender" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-purple-100"></button>
+                    <button data-skin="skin-matcha" class="skin-btn w-9 h-9 shrink-0 rounded-full bg-emerald-50"></button>
+                </div>
+            </div>
+
+            <div id="tray-caption" class="tray glass rounded-2xl p-4 mb-2 absolute bottom-0 left-3 right-3">
+                <div class="flex justify-between items-center mb-2">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/50">Caption</p>
+                    <span id="char-counter" class="text-[10px] text-white/40">0/60</span>
+                </div>
+                <input id="caption-input" maxlength="60" placeholder="Write a beautiful memory..." class="w-full bg-white/10 border border-white/15 rounded-xl px-3.5 py-3 text-xs font-semibold text-white placeholder-white/40 focus:outline-none focus:border-white/40">
+            </div>
+        </div>
+
+        <div class="safe-bottom shrink-0 relative z-20 px-3 pb-3 pt-1">
+            <div class="glass rounded-3xl px-2 py-2 flex items-center justify-between gap-1">
+                <button data-tray="emoji" class="dock-btn dock-icon flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-white/80 active:scale-90 transition">
+                    <i class="fas fa-face-grin-hearts text-base"></i>
+                    <span class="dock-dot w-1 h-1 rounded-full bg-[var(--gold)]"></span>
+                </button>
+                <button data-tray="text" class="dock-btn dock-icon flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-white/80 active:scale-90 transition">
+                    <i class="fas fa-font text-base"></i>
+                    <span class="dock-dot w-1 h-1 rounded-full bg-[var(--gold)]"></span>
+                </button>
+                <button data-tray="draw" class="dock-btn dock-icon flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-white/80 active:scale-90 transition">
+                    <i class="fas fa-pen text-base"></i>
+                    <span class="dock-dot w-1 h-1 rounded-full bg-[var(--gold)]"></span>
+                </button>
+                <button data-tray="filter" class="dock-btn dock-icon flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-white/80 active:scale-90 transition">
+                    <i class="fas fa-sliders text-base"></i>
+                    <span class="dock-dot w-1 h-1 rounded-full bg-[var(--gold)]"></span>
+                </button>
+                <button data-tray="border" class="dock-btn dock-icon flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-white/80 active:scale-90 transition">
+                    <i class="fas fa-vector-square text-base"></i>
+                    <span class="dock-dot w-1 h-1 rounded-full bg-[var(--gold)]"></span>
+                </button>
+                <button data-tray="caption" class="dock-btn dock-icon flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-white/80 active:scale-90 transition">
+                    <i class="fas fa-comment-dots text-base"></i>
+                    <span class="dock-dot w-1 h-1 rounded-full bg-[var(--gold)]"></span>
+                </button>
+                <button id="save-memory-btn" class="ml-1 w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center shadow-lg shadow-black/30 active:scale-90 transition shrink-0">
+                    <i class="fas fa-check text-white text-lg" id="save-icon"></i>
                 </button>
             </div>
-        </main>
+        </div>
     </div>
 
-    <div id="big-preview-modal" class="fixed inset-0 w-screen h-screen bg-black flex flex-col hidden z-[9999] opacity-0 transition-opacity duration-300">
-        
-        <button id="close-preview-btn" class="absolute top-4 left-4 w-12 h-12 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white text-lg z-50 shadow-lg active:scale-90 transition-transform">
+    <div id="big-preview-modal" class="fixed inset-0 w-screen h-screen bg-black flex-col z-[9999] opacity-0 transition-opacity duration-300">
+        <button id="close-preview-btn" class="safe-top absolute top-4 left-4 w-11 h-11 glass-btn rounded-full flex items-center justify-center text-white text-base z-50">
             <i class="fas fa-times"></i>
         </button>
-
-        <div class="w-full h-full relative overflow-hidden bg-slate-950">
-            <img id="big-image-preview" src="" class="w-full h-full object-cover pointer-events-none">
-            
-            <div id="big-active-stickers-layer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-            
-            <div class="absolute bottom-8 left-0 right-0 px-6 text-center z-40 drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]">
-                <p id="big-caption-sync" class="text-base font-bold tracking-wide text-white break-words drop-shadow-md bg-black/40 inline-block px-4 py-2 rounded-xl backdrop-blur-sm"></p>
-            </div>
-        </div>
+        <div id="big-preview-stage" class="w-full h-full flex items-center justify-center overflow-hidden"></div>
     </div>
 
     <div id="back-guard-modal" class="fixed inset-0 z-[6000] flex items-center justify-center p-5 invisible opacity-0 transition-all duration-300">
-        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md"></div>
-        <div class="bg-white rounded-3xl p-6 text-center shadow-2xl max-w-xs w-full relative z-10 text-slate-800">
-            <h3 class="text-sm font-black text-slate-900 mb-1 uppercase tracking-wide rounded-brand-font">Discard Memory?</h3>
-            <p class="text-[11px] text-slate-400 mb-6">Are you sure you want to exit? Changes will be dropped.</p>
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md"></div>
+        <div class="glass rounded-3xl p-6 text-center max-w-xs w-full relative z-10">
+            <h3 class="font-display text-base font-bold mb-1">Discard memory?</h3>
+            <p class="text-[11px] text-white/50 mb-6">Changes will be dropped if you leave now.</p>
             <div class="flex gap-3">
-                <button id="guard-cancel-btn" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-xs uppercase">Keep Editing</button>
-                <button id="guard-confirm-btn" class="flex-1 bg-rose-500 text-white font-bold py-3 rounded-xl text-xs uppercase">Yes, Exit</button>
+                <button id="guard-cancel-btn" class="flex-1 bg-white/10 text-white font-bold py-3 rounded-xl text-xs uppercase">Keep editing</button>
+                <button id="guard-confirm-btn" class="flex-1 bg-rose-500 text-white font-bold py-3 rounded-xl text-xs uppercase">Yes, exit</button>
             </div>
         </div>
     </div>
 
     <div id="success-modal" class="fixed inset-0 z-[7000] flex items-center justify-center p-5 invisible opacity-0 transition-all duration-300">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-md"></div>
-        <div class="bg-white rounded-3xl p-6 text-center shadow-2xl max-w-xs w-full relative z-10 text-slate-800">
-            <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-500 text-3xl"><i class="fas fa-check-circle"></i></div>
-            <h3 class="text-base font-black text-emerald-600 mb-1 uppercase tracking-wide rounded-brand-font">Locked & Saved!</h3>
-            <button id="modal-close-btn" class="w-full mt-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider">View Timeline</button>
+        <div class="absolute inset-0 bg-black/75 backdrop-blur-md"></div>
+        <div class="glass rounded-3xl p-7 text-center max-w-xs w-full relative z-10">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style="background:rgba(124,152,133,.2);">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path class="check-path" d="M4 12.5L9 17.5L20 6.5" stroke="var(--sage)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 class="font-display font-bold text-base mb-1">Locked in your timeline</h3>
+            <p class="text-[11px] text-white/50 mb-4">This moment is safely saved.</p>
+            <button id="modal-close-btn" class="w-full bg-gradient-to-br from-[var(--wine)] to-[var(--wine2)] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider">View timeline</button>
         </div>
     </div>
 
     <script>
-        // --- DATABASE PROTOCOLS ---
+        // ---------- DB ----------
         function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('CC_Memories_DB', 1);
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
-                    if (!db.objectStoreNames.contains('memories')) { db.createObjectStore('memories', { keyPath: 'id' }); }
+                    if (!db.objectStoreNames.contains('memories')) db.createObjectStore('memories', { keyPath: 'id' });
                 };
-                request.onsuccess = (e) => resolve(e.target.result);
-                request.onerror = (e) => reject(e.target.error);
+                request.onsuccess = e => resolve(e.target.result);
+                request.onerror = e => reject(e.target.error);
             });
         }
-
         async function addMemoryToDB(memory) {
             const db = await initDB();
-            const transaction = db.transaction('memories', 'readwrite');
-            const store = transaction.objectStore('memories');
-            store.add(memory);
+            const tx = db.transaction('memories', 'readwrite');
+            tx.objectStore('memories').add(memory);
+            return new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
         }
 
+        // ---------- STATE ----------
+        const dropzone = document.getElementById('sticker-dropzone');
+        const stickersLayer = document.getElementById('active-stickers-layer');
         const imgPreview = document.getElementById('image-preview');
-        const bigImgPreview = document.getElementById('big-image-preview');
+        const ambient = document.getElementById('ambient');
+        const polaroidCard = document.getElementById('polaroid-card');
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const cachedImage = sessionStorage.getItem('recent_memory_image') || "https://images.unsplash.com/photo-1547891654-e66ed7edd96c?auto=format&fit=crop&w=400&q=80";
-            imgPreview.src = cachedImage;
-            bigImgPreview.src = cachedImage;
-            imgPreview.classList.remove('hidden');
-            document.getElementById('loading-placeholder')?.remove();
+        let state = {
+            stickers: [],      // {id, char, left, top, scale, angle, isText, color}
+            skin: 'skin-white',
+            filterKey: 'none',
+            caption: ''
+        };
+        let undoStack = [];
+        let selectedStickerEl = null;
+
+        function pushUndo(action) { undoStack.push(action); document.getElementById('undo-btn').disabled = false; }
+        document.getElementById('undo-btn').addEventListener('click', () => {
+            const action = undoStack.pop();
+            if (!action) return;
+            if (action.type === 'addSticker') removeStickerById(action.id, false);
+            if (action.type === 'stroke') restoreDoodleSnapshot(action.snapshot);
+            if (!undoStack.length) document.getElementById('undo-btn').disabled = true;
         });
 
-        // --- ANTI BACK CONTROL HOOKS ---
-        const backTrigger = document.getElementById('back-guard-trigger');
-        const guardModal = document.getElementById('back-guard-modal');
-        const guardCancel = document.getElementById('guard-cancel-btn');
-        const guardConfirm = document.getElementById('guard-confirm-btn');
+        // ---------- LOAD IMAGE ----------
+        window.addEventListener('DOMContentLoaded', () => {
+            const cachedImage = sessionStorage.getItem('recent_memory_image') || "https://images.unsplash.com/photo-1547891654-e66ed7edd96c?auto=format&fit=crop&w=600&q=80";
+            imgPreview.onload = () => {
+                imgPreview.classList.remove('hidden');
+                document.getElementById('loading-placeholder')?.remove();
+                sizeDoodleCanvas();
+            };
+            imgPreview.onerror = () => { document.getElementById('loading-placeholder').innerHTML = '<i class="fas fa-image-slash text-xl"></i>'; };
+            imgPreview.src = cachedImage;
 
+            const now = new Date();
+            document.getElementById('current-date-stamp').textContent = now.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+
+            buildFilterChips();
+        });
+        window.addEventListener('resize', sizeDoodleCanvas);
+
+        // ---------- BACK GUARD ----------
+        const guardModal = document.getElementById('back-guard-modal');
         window.history.pushState({ noBackExiting: true }, '');
         window.addEventListener('popstate', () => { window.history.pushState({ noBackExiting: true }, ''); showGuardModal(); });
-        function showGuardModal() { guardModal.classList.remove('invisible', 'opacity-0'); guardModal.classList.add('opacity-100'); }
+        function showGuardModal() { guardModal.classList.remove('invisible', 'opacity-0'); }
         function hideGuardModal() { guardModal.classList.add('opacity-0'); setTimeout(() => guardModal.classList.add('invisible'), 250); }
-        backTrigger.addEventListener('click', (e) => { e.stopPropagation(); showGuardModal(); });
-        guardCancel.addEventListener('click', (e) => { e.stopPropagation(); hideGuardModal(); });
-        guardConfirm.addEventListener('click', () => { window.location.replace('dashboard.html'); });
+        document.getElementById('back-guard-trigger').addEventListener('click', e => { e.stopPropagation(); showGuardModal(); });
+        document.getElementById('guard-cancel-btn').addEventListener('click', e => { e.stopPropagation(); hideGuardModal(); });
+        document.getElementById('guard-confirm-btn').addEventListener('click', () => window.location.replace('dashboard.html'));
 
-        // --- SKIN SWAPPING UTILS ---
-        const polaroidCard = document.getElementById('polaroid-card');
-        const skinBtns = document.querySelectorAll('.skin-btn');
-        let activeSkinClass = 'skin-white';
-
-        skinBtns.forEach(btn => {
+        // ---------- BORDER SKIN ----------
+        const skinAmbientColors = {
+            'skin-white': 'rgba(255,255,255,.5)', 'skin-pink': 'rgba(255,180,195,.55)',
+            'skin-kraft': 'rgba(230,190,120,.5)', 'skin-dark': 'rgba(90,110,160,.45)',
+            'skin-lavender': 'rgba(190,140,230,.5)', 'skin-matcha': 'rgba(140,200,150,.5)'
+        };
+        document.querySelectorAll('.skin-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                skinBtns.forEach(b => b.classList.remove('skin-active'));
-                btn.classList.add('skin-active');
-                activeSkinClass = btn.getAttribute('data-skin');
-                polaroidCard.className = `p-3 pb-6 rounded-2xl shadow-2xl max-w-xs w-full relative transition-all ${activeSkinClass}`;
+                document.querySelectorAll('.skin-btn').forEach(b => b.classList.remove('swatch-active'));
+                btn.classList.add('swatch-active');
+                state.skin = btn.dataset.skin;
+                polaroidCard.className = `p-3 pb-6 rounded-2xl shadow-2xl max-w-xs w-full relative transition-colors z-10 ${state.skin}`;
+                ambient.style.background = `radial-gradient(circle, ${skinAmbientColors[state.skin]}, transparent 65%)`;
+                vibrate();
             });
         });
 
-        // --- SYNC INTERACTION STICKERS TRACKING SYSTEM ---
-        const emojiBtns = document.querySelectorAll('.emoji-selector-btn');
-        const mainStickersLayer = document.getElementById('active-stickers-layer');
-        let stickersArray = [];
-
-        document.addEventListener('click', (e) => {
-            if(!e.target.closest('.draggable-sticker') && !e.target.closest('.emoji-selector-btn')) deselectAllStickers();
-        });
-        function deselectAllStickers() { document.querySelectorAll('.draggable-sticker').forEach(s => s.classList.remove('selected')); }
-
-        emojiBtns.forEach(btn => {
+        // ---------- DOCK / TRAYS ----------
+        let openTray = null;
+        document.querySelectorAll('.dock-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                const uniqueId = Date.now();
-                const stickerObj = { id: uniqueId, char: btn.textContent, left: 35, top: 35, scale: 1.2, angle: 0 };
-                stickersArray.push(stickerObj);
-                spawnCanvasStickerElement(stickerObj);
+                const key = btn.dataset.tray;
+                document.querySelectorAll('.tray').forEach(t => t.classList.remove('open'));
+                document.querySelectorAll('.dock-icon').forEach(d => d.classList.remove('active'));
+                if (openTray === key) { openTray = null; return; }
+                document.getElementById('tray-' + key).classList.add('open');
+                btn.classList.add('active');
+                openTray = key;
             });
         });
 
-        function spawnCanvasStickerElement(obj) {
-            deselectAllStickers();
-            const sticker = document.createElement('div');
-            sticker.className = 'draggable-sticker selected';
-            sticker.dataset.id = obj.id;
-            sticker.style.left = obj.left + '%';
-            sticker.style.top = obj.top + '%';
-            sticker.style.transform = `scale(${obj.scale}) rotate(${obj.angle}deg)`;
+        // ---------- GENERIC STICKER ENGINE ----------
+        function createSticker({ char, isText = false, color = '#ffffff' }) {
+            const obj = { id: Date.now() + Math.floor(Math.random() * 1000), char, left: 40, top: 40, scale: isText ? 1 : 1.2, angle: 0, isText, color };
+            state.stickers.push(obj);
+            spawnStickerElement(obj);
+            pushUndo({ type: 'addSticker', id: obj.id });
+            vibrate();
+        }
 
-            const span = document.createElement('span');
-            span.style.fontSize = '32px';
-            span.style.display = 'inline-block';
-            span.textContent = obj.char;
-            sticker.appendChild(span);
+        function spawnStickerElement(obj) {
+            deselectAll();
+            const el = document.createElement('div');
+            el.className = 'draggable-sticker selected pop-in';
+            el.dataset.id = obj.id;
+            el.style.left = obj.left + '%';
+            el.style.top = obj.top + '%';
+            applyTransform(el, obj);
 
-            const delBtn = document.createElement('div');
-            delBtn.className = 'sticker-delete-btn';
-            delBtn.innerHTML = '<i class="fas fa-times"></i>';
-            delBtn.addEventListener('click', (e) => {
+            const body = document.createElement('span');
+            body.className = 'sticker-body';
+            if (obj.isText) {
+                body.style.cssText = `font-family:'Fraunces',serif; font-weight:700; font-size:22px; color:${obj.color}; text-shadow:0 2px 8px rgba(0,0,0,.35);`;
+            } else {
+                body.style.fontSize = '34px';
+            }
+            body.textContent = obj.char;
+            el.appendChild(body);
+
+            const delHandle = document.createElement('div');
+            delHandle.className = 'sticker-handle handle-delete';
+            delHandle.innerHTML = '<i class="fas fa-times"></i>';
+            delHandle.addEventListener('pointerdown', e => { e.stopPropagation(); removeStickerById(obj.id, true); });
+            el.appendChild(delHandle);
+
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'sticker-handle handle-resize';
+            resizeHandle.innerHTML = '<i class="fas fa-arrows-rotate" style="font-size:8px;"></i>';
+            el.appendChild(resizeHandle);
+
+            stickersLayer.appendChild(el);
+            attachDrag(el, obj);
+            attachResizeRotate(resizeHandle, el, obj);
+
+            el.addEventListener('pointerdown', e => {
+                if (e.target === resizeHandle || e.target.closest('.handle-delete')) return;
+                deselectAll(); el.classList.add('selected');
+            });
+        }
+
+        function applyTransform(el, obj) { el.style.transform = `translate(-50%,-50%) scale(${obj.scale}) rotate(${obj.angle}deg)`; }
+        function deselectAll() { document.querySelectorAll('.draggable-sticker').forEach(s => s.classList.remove('selected')); }
+        document.addEventListener('pointerdown', e => {
+            if (!e.target.closest('.draggable-sticker') && !e.target.closest('.dock-btn') && !e.target.closest('.tray')) deselectAll();
+        });
+
+        function removeStickerById(id, animate) {
+            const el = stickersLayer.querySelector(`[data-id="${id}"]`);
+            state.stickers = state.stickers.filter(s => s.id != id);
+            if (el) {
+                if (animate) { el.style.transition = 'all .2s ease'; el.style.opacity = '0'; el.style.transform += ' scale(0)'; setTimeout(() => el.remove(), 200); vibrate(); }
+                else el.remove();
+            }
+        }
+
+        // drag to move + drag-to-trash (UPDATED: Added pointer release)
+        function attachDrag(el, obj) {
+            let sx = 0, sy = 0, startLeftPx = 0, startTopPx = 0, dragging = false;
+            const trash = document.getElementById('trash-zone');
+
+            el.addEventListener('pointerdown', e => {
+                if (e.target.closest('.sticker-handle')) return;
+                dragging = true;
+                el.setPointerCapture(e.pointerId);
+                sx = e.clientX; sy = e.clientY;
+                startLeftPx = (obj.left / 100) * dropzone.clientWidth;
+                startTopPx = (obj.top / 100) * dropzone.clientHeight;
+                trash.classList.add('show');
+            });
+            el.addEventListener('pointermove', e => {
+                if (!dragging) return;
+                const nl = startLeftPx + (e.clientX - sx);
+                const nt = startTopPx + (e.clientY - sy);
+                obj.left = Math.max(0, Math.min(100, (nl / dropzone.clientWidth) * 100));
+                obj.top = Math.max(0, Math.min(100, (nt / dropzone.clientHeight) * 100));
+                el.style.left = obj.left + '%'; el.style.top = obj.top + '%';
+
+                const tRect = trash.getBoundingClientRect();
+                const over = e.clientX > tRect.left && e.clientX < tRect.right && e.clientY > tRect.top && e.clientY < tRect.bottom;
+                trash.classList.toggle('hover', over);
+            });
+            el.addEventListener('pointerup', e => {
+                if (!dragging) return;
+                dragging = false;
+                
+                // IMPORTANT FIX: Release pointer capture cleanly
+                el.releasePointerCapture(e.pointerId);
+                
+                trash.classList.remove('show', 'hover');
+                const tRect = trash.getBoundingClientRect();
+                const over = e.clientX > tRect.left && e.clientX < tRect.right && e.clientY > tRect.top && e.clientY < tRect.bottom;
+                if (over) removeStickerById(obj.id, true);
+            });
+        }
+
+        // one handle drives both scale + rotate (drag away from center)
+        function attachResizeRotate(handle, el, obj) {
+            let startDist = 0, startAngle = 0, baseScale = 1, baseAngle = 0, active = false;
+            handle.addEventListener('pointerdown', e => {
                 e.stopPropagation();
-                stickersArray = stickersArray.filter(s => s.id !== obj.id);
-                sticker.remove();
+                active = true;
+                handle.setPointerCapture(e.pointerId);
+                const rect = dropzone.getBoundingClientRect();
+                const cx = rect.left + (obj.left / 100) * rect.width;
+                const cy = rect.top + (obj.top / 100) * rect.height;
+                startDist = Math.hypot(e.clientX - cx, e.clientY - cy) || 1;
+                startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+                baseScale = obj.scale; baseAngle = obj.angle;
             });
-            sticker.appendChild(delBtn);
-
-            sticker.addEventListener('click', (e) => { e.stopPropagation(); deselectAllStickers(); sticker.classList.add('selected'); });
-
-            mainStickersLayer.appendChild(sticker);
-            attachMobileInteractiveTouchTracks(sticker, obj);
+            handle.addEventListener('pointermove', e => {
+                if (!active) return;
+                const rect = dropzone.getBoundingClientRect();
+                const cx = rect.left + (obj.left / 100) * rect.width;
+                const cy = rect.top + (obj.top / 100) * rect.height;
+                const dist = Math.hypot(e.clientX - cx, e.clientY - cy) || 1;
+                const angle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+                obj.scale = Math.max(0.4, Math.min(3, baseScale * (dist / startDist)));
+                obj.angle = baseAngle + (angle - startAngle);
+                applyTransform(el, obj);
+            });
+            handle.addEventListener('pointerup', () => { active = false; });
         }
 
-        function attachMobileInteractiveTouchTracks(elm, referenceObj) {
-            let startX = 0, startY = 0;
-            let startLeft = 0, startTop = 0;
-            const parent = document.getElementById('sticker-dropzone');
+        // ---------- EMOJI TRAY ----------
+        document.querySelectorAll('.emoji-selector-btn').forEach(btn => {
+            btn.addEventListener('click', () => createSticker({ char: btn.textContent }));
+        });
 
-            elm.addEventListener('touchstart', (e) => {
-                deselectAllStickers();
-                elm.classList.add('selected');
-                if (e.touches.length === 1) {
-                    startX = e.touches[0].clientX;
-                    startY = e.touches[0].clientY;
-                    startLeft = elm.offsetLeft;
-                    startTop = elm.offsetTop;
-                }
-            }, { passive: true });
+        // ---------- TEXT TRAY ----------
+        let activeTextColor = '#ffffff';
+        document.getElementById('text-color-row').addEventListener('click', e => {
+            const dot = e.target.closest('.color-dot'); if (!dot) return;
+            document.querySelectorAll('#text-color-row .color-dot').forEach(d => d.classList.remove('active'));
+            dot.classList.add('active'); activeTextColor = dot.dataset.color;
+        });
+        document.getElementById('add-text-sticker-btn').addEventListener('click', () => {
+            const input = document.getElementById('text-sticker-input');
+            const val = input.value.trim();
+            if (!val) return;
+            createSticker({ char: val, isText: true, color: activeTextColor });
+            input.value = '';
+        });
 
-            elm.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 1 && startX !== 0) {
-                    let nextL = startLeft + (e.touches[0].clientX - startX);
-                    let nextT = startTop + (e.touches[0].clientY - startY);
+        // ---------- DOODLE ----------
+        const doodleCanvas = document.getElementById('doodle-canvas');
+        const dctx = doodleCanvas.getContext('2d');
+        let drawMode = false, drawing = false, drawColor = '#ffffff', drawSize = 5;
 
-                    if(nextL > -15 && nextL < (parent.offsetWidth - 20)) elm.style.left = nextL + "px";
-                    if(nextT > -15 && nextT < (parent.offsetHeight - 20)) elm.style.top = nextT + "px";
+        function sizeDoodleCanvas() {
+            const rect = dropzone.getBoundingClientRect();
+            const prev = doodleCanvas.toDataURL();
+            doodleCanvas.width = rect.width; doodleCanvas.height = rect.height;
+            const img = new Image();
+            img.onload = () => dctx.drawImage(img, 0, 0, rect.width, rect.height);
+            img.src = prev;
+        }
+        document.getElementById('draw-toggle-btn').addEventListener('click', function () {
+            drawMode = !drawMode;
+            this.textContent = 'Draw: ' + (drawMode ? 'On' : 'Off');
+            doodleCanvas.style.pointerEvents = drawMode ? 'auto' : 'none';
+            doodleCanvas.style.zIndex = drawMode ? '45' : '1';
+        });
+        document.getElementById('draw-color-row').addEventListener('click', e => {
+            const dot = e.target.closest('.color-dot'); if (!dot) return;
+            document.querySelectorAll('#draw-color-row .color-dot').forEach(d => d.classList.remove('active'));
+            dot.classList.add('active'); drawColor = dot.dataset.color;
+        });
+        document.getElementById('draw-size').addEventListener('input', e => drawSize = parseInt(e.target.value, 10));
+        document.getElementById('draw-clear-btn').addEventListener('click', () => {
+            pushUndo({ type: 'stroke', snapshot: doodleCanvas.toDataURL() });
+            dctx.clearRect(0, 0, doodleCanvas.width, doodleCanvas.height);
+        });
 
-                    referenceObj.left = (elm.offsetLeft / parent.offsetWidth) * 100;
-                    referenceObj.top = (elm.offsetTop / parent.offsetHeight) * 100;
-                }
-            }, { passive: true });
+        let strokeSnapshotBeforeStroke = null;
+        doodleCanvas.addEventListener('pointerdown', e => {
+            if (!drawMode) return;
+            drawing = true;
+            strokeSnapshotBeforeStroke = doodleCanvas.toDataURL();
+            doodleCanvas.setPointerCapture(e.pointerId);
+            dctx.beginPath();
+            const r = doodleCanvas.getBoundingClientRect();
+            dctx.moveTo(e.clientX - r.left, e.clientY - r.top);
+        });
+        doodleCanvas.addEventListener('pointermove', e => {
+            if (!drawing) return;
+            const r = doodleCanvas.getBoundingClientRect();
+            dctx.lineTo(e.clientX - r.left, e.clientY - r.top);
+            dctx.strokeStyle = drawColor; dctx.lineWidth = drawSize; dctx.lineCap = 'round'; dctx.lineJoin = 'round';
+            dctx.stroke();
+        });
+        doodleCanvas.addEventListener('pointerup', () => {
+            if (!drawing) return;
+            drawing = false;
+            if (strokeSnapshotBeforeStroke) pushUndo({ type: 'stroke', snapshot: strokeSnapshotBeforeStroke });
+        });
+        
+        // IMPORTANT FIX: Cancel event added so swipes that go out of bounds don't freeze the canvas
+        doodleCanvas.addEventListener('pointercancel', () => {
+            if (!drawing) return;
+            drawing = false;
+            if (strokeSnapshotBeforeStroke) pushUndo({ type: 'stroke', snapshot: strokeSnapshotBeforeStroke });
+        });
 
-            elm.addEventListener('mousedown', (e) => {
-                deselectAllStickers(); elm.classList.add('selected');
-                let mX = e.clientX, mY = e.clientY, sL = elm.offsetLeft, sT = elm.offsetTop;
-                document.onmousemove = (me) => {
-                    let nextL = sL + (me.clientX - mX), nextT = sT + (me.clientY - mY);
-                    elm.style.left = nextL + "px"; elm.style.top = nextT + "px";
-                    referenceObj.left = (elm.offsetLeft / parent.offsetWidth) * 100;
-                    referenceObj.top = (elm.offsetTop / parent.offsetHeight) * 100;
-                };
-                document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; };
-            });
+        function restoreDoodleSnapshot(dataUrl) {
+            const img = new Image();
+            img.onload = () => { dctx.clearRect(0, 0, doodleCanvas.width, doodleCanvas.height); dctx.drawImage(img, 0, 0, doodleCanvas.width, doodleCanvas.height); };
+            img.src = dataUrl;
         }
 
-        // --- 🚨 FIXED TRUE FULL-BLEED SCREENSHOT PREVIEW MODAL LOGIC ---
-        const bigPreviewModal = document.getElementById('big-preview-modal');
-        const bigStickersLayer = document.getElementById('big-active-stickers-layer');
-        const bigCaptionSync = document.getElementById('big-caption-sync');
+        // ---------- FILTERS ----------
+        const FILTERS = {
+            none: { label: 'Original', css: 'none' },
+            vivid: { label: 'Vivid', css: 'saturate(1.45) contrast(1.1)' },
+            mono: { label: 'Mono', css: 'grayscale(1) contrast(1.05)' },
+            vintage: { label: 'Vintage', css: 'sepia(.35) saturate(1.1) contrast(.95) brightness(1.05)' },
+            warm: { label: 'Warm', css: 'sepia(.15) saturate(1.2) hue-rotate(-5deg) brightness(1.05)' },
+            cool: { label: 'Cool', css: 'saturate(1.1) hue-rotate(10deg) brightness(1.02) contrast(1.05)' }
+        };
+        function buildFilterChips() {
+            const row = document.getElementById('filter-row');
+            row.innerHTML = Object.entries(FILTERS).map(([key, f]) => `
+                <button data-filter="${key}" class="filter-chip ${key === 'none' ? 'active' : ''}" style="background-image:url('${imgPreview.src}'); filter:${f.css};">
+                    <span>${f.label}</span>
+                </button>`).join('');
+            row.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    row.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    state.filterKey = chip.dataset.filter;
+                    imgPreview.style.filter = FILTERS[state.filterKey].css;
+                });
+            });
+        }
+        imgPreview.addEventListener('load', () => { if (document.getElementById('filter-row').children.length) buildFilterChips(); });
+
+        // ---------- CAPTION ----------
         const captionInput = document.getElementById('caption-input');
+        captionInput.addEventListener('input', e => {
+            state.caption = e.target.value;
+            document.getElementById('char-counter').textContent = `${e.target.value.length}/60`;
+        });
 
-        document.getElementById('sticker-dropzone').addEventListener('click', (e) => {
-            if(e.target.closest('.draggable-sticker')) return;
+        // ---------- FULL PREVIEW (clone = always in sync) ----------
+        document.getElementById('fullscreen-tap-catcher').addEventListener('click', () => {
+            const stage = document.getElementById('big-preview-stage');
+            stage.innerHTML = '';
+            const clone = polaroidCard.cloneNode(true);
+            clone.querySelectorAll('.sticker-handle').forEach(h => h.remove());
+            clone.querySelectorAll('.draggable-sticker').forEach(s => s.classList.remove('selected'));
+            clone.querySelectorAll('#fullscreen-tap-catcher').forEach(b => b.remove());
+            clone.className = 'w-[92vw] max-w-md';
+            clone.style.padding = '0'; clone.style.borderRadius = '20px'; clone.style.overflow = 'hidden'; clone.style.background = 'transparent'; clone.style.boxShadow = 'none';
+            const dz = clone.querySelector('#sticker-dropzone');
+            if (dz) { dz.style.borderRadius = '20px'; dz.classList.remove('aspect-[4/3]'); dz.style.aspectRatio = '4/3'; }
+            const dateRow = clone.querySelector('.mt-3'); if (dateRow) dateRow.remove();
+            stage.appendChild(clone);
 
-            // Caption mapping
-            bigCaptionSync.textContent = captionInput.value.trim() || "A beautiful uncaptioned memory...";
-            bigStickersLayer.innerHTML = ''; 
+            if (state.caption) {
+                const cap = document.createElement('p');
+                cap.className = 'absolute bottom-10 left-0 right-0 text-center text-sm font-bold text-white px-6';
+                cap.style.textShadow = '0 2px 8px rgba(0,0,0,.8)';
+                cap.textContent = state.caption;
+                stage.appendChild(cap);
+            }
+            const modal = document.getElementById('big-preview-modal');
+            modal.classList.add('active');
+            requestAnimationFrame(() => modal.classList.add('opacity-100'));
+        });
+        document.getElementById('close-preview-btn').addEventListener('click', () => {
+            const modal = document.getElementById('big-preview-modal');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => modal.classList.remove('active'), 300);
+        });
 
-            // Emojis mapping on full-bleed viewport proportions
-            stickersArray.forEach(st => {
-                const mirror = document.createElement('div');
-                mirror.style.position = 'absolute';
-                mirror.style.left = st.left + '%';
-                mirror.style.top = st.top + '%';
-                mirror.style.transform = `scale(${st.scale * 1.3}) rotate(${st.angle}deg)`; // Slightly bigger for full screen scaling
-                mirror.innerHTML = `<span style="font-size:38px; display:inline-block; user-select:none;">${st.char}</span>`;
-                bigStickersLayer.appendChild(mirror);
+        // ---------- SAVE PIPELINE ----------
+        function drawImageCover(ctx, img, W, H) {
+            const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+            const scale = Math.max(W / iw, H / ih);
+            const sw = W / scale, sh = H / scale;
+            const sx = (iw - sw) / 2, sy = (ih - sh) / 2;
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
+        }
+
+        async function compositeFinalImage() {
+            const W = 900, H = Math.round(900 * 3 / 4);
+            const canvas = document.createElement('canvas');
+            canvas.width = W; canvas.height = H;
+            const ctx = canvas.getContext('2d');
+
+            ctx.filter = FILTERS[state.filterKey]?.css || 'none';
+            drawImageCover(ctx, imgPreview, W, H);
+            ctx.filter = 'none';
+
+            ctx.drawImage(doodleCanvas, 0, 0, W, H);
+
+            state.stickers.forEach(s => {
+                ctx.save();
+                ctx.translate((s.left / 100) * W, (s.top / 100) * H);
+                ctx.rotate(s.angle * Math.PI / 180);
+                ctx.scale(s.scale, s.scale);
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                if (s.isText) { ctx.font = "700 34px Fraunces, serif"; ctx.fillStyle = s.color; ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 6; }
+                else { ctx.font = "42px sans-serif"; }
+                ctx.fillText(s.char, 0, 0);
+                ctx.restore();
             });
 
-            bigPreviewModal.classList.remove('hidden');
-            setTimeout(() => { bigPreviewModal.classList.add('opacity-100'); }, 10);
-        });
+            return canvas.toDataURL('image/jpeg', 0.92);
+        }
 
-        document.getElementById('close-preview-btn').addEventListener('click', () => {
-            bigPreviewModal.classList.remove('opacity-100');
-            setTimeout(() => { bigPreviewModal.classList.add('hidden'); }, 300);
-        });
+        const saveBtn = document.getElementById('save-memory-btn');
+        const saveIcon = document.getElementById('save-icon');
+        saveBtn.addEventListener('click', async () => {
+            saveIcon.className = 'fas fa-spinner spin text-white text-lg';
+            saveBtn.disabled = true;
+            let finalImage;
+            try { finalImage = await compositeFinalImage(); }
+            catch (err) { console.warn('Composite failed, saving original photo instead:', err); finalImage = imgPreview.src; }
 
-        // --- SUBMIT SAVE PIPELINE ---
-        const successModal = document.getElementById('success-modal');
-        document.getElementById('save-memory-btn').addEventListener('click', async () => {
-            const payloadStickers = stickersArray.map(s => ({ id: s.id, char: s.char, left: s.left, top: s.top, scale: s.scale, angle: s.angle }));
-            
+            const now = new Date();
             const newMemory = {
                 id: Date.now(),
-                image: imgPreview.src,
-                caption: captionInput.value.trim() || "A beautiful uncaptioned moment...",
-                tags: ["✨ Polaroid"],
-                date: "11 July 2026",
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                skin: activeSkinClass,
-                stickers: payloadStickers 
+                image: finalImage,
+                caption: state.caption.trim() || 'A beautiful uncaptioned moment...',
+                tags: ['✨ Polaroid'],
+                tag: sessionStorage.getItem('cc_last_tag') || 'Me',
+                sender: sessionStorage.getItem('cc_user_id') || 'local',
+                date: now.toDateString(),
+                time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                skin: state.skin,
+                stickers: state.stickers
             };
             try {
                 await addMemoryToDB(newMemory);
-                successModal.classList.remove('invisible', 'opacity-0'); successModal.classList.add('opacity-100');
-            } catch (err) { console.error(err); }
+                const modal = document.getElementById('success-modal');
+                modal.classList.remove('invisible', 'opacity-0');
+            } catch (err) {
+                console.error(err);
+                saveIcon.className = 'fas fa-check text-white text-lg';
+                saveBtn.disabled = false;
+            }
         });
+        document.getElementById('modal-close-btn').addEventListener('click', () => window.location.href = 'timeline.html');
 
-        document.getElementById('modal-close-btn').addEventListener('click', () => { window.location.href = 'timeline.html'; });
-        captionInput.addEventListener('input', (e) => { document.getElementById('char-counter').textContent = `${e.target.value.length}/60`; });
+        function vibrate() { if (navigator.vibrate) navigator.vibrate(12); }
     </script>
 </body>
 </html>
