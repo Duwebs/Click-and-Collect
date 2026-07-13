@@ -93,6 +93,9 @@
             const snapshot = await get(roomRef);
             
             if (snapshot.exists()) {
+                // ✅ FIX: Save the pin locally so capture.html / timeline.html can find the room
+                localStorage.setItem('cc_room_pin', inputPin);
+
                 // Update Firebase with Status and Guest Avatar
                 await update(roomRef, { 
                     status: 'connected',

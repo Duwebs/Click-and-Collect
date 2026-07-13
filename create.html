@@ -97,6 +97,10 @@
         };
 
         const pin = Math.floor(1000 + Math.random() * 9000).toString();
+
+        // ✅ FIX: Save the pin locally so capture.html / timeline.html can find the room
+        localStorage.setItem('cc_room_pin', pin);
+
         document.getElementById('generated-pin').textContent = pin;
         new QRCode(document.getElementById("qrcode"), { text: pin, width: 200, height: 200 });
 
