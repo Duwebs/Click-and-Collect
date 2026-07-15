@@ -2,39 +2,189 @@
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>C&C - Memories Feed</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #f0fdfa 0%, #fdf2f8 100%); }
-        .card-glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
-        .timeline-line::before { content: ''; position: absolute; left: 24px; top: 20px; bottom: 20px; width: 2px; background: #e2e8f0; }
-        .btn-active { background: linear-gradient(135deg, #0d9488 0%, #e11d48 100%) !important; color: white !important; }
+        * { font-family: 'Inter', sans-serif; }
+
+        body {
+            background: linear-gradient(180deg, #0d4f4a 0%, #0a3d39 100%);
+            overscroll-behavior: none;
+        }
+
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Header */
+        .header-glass {
+            background: rgba(13, 79, 74, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s ease;
+        }
+        .icon-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.16); }
+
+        .count-badge {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4);
+        }
+
+        /* Tab switcher */
+        .tab-wrap {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .tab-btn {
+            transition: color 0.3s ease;
+            color: rgba(255,255,255,0.45);
+        }
+        .tab-btn.active { color: #05221f; }
+        .tab-slider {
+            position: absolute;
+            top: 4px; bottom: 4px; left: 4px;
+            width: calc(50% - 4px);
+            background: linear-gradient(135deg, #2dd4bf 0%, #f43f5e 100%);
+            border-radius: 14px;
+            transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+        .tab-slider.right { transform: translateX(100%); }
+
+        /* Main surface */
+        .content-sheet {
+            background: #fafaf9;
+            border-radius: 32px 32px 0 0;
+        }
+
+        /* Timeline */
+        .tl-rail::before {
+            content: '';
+            position: absolute;
+            left: 27px; top: 6px; bottom: 6px;
+            width: 2px;
+            background: linear-gradient(180deg, #ccfbf1 0%, #fecdd3 100%);
+        }
+        .tl-dot {
+            box-shadow: 0 0 0 4px #fafaf9, 0 0 0 6px rgba(20, 184, 166, 0.15);
+        }
+        .tl-card {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tl-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 2px rgba(15,23,42,0.08);
+        }
+
+        .tag-pill {
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        /* Gallery grid */
+        .gl-item {
+            transition: transform 0.2s ease;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+        }
+        .gl-item:active { transform: scale(0.95); }
+
+        /* Lightbox */
         #lightbox { display: none; }
-        #lightbox.active { display: flex; }
+        #lightbox.active { display: flex; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #lb-img { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Empty state */
+        .empty-icon {
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.12) 0%, rgba(244, 63, 94, 0.12) 100%);
+        }
+
+        /* Skeleton loader */
+        .skel {
+            background: linear-gradient(90deg, #f1f5f4 25%, #e7ebea 37%, #f1f5f4 63%);
+            background-size: 400% 100%;
+            animation: skelShine 1.4s ease infinite;
+        }
+        @keyframes skelShine {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="h-full gradient-bg text-slate-800 flex flex-col">
+<body class="h-full flex flex-col overflow-hidden">
 
-    <header class="p-6 flex items-center justify-between">
-        <a href="dashboard.html" class="p-3 bg-white shadow-lg rounded-2xl text-teal-600"><i class="fas fa-arrow-left"></i></a>
-        <h1 class="text-lg font-black uppercase tracking-widest text-teal-800">C & C Feed</h1>
-        <div class="w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center font-black shadow-lg shadow-rose-500/20" id="total-count">0</div>
+    <!-- Header -->
+    <header class="header-glass sticky top-0 z-30 px-5 pt-5 pb-4 flex items-center justify-between">
+        <a href="dashboard.html" class="icon-btn w-11 h-11 rounded-2xl flex items-center justify-center text-white">
+            <i class="fas fa-arrow-left text-sm"></i>
+        </a>
+        <div class="text-center">
+            <h1 class="text-white font-black text-sm uppercase tracking-[0.2em]">Memories</h1>
+            <p class="text-teal-200/50 text-[10px] font-medium mt-0.5">C &amp; C Collection</p>
+        </div>
+        <div class="count-badge w-11 h-11 rounded-2xl flex items-center justify-center">
+            <span id="total-count" class="text-white font-black text-sm">0</span>
+        </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto px-6 pb-20 scrollbar-none">
-        <div class="flex p-1 bg-white shadow-inner rounded-2xl mb-8 border border-slate-100">
-            <button id="tl-btn" class="btn-active flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all">Timeline</button>
-            <button id="gl-btn" class="flex-1 py-3 rounded-xl font-black text-xs uppercase text-slate-400 transition-all">Gallery</button>
-        </div>
-        <div id="timeline-box" class="timeline-line space-y-8"></div>
-        <div id="gallery-box" class="grid grid-cols-2 gap-3 hidden"></div>
-    </main>
+    <!-- Sheet -->
+    <div class="content-sheet flex-1 flex flex-col overflow-hidden -mt-1">
 
-    <div id="lightbox" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4" onclick="this.classList.remove('active')">
-        <img id="lb-img" src="" class="max-w-full max-h-[85vh] rounded-3xl object-contain border-4 border-white shadow-2xl">
+        <div class="px-5 pt-6 pb-2">
+            <div class="tab-wrap relative flex p-1 rounded-2xl h-12" style="background:#f1f5f4;border-color:#e7ebea;">
+                <div id="tab-slider" class="tab-slider"></div>
+                <button id="tl-btn" class="tab-btn active relative z-10 flex-1 font-black text-xs uppercase tracking-wider">Timeline</button>
+                <button id="gl-btn" class="tab-btn relative z-10 flex-1 font-black text-xs uppercase tracking-wider">Gallery</button>
+            </div>
+        </div>
+
+        <main class="flex-1 overflow-y-auto scrollbar-none px-5 pt-4 pb-24">
+
+            <!-- Skeleton (shown until first render) -->
+            <div id="skeleton" class="space-y-5">
+                <div class="flex gap-3"><div class="skel w-3 h-3 rounded-full mt-2"></div><div class="skel flex-1 h-28 rounded-2xl"></div></div>
+                <div class="flex gap-3"><div class="skel w-3 h-3 rounded-full mt-2"></div><div class="skel flex-1 h-28 rounded-2xl"></div></div>
+                <div class="flex gap-3"><div class="skel w-3 h-3 rounded-full mt-2"></div><div class="skel flex-1 h-28 rounded-2xl"></div></div>
+            </div>
+
+            <div id="timeline-box" class="tl-rail relative space-y-7 hidden"></div>
+            <div id="gallery-box" class="grid grid-cols-2 gap-3 hidden"></div>
+
+            <!-- Empty state -->
+            <div id="empty-state" class="hidden flex-col items-center justify-center text-center pt-20 pb-10">
+                <div class="empty-icon w-20 h-20 rounded-3xl flex items-center justify-center mb-5">
+                    <i class="fas fa-camera-retro text-2xl" style="color:#14b8a6;"></i>
+                </div>
+                <h3 class="font-black text-slate-700 text-sm uppercase tracking-wide">No memories yet</h3>
+                <p class="text-slate-400 text-xs mt-1.5 max-w-[220px] leading-relaxed">Click your first photo and it'll show up here</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md items-center justify-center p-5" onclick="this.classList.remove('active')">
+        <img id="lb-img" src="" class="max-w-full max-h-[85vh] rounded-[28px] object-contain border-4 border-white/90 shadow-2xl">
     </div>
 
     <script type="module">
@@ -89,45 +239,85 @@
             }
         }
 
+        function tagStyle(tag) {
+            if (tag === 'Friend') return { bg: 'rgba(168, 85, 247, 0.12)', color: '#9333ea', icon: 'fa-user-group' };
+            if (tag === 'Both') return { bg: 'rgba(244, 63, 94, 0.12)', color: '#e11d48', icon: 'fa-heart' };
+            return { bg: 'rgba(20, 184, 166, 0.12)', color: '#0d9488', icon: 'fa-user' };
+        }
+
         function renderGallery(data) {
             // FIXED: Numeric sorting based on timestamps
             data.sort((a,b) => (b.time || 0) - (a.time || 0));
             document.getElementById('total-count').textContent = data.length;
-            
+
+            document.getElementById('skeleton').classList.add('hidden');
+
             const tlBox = document.getElementById('timeline-box');
             const glBox = document.getElementById('gallery-box');
+            const emptyState = document.getElementById('empty-state');
             tlBox.innerHTML = ''; glBox.innerHTML = '';
-            
-            data.forEach(m => {
-                const dateStr = new Date(m.time).toDateString();
+
+            if (data.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                tlBox.classList.add('hidden');
+                glBox.classList.add('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+
+            const activeTab = document.getElementById('tl-btn').classList.contains('active') ? 'tl' : 'gl';
+            if (activeTab === 'tl') tlBox.classList.remove('hidden'); else glBox.classList.remove('hidden');
+
+            data.forEach((m, i) => {
+                const dateStr = new Date(m.time).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
                 const timeStr = new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const style = tagStyle(m.tag);
+                const delay = Math.min(i * 0.05, 0.4);
 
                 tlBox.innerHTML += `
-                    <div class="relative pl-10">
-                        <div class="absolute left-[20px] top-1 w-2 h-2 bg-rose-500 rounded-full"></div>
-                        <div class="text-[9px] font-bold text-teal-600 mb-1 tracking-wider uppercase">${dateStr} - ${timeStr}</div>
-                        <div class="card-glass p-2 rounded-2xl shadow-sm transition active:scale-95 mb-4" onclick="openLB('${m.image}')">
-                            <img src="${m.image}" class="w-full aspect-[4/3] rounded-xl object-cover">
+                    <div class="relative pl-[52px] fade-up" style="animation-delay:${delay}s">
+                        <div class="tl-dot absolute left-[22px] top-2 w-3 h-3 rounded-full" style="background:${style.color};"></div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider" style="color:#94a3a8;">${dateStr} · ${timeStr}</span>
+                            <span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide" style="background:${style.bg};color:${style.color};">
+                                <i class="fas ${style.icon} text-[8px]"></i>${m.tag || 'Me'}
+                            </span>
+                        </div>
+                        <div class="tl-card rounded-[22px] overflow-hidden cursor-pointer" onclick="openLB('${m.image}')">
+                            <img src="${m.image}" class="w-full aspect-[4/3] object-cover">
                         </div>
                     </div>`;
-                glBox.innerHTML += `<img src="${m.image}" onclick="openLB('${m.image}')" class="aspect-square rounded-2xl object-cover shadow-md">`;
+
+                glBox.innerHTML += `
+                    <div class="gl-item relative rounded-[20px] overflow-hidden cursor-pointer fade-up" style="animation-delay:${delay}s" onclick="openLB('${m.image}')">
+                        <img src="${m.image}" class="aspect-square w-full object-cover">
+                        <div class="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center" style="background:${style.color};">
+                            <i class="fas ${style.icon} text-[8px] text-white"></i>
+                        </div>
+                    </div>`;
             });
         }
 
         window.openLB = function(src) { document.getElementById('lb-img').src = src; document.getElementById('lightbox').classList.add('active'); }
         
+        const slider = document.getElementById('tab-slider');
+
         document.getElementById('tl-btn').onclick = function() {
             document.getElementById('timeline-box').classList.remove('hidden');
             document.getElementById('gallery-box').classList.add('hidden');
-            this.classList.add('btn-active');
-            document.getElementById('gl-btn').classList.remove('btn-active');
+            this.classList.add('active');
+            document.getElementById('gl-btn').classList.remove('active');
+            slider.classList.remove('right');
         };
         
         document.getElementById('gl-btn').onclick = function() {
             document.getElementById('timeline-box').classList.add('hidden');
             document.getElementById('gallery-box').classList.remove('hidden');
-            this.classList.add('btn-active');
-            document.getElementById('tl-btn').classList.remove('btn-active');
+            this.classList.add('active');
+            document.getElementById('tl-btn').classList.remove('active');
+            slider.classList.add('right');
         };
 
         loadAllMemories();
