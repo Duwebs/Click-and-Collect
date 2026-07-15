@@ -90,10 +90,14 @@
     </style>
 </head>
 <body class="h-full max-h-screen flex flex-col overflow-hidden select-none relative premium-bg text-white">
+    
+    <div id="page-loader">
+    <img src="loader-image.png" alt="Loading...">
+  </div>
 
     <input type="file" id="native-camera-picker" accept="image/*" capture="environment" class="hidden">
     <input type="file" id="native-gallery-picker" accept="image/*" class="hidden">
-
+    
     <div class="shrink-0 flex flex-col pb-6 relative">
         <header class="h-14 flex items-center px-4 shrink-0 bg-transparent relative">
             <div class="animate-camera-morph">
