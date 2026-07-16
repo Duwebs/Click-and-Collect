@@ -159,7 +159,7 @@ document.getElementById('pwa-backdrop')?.addEventListener('click', closePWABotto
 
 
 document.addEventListener("DOMContentLoaded", function () {
-const DEPLOYED_APP_VERSION = '2.0'; // ⚡ Aapki app ka current version
+    const DEPLOYED_APP_VERSION = '7.0'; // ⚡ Aapki app ka current version
 
     // ==========================================
     // 1. DYNAMIC VERSION BADGE LOGIC
@@ -181,10 +181,9 @@ const DEPLOYED_APP_VERSION = '2.0'; // ⚡ Aapki app ka current version
     let savedUserVersion = localStorage.getItem('app_last_seen_version');
     if (savedUserVersion) savedUserVersion = savedUserVersion.trim();
     
-    // Agar page par update modal ke elements nahi hain, toh code yahin ruk jaye (No Errors)
     if (!wrapper || !modalBox || !closeBtn) return;
 
-    // A. Agar bilkul naya user hai (pehli baar aaya hai)
+    // A. Agar bilkul naya user hai
     if (!savedUserVersion) {
         localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
         console.log("Naya user detect hua. Version saved in local storage.");
@@ -193,7 +192,6 @@ const DEPLOYED_APP_VERSION = '2.0'; // ⚡ Aapki app ka current version
     else if (savedUserVersion !== DEPLOYED_APP_VERSION) {
         console.log(`🚨 Update found! User was on v${savedUserVersion}, App is on v${DEPLOYED_APP_VERSION}`);
         
-        // 1.2 second ke stylish delay ke baad popup trigger hoga
         setTimeout(() => {
             wrapper.classList.remove('opacity-0', 'pointer-events-none');
             wrapper.classList.add('opacity-100');
@@ -206,13 +204,19 @@ const DEPLOYED_APP_VERSION = '2.0'; // ⚡ Aapki app ka current version
         console.log("User is already on the latest version.");
     }
 
-    // Modal close hone par user ka version local storage mein update karna
+    // ==========================================
+    // ⚡ FIX YAHAN KIYA HAI: CLOSE EVENT
+    // ==========================================
     closeBtn.addEventListener('click', function () {
+        // 1. Inner modal box ko chota aur invisible karo
         modalBox.classList.remove('scale-100', 'opacity-100');
         modalBox.classList.add('scale-90', 'opacity-0');
-        wrapper.classList.add('opacity-0', 'pointer-events-none');
         
-        // Version ko lock kar do taaki popup dobara na aaye
+        // 2. Black parda (wrapper) ko remove karo
+        wrapper.classList.remove('opacity-100'); // 👈 YEAH LINE LAKH RUPAY KI HAI! (Isse opacity-100 hatega)
+        wrapper.classList.add('opacity-0', 'pointer-events-none'); // Isse smoothly fade-out ho jayega
+        
+        // Version ko save karlo
         localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
         console.log(`Update dismissed. Version saved as v${DEPLOYED_APP_VERSION}`);
     });
