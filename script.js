@@ -153,3 +153,67 @@ if (headerInstallBtn) headerInstallBtn.addEventListener('click', showPWABottomSh
 if (actionInstallBtn) actionInstallBtn.addEventListener('click', triggerInstall);
 if (closeSheetBtn) closeSheetBtn.addEventListener('click', closePWABottomSheet);
 document.getElementById('pwa-backdrop')?.addEventListener('click', closePWABottomSheet);
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const DEPLOYED_APP_VERSION = '1.0'; // ⚡ Aapki app ka current version
+
+    // ==========================================
+    // 1. DYNAMIC VERSION BADGE LOGIC
+    // ==========================================
+    const versionElement = document.getElementById('app-version');
+    if (versionElement) {
+        versionElement.textContent = `v${DEPLOYED_APP_VERSION}`;
+        console.log(`App Version set to: v${DEPLOYED_APP_VERSION}`);
+    }
+
+    // ==========================================
+    // 2. UPDATE MODAL LOGIC
+    // ==========================================
+    const wrapper = document.getElementById('update-modal-wrapper');
+    const modalBox = document.getElementById('update-modal-box');
+    const closeBtn = document.getElementById('close-update-modal-btn');
+    
+    // Check local storage safely
+    let savedUserVersion = localStorage.getItem('app_last_seen_version');
+    if (savedUserVersion) savedUserVersion = savedUserVersion.trim();
+    
+    // Agar page par update modal ke elements nahi hain, toh code yahin ruk jaye (No Errors)
+    if (!wrapper || !modalBox || !closeBtn) return;
+
+    // A. Agar bilkul naya user hai (pehli baar aaya hai)
+    if (!savedUserVersion) {
+        localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+        console.log("Naya user detect hua. Version saved in local storage.");
+    } 
+    // B. Agar purana user hai aur app version change hua hai
+    else if (savedUserVersion !== DEPLOYED_APP_VERSION) {
+        console.log(`🚨 Update found! User was on v${savedUserVersion}, App is on v${DEPLOYED_APP_VERSION}`);
+        
+        // 1.2 second ke stylish delay ke baad popup trigger hoga
+        setTimeout(() => {
+            wrapper.classList.remove('opacity-0', 'pointer-events-none');
+            wrapper.classList.add('opacity-100');
+            modalBox.classList.remove('scale-90', 'opacity-0');
+            modalBox.classList.add('scale-100', 'opacity-100');
+        }, 1200); 
+    } 
+    // C. Agar user pehle se updated version par hai
+    else {
+        console.log("User is already on the latest version.");
+    }
+
+    // Modal close hone par user ka version local storage mein update karna
+    closeBtn.addEventListener('click', function () {
+        modalBox.classList.remove('scale-100', 'opacity-100');
+        modalBox.classList.add('scale-90', 'opacity-0');
+        wrapper.classList.add('opacity-0', 'pointer-events-none');
+        
+        // Version ko lock kar do taaki popup dobara na aaye
+        localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+        console.log(`Update dismissed. Version saved as v${DEPLOYED_APP_VERSION}`);
+    });
+});
