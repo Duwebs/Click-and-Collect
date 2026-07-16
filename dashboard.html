@@ -88,18 +88,6 @@
         .animate-pwa-bg-loop {
             animation: scrollBackground 55s linear infinite !important;
         }
-
-        /*
-          FIX: removing #page-loader from the HTML entirely broke the
-          install-button / PWA-install-sheet flow. script.js reaches for
-          document.getElementById('page-loader') on load to hide it — with
-          the element deleted that call returned null, threw, and stopped the
-          rest of that script (which is what wires up the INSTALL APP button
-          and its slide-up sheet). Keeping the element in the DOM but forcing
-          it hidden with !important gives you both: it never visibly shows,
-          and anything script.js does to it is a harmless no-op.
-        */
-        #page-loader { display: none !important; }
     </style>
 </head>
 <body class="h-full max-h-screen flex flex-col overflow-hidden select-none relative premium-bg text-white">
