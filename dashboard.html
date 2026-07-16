@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
@@ -9,6 +8,7 @@
     <title>C&C Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
@@ -91,10 +91,14 @@
     </style>
 </head>
 <body class="h-full max-h-screen flex flex-col overflow-hidden select-none relative premium-bg text-white">
+    
+    <div id="page-loader">
+    <img src="/assets/loader.svg" alt="Loading...">
+  </div>
 
     <input type="file" id="native-camera-picker" accept="image/*" capture="environment" class="hidden">
     <input type="file" id="native-gallery-picker" accept="image/*" class="hidden">
-
+    
     <div class="shrink-0 flex flex-col pb-6 relative">
         <header class="h-14 flex items-center px-4 shrink-0 bg-transparent relative">
             <div class="animate-camera-morph">
@@ -158,6 +162,23 @@
                 <button id="card-click-camera" class="text-brand-coral border border-brand-coral rounded-xl py-2.5 text-xs font-bold flex items-center justify-center space-x-1.5 active:scale-95 transition bg-white"><i class="fas fa-camera text-xs"></i><span>Click a Photo</span></button>
                 <button id="card-open-gallery" class="text-brand-coral border border-brand-coral rounded-xl py-2.5 text-xs font-bold flex items-center justify-center space-x-1.5 active:scale-95 transition bg-white"><i class="fas fa-image text-xs"></i><span>Select a Photo</span></button>
             </div>
+            <!---Click with frnd button start---->
+            <div onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='avatar.html'" class="flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
+    <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+        <i class="fas fa-user-friends text-sm"></i>
+    </div>
+    <div class="text-left flex-1">
+        <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+            Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
+        </p>
+        <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
+    </div>
+    <i class="fas fa-chevron-right text-xs text-slate-300"></i>
+</div>
+
+<!---click with frnd button ending--->
+
+
         </div>
         
         <div class="w-full pl-1">
@@ -210,7 +231,24 @@
                         <p class="text-xs font-bold text-slate-800">Upload from Gallery</p>
                         <p class="text-[10px] text-slate-400 mt-0.5">Open phone gallery to pick a picture</p>
                     </div>
+                    
+
+                    
+                    
                 </button>
+                <div onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='avatar.html'" class="flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
+    <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+        <i class="fas fa-user-friends text-sm"></i>
+    </div>
+    <div class="text-left flex-1">
+        <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+            Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
+        </p>
+        <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
+    </div>
+    <i class="fas fa-chevron-right text-xs text-slate-300"></i>
+</div>
+
             </div>
         </div>
     </div>
@@ -511,6 +549,6 @@
         });
     </script>
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
