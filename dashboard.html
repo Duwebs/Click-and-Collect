@@ -521,35 +521,6 @@
         document.getElementById('sheet-open-gallery').addEventListener('click', () => { closeBottomSheet(); galleryPicker.click(); });
     </script>
     
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const DEPLOYED_APP_VERSION = '7.0'; 
-            const wrapper = document.getElementById('update-modal-wrapper');
-            const modalBox = document.getElementById('update-modal-box');
-            const closeBtn = document.getElementById('close-update-modal-btn');
-            let savedUserVersion = localStorage.getItem('app_last_seen_version');
-            
-            if (!wrapper || !modalBox || !closeBtn) return;
-
-            if (!savedUserVersion) {
-                localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
-            } else if (savedUserVersion !== DEPLOYED_APP_VERSION) {
-                setTimeout(() => {
-                    wrapper.classList.remove('opacity-0', 'pointer-events-none');
-                    wrapper.classList.add('opacity-100');
-                    modalBox.classList.remove('scale-90', 'opacity-0');
-                    modalBox.classList.add('scale-100', 'opacity-100');
-                }, 1200); 
-            }
-
-            closeBtn.addEventListener('click', function () {
-                modalBox.classList.remove('scale-100', 'opacity-100');
-                modalBox.classList.add('scale-90', 'opacity-0');
-                wrapper.classList.add('opacity-0', 'pointer-events-none');
-                localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
-            });
-        });
-    </script>
 
     <script src="script.js"></script>
 </body>
