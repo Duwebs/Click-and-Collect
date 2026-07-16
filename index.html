@@ -45,22 +45,33 @@
         .animate-fade-in { animation: fadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         /*
-          FIX (v2): the previous fix used `ch` units (4.4ch / 6.4ch) to guess
-          the revealed width. That guess didn't match Fredoka's actual glyph
-          widths, so the box was wider than the word "lick" itself — leaving
-          visible empty space between "Click" and "&" on phones.
-          The robust fix: don't guess a width at all. Let the span size itself
-          naturally to its real content (no explicit width), and reveal it
-          with clip-path instead — animating from "fully clipped" to "fully
-          shown" as a PERCENTAGE of the element's own box. A percentage of the
-          element's own real width is always exactly right, on any screen
-          size, with zero guessing.
+          Original animation technique, unchanged: reveal by animating `width`
+          from 0 up to a fixed value and back down, same timing/easing as
+          before. The ONLY problem was that 3.5rem / 5.2rem were sized for the
+          mobile text-3xl font only, so at the larger sm:text-4xl desktop size
+          the same widths came up short and "Collect" got clipped.
+          Fix: keep the base (mobile) keyframes exactly as they were, and add
+          a min-width:640px override with the SAME keyframes scaled by the
+          same ratio the font itself grows by at that breakpoint
+          (text-4xl / text-3xl = 36px / 30px = 1.2x). Same animation, same
+          feel, just proportioned correctly for the bigger text.
         */
-        @keyframes reveal-text { 0% { clip-path: inset(0 100% 0 0); opacity: 0; } 15%, 65% { clip-path: inset(0 0 0 0); opacity: 1; } 80%, 100% { clip-path: inset(0 100% 0 0); opacity: 0; } }
+        @keyframes reveal-unreal-lick { 0% { width: 0; opacity: 0; margin-left: 0; } 15%, 65% { width: 3.5rem; opacity: 1; margin-left: 2px; } 80%, 100% { width: 0; opacity: 0; margin-left: 0; } }
+        @keyframes reveal-unreal-ollect { 0% { width: 0; opacity: 0; margin-left: 0; } 15%, 65% { width: 5.2rem; opacity: 1; margin-left: 2px; } 80%, 100% { width: 0; opacity: 0; margin-left: 0; } }
         @keyframes tagline-unreal { 0% { opacity: 0; transform: translateY(10px); } 15%, 60% { opacity: 0.85; transform: translateY(0); } 75%, 100% { opacity: 0; transform: translateY(-5px); } }
 
-        .reveal-click, .reveal-collect { display: inline-block; opacity: 0; overflow: hidden; vertical-align: bottom; white-space: nowrap; clip-path: inset(0 100% 0 0); animation: reveal-text 3.4s cubic-bezier(0.77, 0, 0.175, 1) forwards; animation-delay: 1.4s; }
+        .reveal-click { display: inline-block; width: 0; opacity: 0; overflow: hidden; vertical-align: bottom; white-space: nowrap; animation: reveal-unreal-lick 3.4s cubic-bezier(0.77, 0, 0.175, 1) forwards; animation-delay: 1.4s; }
+        .reveal-collect { display: inline-block; width: 0; opacity: 0; overflow: hidden; vertical-align: bottom; white-space: nowrap; animation: reveal-unreal-ollect 3.4s cubic-bezier(0.77, 0, 0.175, 1) forwards; animation-delay: 1.4s; }
         .animate-tagline { opacity: 0; animation: tagline-unreal 3.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: 1.4s; }
+
+        /* Desktop-only width override (font grows via sm:text-4xl at 640px+).
+           Full keyframes must be repeated here because a @keyframes rule with
+           the same name fully replaces the earlier one when its media query
+           matches — it does not merge with the base keyframes above. */
+        @media (min-width: 640px) {
+            @keyframes reveal-unreal-lick { 0% { width: 0; opacity: 0; margin-left: 0; } 15%, 65% { width: 4.2rem; opacity: 1; margin-left: 2px; } 80%, 100% { width: 0; opacity: 0; margin-left: 0; } }
+            @keyframes reveal-unreal-ollect { 0% { width: 0; opacity: 0; margin-left: 0; } 15%, 65% { width: 6.24rem; opacity: 1; margin-left: 2px; } 80%, 100% { width: 0; opacity: 0; margin-left: 0; } }
+        }
 
         .premium-text { color: #ffffff; text-shadow: 0 2px 10px rgba(255,255,255,0.2); }
         @keyframes float-card { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
@@ -95,7 +106,7 @@
             </div>
         </div>
         
-        <h1 class="font-logo text-3xl sm:text-4xl font-bold tracking-wide mb-3 drop-shadow-sm premium-text flex items-center justify-center flex-wrap">
+        <h1 class="font-logo text-3xl sm:text-4xl font-bold tracking-wide mb-3 drop-shadow-sm premium-text flex items-center justify-center">
             <span class="inline-flex items-center justify-start"><span>C</span><span class="reveal-click text-left text-teal-100">lick</span></span>
             <span class="mx-2 opacity-85">&amp;</span>
             <span class="inline-flex items-center justify-start"><span>C</span><span class="reveal-collect text-left text-teal-100">ollect</span></span>
