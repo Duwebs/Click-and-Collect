@@ -108,7 +108,7 @@ function showPWABottomSheet() {
     // Slide Up Sheet
     setTimeout(() => {
         pwaBottomSheet.style.transform = 'translateY(0)';
-    }, 5000);
+    }, 50);
 
     // Platform ke hisaab se sahi action dikhao
     if (isIOS) {
