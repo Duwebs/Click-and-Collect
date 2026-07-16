@@ -159,7 +159,7 @@ document.getElementById('pwa-backdrop')?.addEventListener('click', closePWABotto
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const DEPLOYED_APP_VERSION = '1.0'; // ⚡ Aapki app ka current version
+const DEPLOYED_APP_VERSION = '2.0'; // ⚡ Aapki app ka current version
 
     // ==========================================
     // 1. DYNAMIC VERSION BADGE LOGIC
