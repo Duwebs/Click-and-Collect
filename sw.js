@@ -1,4 +1,4 @@
-const CACHE_NAME = 'click-collect-v2';
+const CACHE_NAME = 'click-collect-v3';
 
 // 1. Sirf wahi main files jo app ko start karne ke liye zaroori hain (Pre-cache)
 const PRE_CACHE_ASSETS = [
