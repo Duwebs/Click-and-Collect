@@ -84,17 +84,20 @@ const iosAction = document.getElementById('ios-action');
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
+// ⚡ YAHAN UPDATE KIYA HAI: 5 Second ke delay ke sath trigger hoga
 window.addEventListener('beforeinstallprompt', (e) => {
     // Browser ke default prompt ko rokna
     e.preventDefault();
     deferredPrompt = e;
 
-    // Agar app pehle se installed nahi hai, toh buttons aur sheet dikhao
+    // Agar app pehle se installed nahi hai, toh 5 second baad trigger karo
     if (!isInStandaloneMode) {
-        if (headerInstallBtn) headerInstallBtn.classList.remove('hidden');
-        
-        // Show custom PWA Sheet with animation
-        showPWABottomSheet();
+        setTimeout(() => {
+            if (headerInstallBtn) headerInstallBtn.classList.remove('hidden');
+            
+            // Show custom PWA Sheet with animation
+            showPWABottomSheet();
+        }, 5000); // 5000 ms = 5 second. Agar 6 second chahiye toh yahan 6000 kar dena.
     }
 });
 
@@ -108,7 +111,7 @@ function showPWABottomSheet() {
     // Slide Up Sheet
     setTimeout(() => {
         pwaBottomSheet.style.transform = 'translateY(0)';
-    }, 5000);
+    }, 50);
 
     // Platform ke hisaab se sahi action dikhao
     if (isIOS) {
@@ -128,7 +131,7 @@ function closePWABottomSheet() {
     setTimeout(() => {
         pwaWrapper.classList.remove('opacity-100');
         pwaWrapper.classList.add('opacity-0', 'pointer-events-none');
-    }, 4000);
+    }, 400);
 }
 
 // Header & Main Install Button Clicks
