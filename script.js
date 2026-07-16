@@ -58,3 +58,95 @@ window.addEventListener('load', function() {
     setTimeout(() => loader.remove(), 600);
   }
 });
+
+
+
+// 1. Service Worker Register Karna (Offline Support ke liye)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js') // Aapki sw.js file ka naam
+            .then(reg => console.log('Service Worker Registered!', reg))
+            .catch(err => console.error('Service Worker Registration Failed:', err));
+    });
+}
+
+// 2. PWA Custom Install Prompt Logic
+let deferredPrompt;
+const pwaWrapper = document.getElementById('pwa-wrapper');
+const pwaBottomSheet = document.getElementById('pwa-bottom-sheet');
+const headerInstallBtn = document.getElementById('header-install-btn');
+const actionInstallBtn = document.getElementById('action-install-btn');
+const closeSheetBtn = document.getElementById('close-sheet-btn');
+const androidAction = document.getElementById('android-action');
+const iosAction = document.getElementById('ios-action');
+
+// Device Detection (Android vs iOS)
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Browser ke default prompt ko rokna
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Agar app pehle se installed nahi hai, toh buttons aur sheet dikhao
+    if (!isInStandaloneMode) {
+        if (headerInstallBtn) headerInstallBtn.classList.remove('hidden');
+        
+        // Show custom PWA Sheet with animation
+        showPWABottomSheet();
+    }
+});
+
+// Show PWA Bottom Sheet Function
+function showPWABottomSheet() {
+    if (!pwaWrapper || !pwaBottomSheet) return;
+    
+    pwaWrapper.classList.remove('opacity-0', 'pointer-events-none');
+    pwaWrapper.classList.add('opacity-100');
+    
+    // Slide Up Sheet
+    setTimeout(() => {
+        pwaBottomSheet.style.transform = 'translateY(0)';
+    }, 50);
+
+    // Platform ke hisaab se sahi action dikhao
+    if (isIOS) {
+        if (iosAction) iosAction.classList.remove('hidden');
+        if (androidAction) androidAction.classList.add('hidden');
+    } else {
+        if (androidAction) androidAction.classList.remove('hidden');
+        if (iosAction) iosAction.classList.add('hidden');
+    }
+}
+
+// Close PWA Bottom Sheet Function
+function closePWABottomSheet() {
+    if (!pwaWrapper || !pwaBottomSheet) return;
+    
+    pwaBottomSheet.style.transform = 'translateY(100%)';
+    setTimeout(() => {
+        pwaWrapper.classList.remove('opacity-100');
+        pwaWrapper.classList.add('opacity-0', 'pointer-events-none');
+    }, 400);
+}
+
+// Header & Main Install Button Clicks
+const triggerInstall = () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt(); // Browser ka install dialog dikhao
+    
+    deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+            console.log('User ne PWA install kar liya!');
+            if (headerInstallBtn) headerInstallBtn.classList.add('hidden');
+            closePWABottomSheet();
+        }
+        deferredPrompt = null;
+    });
+};
+
+if (headerInstallBtn) headerInstallBtn.addEventListener('click', showPWABottomSheet);
+if (actionInstallBtn) actionInstallBtn.addEventListener('click', triggerInstall);
+if (closeSheetBtn) closeSheetBtn.addEventListener('click', closePWABottomSheet);
+document.getElementById('pwa-backdrop')?.addEventListener('click', closePWABottomSheet);
