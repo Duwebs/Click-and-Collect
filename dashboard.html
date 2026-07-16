@@ -8,14 +8,16 @@
     <title>C&C Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Fixed: 'class' attribute changed to 'rel' for strict browser compatibility -->
     <link rel="apple-touch-icon" sizes="57x57" href="assets/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="assets/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="assets/apple-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="76x76" href="assets/apple-icon-76x76.png">
-    <link class="apple-touch-icon" sizes="114x114" href="assets/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="assets/apple-icon-114x114.png">
     <link rel="apple-touch-icon" sizes="120x120" href="assets/apple-icon-120x120.png">
     <link rel="apple-touch-icon" sizes="144x144" href="assets/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="assets/apple-icon-152x152.png">
@@ -90,10 +92,15 @@
     </style>
 </head>
 <body class="h-full max-h-screen flex flex-col overflow-hidden select-none relative premium-bg text-white">
+    
+    <!-- Fixed: Styled properly with standard overlay rules so it covers the screen cleanly until hidden -->
+    <div id="page-loader" class="fixed inset-0 bg-teal-800 z-[9999] flex items-center justify-center transition-opacity duration-300">
+        <img src="assets/loader.svg" alt="Loading..." class="w-16 h-16">
+    </div>
 
     <input type="file" id="native-camera-picker" accept="image/*" capture="environment" class="hidden">
     <input type="file" id="native-gallery-picker" accept="image/*" class="hidden">
-
+    
     <div class="shrink-0 flex flex-col pb-6 relative">
         <header class="h-14 flex items-center px-4 shrink-0 bg-transparent relative">
             <div class="animate-camera-morph">
@@ -112,7 +119,12 @@
                 <span class="text-2xl font-bold tracking-wide text-white rounded-brand-font uppercase">C &amp; C</span>
             </div>
 
-            <button id="header-install-btn" class="absolute top-3 right-4 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold backdrop-blur-xl px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all active:scale-95 border border-white/10 hidden z-30 tracking-wide">
+            <!-- Timeline Gallery Button -->
+            <button onclick="window.location.href='timeline.html'" class="absolute top-2 right-4 w-10 h-10 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center text-white border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.1)] transition-all active:scale-95 z-30">
+                <i class="fas fa-images text-base"></i>
+            </button>
+
+            <button id="header-install-btn" class="absolute top-3 right-16 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold backdrop-blur-xl px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all active:scale-95 border border-white/10 hidden z-30 tracking-wide">
                 <span class="relative flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
@@ -129,15 +141,15 @@
 
             <div class="flex items-end justify-center space-x-[-12px] mb-4 w-full max-w-sm relative z-10">
                 <div class="bg-white p-1.5 pb-4 rounded shadow-lg transform -rotate-12 w-24 border border-white/40">
-                    <img src="/assets/selfie.jpg" alt="Vector Human 1" class="aspect-square w-full object-cover rounded-sm">
+                    <img src="assets/selfie.jpg" alt="Vector Human 1" class="aspect-square w-full object-cover rounded-sm">
                 </div>
                 
                 <div class="bg-white p-2 pb-5 rounded-md shadow-2xl transform scale-110 z-20 w-32 border border-white relative polaroid-tip mb-1">
-                    <img src="/assets/girl.svg" alt="Vector Family Center" class="aspect-square w-full object-cover rounded-sm">
+                    <img src="assets/girl.svg" alt="Vector Family Center" class="aspect-square w-full object-cover rounded-sm">
                 </div>
                 
                 <div class="bg-white p-1.5 pb-4 rounded shadow-lg transform rotate-12 w-24 border border-white/40">
-                    <img src="/assets/friends.jpg" alt="Vector Human 3" class="aspect-square w-full object-cover rounded-sm">
+                    <img src="assets/friends.jpg" alt="Vector Human 3" class="aspect-square w-full object-cover rounded-sm">
                 </div>
             </div>
             
@@ -157,23 +169,21 @@
                 <button id="card-click-camera" class="text-brand-coral border border-brand-coral rounded-xl py-2.5 text-xs font-bold flex items-center justify-center space-x-1.5 active:scale-95 transition bg-white"><i class="fas fa-camera text-xs"></i><span>Click a Photo</span></button>
                 <button id="card-open-gallery" class="text-brand-coral border border-brand-coral rounded-xl py-2.5 text-xs font-bold flex items-center justify-center space-x-1.5 active:scale-95 transition bg-white"><i class="fas fa-image text-xs"></i><span>Select a Photo</span></button>
             </div>
-            <!---Click with frnd button start---->
-            <div onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='click-hub.html'" class="flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
-    <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20">
-        <i class="fas fa-user-friends text-sm"></i>
-    </div>
-    <div class="text-left flex-1">
-        <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-            Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
-        </p>
-        <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
-    </div>
-    <i class="fas fa-chevron-right text-xs text-slate-300"></i>
-</div>
-
-<!---click with frnd button ending--->
-
-
+            
+            <!-- Click with friend button start -->
+            <div onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='avatar.html'" class="flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
+                <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+                    <i class="fas fa-user-friends text-sm"></i>
+                </div>
+                <div class="text-left flex-1">
+                    <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                        Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
+                    </p>
+                    <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
+                </div>
+                <i class="fas fa-chevron-right text-xs text-slate-300"></i>
+            </div>
+            <!-- Click with friend button ending -->
         </div>
         
         <div class="w-full pl-1">
@@ -226,24 +236,20 @@
                         <p class="text-xs font-bold text-slate-800">Upload from Gallery</p>
                         <p class="text-[10px] text-slate-400 mt-0.5">Open phone gallery to pick a picture</p>
                     </div>
-                    
-
-                    
-                    
                 </button>
-                <div onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='click-hub.html'" class="flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
-    <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20">
-        <i class="fas fa-user-friends text-sm"></i>
-    </div>
-    <div class="text-left flex-1">
-        <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-            Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
-        </p>
-        <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
-    </div>
-    <i class="fas fa-chevron-right text-xs text-slate-300"></i>
-</div>
-
+                
+                <div onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='avatar.html'" class="flex items-center space-x-4 p-3.5 bg-gradient-to-r from-teal-500/10 to-rose-500/10 hover:from-teal-500/20 hover:to-rose-500/20 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3 animate-pulse">
+                    <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+                        <i class="fas fa-user-friends text-sm"></i>
+                    </div>
+                    <div class="text-left flex-1">
+                        <p class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                            Click with Friend <span class="bg-rose-500 text-white text-[8px] px-1 py-0.5 rounded font-black tracking-normal lowercase">new</span>
+                        </p>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Realtime mein dost ke sath connect hokar photo kheencho aur live sync karo!</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-xs text-slate-300"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -253,7 +259,7 @@
         
         <div id="pwa-bottom-sheet" class="absolute bottom-0 inset-x-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.3)] p-6 pt-5 pb-10 transform translate-y-full text-slate-800 overflow-hidden max-w-md mx-auto flex flex-col" style="transition: transform 650ms cubic-bezier(0.19, 1, 0.22, 1); min-height: 52vh;">
             
-            <div class="absolute inset-0 opacity-[0.08] pointer-events-none bg-repeat bg-center z-0 animate-pwa-bg-loop" style="background-image: url('/assets/InstallGraphic.png'); background-size: 260px;"></div>
+            <div class="absolute inset-0 opacity-[0.08] pointer-events-none bg-repeat bg-center z-0 animate-pwa-bg-loop" style="background-image: url('assets/InstallGraphic.png'); background-size: 260px;"></div>
 
             <div class="absolute inset-x-0 bottom-0 h-48 opacity-[0.12] pointer-events-none mix-blend-multiply animate-wave-float">
                 <svg viewBox="0 0 1440 320" class="w-full h-full object-cover">
