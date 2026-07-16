@@ -108,7 +108,7 @@ function showPWABottomSheet() {
     // Slide Up Sheet
     setTimeout(() => {
         pwaBottomSheet.style.transform = 'translateY(0)';
-    }, 50);
+    }, 5000);
 
     // Platform ke hisaab se sahi action dikhao
     if (isIOS) {
@@ -128,7 +128,7 @@ function closePWABottomSheet() {
     setTimeout(() => {
         pwaWrapper.classList.remove('opacity-100');
         pwaWrapper.classList.add('opacity-0', 'pointer-events-none');
-    }, 400);
+    }, 4000);
 }
 
 // Header & Main Install Button Clicks
