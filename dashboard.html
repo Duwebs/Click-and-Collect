@@ -22,7 +22,7 @@
     <link rel="apple-touch-icon" sizes="152x152" href="assets/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-icon-180x180.png">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link class="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="assets/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
     <link rel="manifest" href="assets/manifest.json">
@@ -91,10 +91,10 @@
     </style>
 </head>
 <body class="h-full max-h-screen flex flex-col overflow-hidden select-none relative premium-bg text-white">
-
+    
     <div id="page-loader">
-        <img src="/assets/loader.svg" alt="Loading...">
-    </div>
+    <img src="/assets/loader.svg" alt="Loading...">
+  </div>
 
     <input type="file" id="native-camera-picker" accept="image/*" capture="environment" class="hidden">
     <input type="file" id="native-gallery-picker" accept="image/*" class="hidden">
@@ -117,23 +117,18 @@
                 <span class="text-2xl font-bold tracking-wide text-white rounded-brand-font uppercase">C &amp; C</span>
             </div>
 
-            <!-- Grouped in one flex row (instead of two independently-positioned
-                 absolute buttons) so that when script.js reveals the INSTALL APP
-                 pill, it naturally pushes the gallery icon left instead of
-                 overlapping it — no matter how wide the pill text ends up being. -->
-            <div class="absolute top-3 right-4 z-30 flex items-center gap-2">
-                <button id="header-gallery-btn" onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='timeline.html'" title="Open Gallery" class="bg-white/10 hover:bg-white/20 text-white w-9 h-9 shrink-0 backdrop-blur-xl rounded-full flex items-center justify-center transition-all active:scale-90 border border-white/10">
-                    <i class="fas fa-images text-sm"></i>
-                </button>
+            <!-- Timeline Gallery Button -->
+            <button onclick="window.location.href='timeline.html'" class="absolute top-2 right-4 w-10 h-10 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center text-white border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.1)] transition-all active:scale-95 z-30">
+                <i class="fas fa-images text-base"></i>
+            </button>
 
-                <button id="header-install-btn" class="bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold backdrop-blur-xl px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all active:scale-95 border border-white/10 hidden whitespace-nowrap tracking-wide">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                    </span>
-                    INSTALL APP
-                </button>
-            </div>
+            <button id="header-install-btn" class="absolute top-3 right-16 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold backdrop-blur-xl px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all active:scale-95 border border-white/10 hidden z-30 tracking-wide">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                </span>
+                INSTALL APP
+            </button>
         </header>
 
         <div class="animate-fade-hero flex flex-col items-center text-center px-6 mt-2 relative">
@@ -188,18 +183,6 @@
 
 <!---click with frnd button ending--->
 
-<!---Gallery / Timeline button start---->
-<div onclick="if(navigator.vibrate) navigator.vibrate(40); window.location.href='timeline.html'" class="flex items-center space-x-4 p-3.5 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 cursor-pointer transition active:scale-95 mt-3">
-    <div class="w-11 h-11 bg-gradient-to-tr from-teal-400 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-500/20">
-        <i class="fas fa-images text-sm"></i>
-    </div>
-    <div class="text-left flex-1">
-        <p class="text-xs font-black text-slate-800 uppercase tracking-wide">Photo Gallery</p>
-        <p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight">Apni saari yaadon ki timeline yahan dekho</p>
-    </div>
-    <i class="fas fa-chevron-right text-xs text-slate-300"></i>
-</div>
-<!---Gallery / Timeline button end---->
 
         </div>
         
@@ -542,57 +525,32 @@
     </script>
     
     <script>
-        // ---- "What's new" update popup ----
-        // Rule: a brand-new user must NEVER see this popup on their first visit.
-        // It should only appear for a RETURNING user whose last-seen app version
-        // is older than the version currently deployed (i.e. a new feature shipped
-        // since they last opened the app).
         document.addEventListener("DOMContentLoaded", function () {
-            const DEPLOYED_APP_VERSION = '7.0'; // bump this string on every release that should trigger the popup
-            const STORAGE_KEY = 'cc_app_version';
-
+            const DEPLOYED_APP_VERSION = '7.0'; 
             const wrapper = document.getElementById('update-modal-wrapper');
             const modalBox = document.getElementById('update-modal-box');
-            const backdrop = document.getElementById('update-backdrop');
             const closeBtn = document.getElementById('close-update-modal-btn');
-
+            let savedUserVersion = localStorage.getItem('app_last_seen_version');
+            
             if (!wrapper || !modalBox || !closeBtn) return;
 
-            function showUpdateModal() {
-                wrapper.classList.remove('opacity-0', 'pointer-events-none');
-                wrapper.classList.add('opacity-100');
-                modalBox.classList.remove('scale-90', 'opacity-0');
-                modalBox.classList.add('scale-100', 'opacity-100');
+            if (!savedUserVersion) {
+                localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+            } else if (savedUserVersion !== DEPLOYED_APP_VERSION) {
+                setTimeout(() => {
+                    wrapper.classList.remove('opacity-0', 'pointer-events-none');
+                    wrapper.classList.add('opacity-100');
+                    modalBox.classList.remove('scale-90', 'opacity-0');
+                    modalBox.classList.add('scale-100', 'opacity-100');
+                }, 1200); 
             }
 
-            function hideUpdateModal() {
+            closeBtn.addEventListener('click', function () {
                 modalBox.classList.remove('scale-100', 'opacity-100');
                 modalBox.classList.add('scale-90', 'opacity-0');
-                wrapper.classList.remove('opacity-100');
                 wrapper.classList.add('opacity-0', 'pointer-events-none');
-                try { localStorage.setItem(STORAGE_KEY, DEPLOYED_APP_VERSION); } catch (e) { /* ignore */ }
-            }
-
-            try {
-                const savedVersion = localStorage.getItem(STORAGE_KEY);
-
-                if (savedVersion === null) {
-                    // First time this browser has ever opened the app -> silently
-                    // record the current version. No popup for brand-new users.
-                    localStorage.setItem(STORAGE_KEY, DEPLOYED_APP_VERSION);
-                } else if (savedVersion !== DEPLOYED_APP_VERSION) {
-                    // Returning user whose stored version doesn't match what's live
-                    // right now -> a new feature shipped since their last visit.
-                    setTimeout(showUpdateModal, 1200);
-                }
-                // else: returning user already on the latest version -> do nothing.
-            } catch (e) {
-                // localStorage blocked (e.g. private/incognito) -> fail silently,
-                // never let this break the rest of the page.
-            }
-
-            closeBtn.addEventListener('click', hideUpdateModal);
-            if (backdrop) backdrop.addEventListener('click', hideUpdateModal);
+                localStorage.setItem('app_last_seen_version', DEPLOYED_APP_VERSION);
+            });
         });
     </script>
 
