@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Fixed: 'class' attribute changed to 'rel' for strict browser compatibility -->
     <link rel="apple-touch-icon" sizes="57x57" href="assets/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="assets/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="assets/apple-icon-72x72.png">
@@ -52,9 +51,34 @@
         @keyframes shine-swipe { 0% { transform: translateX(-100%) skewX(-15deg); } 25%, 100% { transform: translateX(200%) skewX(-15deg); } }
         .animate-shine { animation: shine-swipe 4s infinite linear; }
 
-        .shimmer-footer { position: relative; background-color: #000000; overflow: hidden; }
-        .shimmer-footer::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%); transform: translateX(-100%); animation: footerSweep 3.8s infinite ease-in-out; }
-        @keyframes footerSweep { 0% { transform: translateX(-100%); } 40%, 100% { transform: translateX(100%); } }
+        /* ======== UPDATED FOOTER SHIMMER CSS ======== */
+        .shimmer-footer { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background-color: #000000; 
+            overflow: hidden; 
+            z-index: 100;
+        }
+
+        .shimmer-footer::after { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: -100%; 
+            width: 40%; 
+            height: 100%; 
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.7), transparent); 
+            transform: skewX(-20deg); 
+            animation: footerSweep 3s infinite ease-in-out; 
+        }
+
+        @keyframes footerSweep { 
+            0% { left: -100%; } 
+            40%, 100% { left: 200%; } 
+        }
+        /* ============================================ */
 
         /* Twinkling Stars Animation */
         @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 0.9; transform: scale(1.1); } }
@@ -93,8 +117,6 @@
 </head>
 <body class="h-full max-h-screen flex flex-col overflow-hidden select-none relative premium-bg text-white">
     
-
-
     <input type="file" id="native-camera-picker" accept="image/*" capture="environment" class="hidden">
     <input type="file" id="native-gallery-picker" accept="image/*" class="hidden">
     
@@ -152,11 +174,12 @@
             
             <h2 class="text-[10px] uppercase tracking-[0.15em] text-teal-100/90 font-extrabold mb-0.5">Save Your Precious</h2>
             <h3 class="text-3xl font-extrabold text-white tracking-wide mb-0.5">Memories</h3>
-<h4 class="text-[10px] uppercase tracking-[0.2em] text-teal-50/80 font-bold mb-2">FOREVER</h4>
-<!-- Version Sub-text -->
-<div class="inline-flex items-center">
-    <span id="app-version" class="text-[9px] font-mono tracking-wider text-teal-100/50 bg-teal-900/20 px-2.5 py-0.5 rounded-full border border-teal-500/10">v0.0</span>
-</div>
+            <h4 class="text-[10px] uppercase tracking-[0.2em] text-teal-50/80 font-bold mb-2">FOREVER</h4>
+            <!-- Version Sub-text -->
+            <div class="inline-flex items-center">
+                <span id="app-version" class="text-[9px] font-mono tracking-wider text-teal-100/50 bg-teal-900/20 px-2.5 py-0.5 rounded-full border border-teal-500/10">v0.0</span>
+            </div>
+        </div>
 
     </div>
 
@@ -209,14 +232,19 @@
         </div>
     </main>
 
-    <footer class="h-11 shimmer-footer text-white/90 text-[10px] flex items-center justify-center space-x-1.5 shrink-0 font-medium tracking-wide z-10 border-t border-white/5">
-        <i class="fas fa-lock text-[10px]"></i><span>Your memories are saved privately, only you can see these</span>
+    <!-- ======== UPDATED FOOTER HTML ======== -->
+    <footer class="h-12 shimmer-footer text-white/90 text-[11px] flex items-center justify-center space-x-2 shrink-0 font-medium tracking-wide border-t border-white/10">
+        <i class="fas fa-lock text-gray-400"></i>
+        <span>Your memories are saved privately, only you can see these</span>
     </footer>
+    <!-- ===================================== -->
 
-    <div class="animate-fade-content absolute bottom-16 right-4 z-40 flex items-center space-x-1.5">
+    <!-- ======== UPDATED FAB POSITION ======== -->
+    <div class="animate-fade-content fixed bottom-20 right-4 z-40 flex items-center space-x-1.5">
         <div id="tutorial-tooltip" class="animate-nudge bg-brand-coral text-white text-[10.5px] font-semibold px-2.5 py-1.5 rounded shadow-md relative fab-tooltip tracking-wide flex items-center space-x-1 transition-all duration-300 ease-out origin-right"><i class="fas fa-hand-point-right text-xs mr-0.5 animate-pulse"></i><span>Add your First Photo</span></div>
         <button id="main-fab-btn" class="bg-brand-coral w-12 h-12 rounded-full flex items-center justify-center text-white text-base shadow-lg shadow-rose-500/30 active:scale-90 transition border border-white/10"><i class="fas fa-camera"></i></button>
     </div>
+    <!-- ===================================== -->
 
     <div id="bottom-sheet" class="fixed inset-0 z-50 invisible transition-all duration-300">
         <div id="sheet-backdrop" class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300"></div>
@@ -521,7 +549,6 @@
         document.getElementById('sheet-open-gallery').addEventListener('click', () => { closeBottomSheet(); galleryPicker.click(); });
     </script>
     
-
     <script src="script.js"></script>
 </body>
 </html>
