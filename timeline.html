@@ -28,16 +28,15 @@
 
         /* Header Styling */
         .header-glass {
-            background: rgba(9, 44, 40, 0.75);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            background: rgba(9, 44, 40, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .icon-btn {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(10px);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .icon-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.18); }
@@ -84,36 +83,37 @@
             left: 21px; top: 12px; bottom: 12px;
             width: 2px;
             background: linear-gradient(180deg, #14b8a6 0%, #f43f5e 100%);
-            opacity: 0.3;
+            opacity: 0.35;
         }
         .tl-dot {
             box-shadow: 0 0 0 4px #f8fafc, 0 0 0 7px rgba(20, 184, 166, 0.2);
         }
         .tl-card {
             background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .tl-card:active {
-            transform: scale(0.985);
+            transform: scale(0.98);
         }
 
-        /* Responsive image box that preserves edited drawings/aspect-ratio */
-        .photo-frame {
+        /* Fixed Compact Photo Container in Timeline */
+        .photo-thumb-container {
+            width: 100%;
+            height: 190px; /* Controlled compact height so it doesn't cover full screen */
             background-color: #0f172a;
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
-            justify-center: center;
+            justify-content: center;
         }
 
-        .photo-img {
+        .photo-thumb-img {
             width: 100%;
-            height: auto;
-            max-height: 520px;
-            object-fit: contain; /* Prevents user edits, canvas drawing, stickers from getting cropped */
+            height: 100%;
+            object-fit: cover; /* Compact card thumbnail view */
             image-rendering: -webkit-optimize-contrast;
         }
 
@@ -166,7 +166,7 @@
             animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
+            from { opacity: 0; transform: translateY(14px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -175,7 +175,7 @@
 
     <!-- Header -->
     <header class="header-glass sticky top-0 z-30 px-5 pt-5 pb-4 flex items-center justify-between">
-        <a href="dashboard.html" class="icon-btn w-11 h-11 rounded-2xl flex items-center justify-center text-white active:scale-90">
+        <a href="dashboard.html" class="icon-btn w-11 h-11 rounded-2xl flex items-center justify-center text-white">
             <i class="fas fa-arrow-left text-sm"></i>
         </a>
 
@@ -205,19 +205,19 @@
         <main class="flex-1 overflow-y-auto scrollbar-none px-4 pt-3 pb-24">
 
             <!-- Skeleton Loading State -->
-            <div id="skeleton" class="space-y-6 pt-2">
+            <div id="skeleton" class="space-y-5 pt-2">
                 <div class="flex gap-4">
                     <div class="skel w-3.5 h-3.5 rounded-full mt-1.5 shrink-0"></div>
-                    <div class="skel flex-1 h-44 rounded-3xl"></div>
+                    <div class="skel flex-1 h-36 rounded-3xl"></div>
                 </div>
                 <div class="flex gap-4">
                     <div class="skel w-3.5 h-3.5 rounded-full mt-1.5 shrink-0"></div>
-                    <div class="skel flex-1 h-44 rounded-3xl"></div>
+                    <div class="skel flex-1 h-36 rounded-3xl"></div>
                 </div>
             </div>
 
             <!-- Feed Boxes -->
-            <div id="timeline-box" class="tl-rail relative space-y-6 hidden pl-1"></div>
+            <div id="timeline-box" class="tl-rail relative space-y-5 hidden pl-1"></div>
             <div id="gallery-box" class="grid grid-cols-2 gap-3.5 hidden"></div>
 
             <!-- Empty State -->
@@ -232,23 +232,23 @@
         </main>
     </div>
 
-    <!-- Enhanced Lightbox View -->
-    <div id="lightbox" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-between p-4" onclick="closeLB()">
+    <!-- Lightbox Full-Screen View -->
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/92 backdrop-blur-xl flex flex-col items-center justify-between p-4" onclick="closeLB()">
         <!-- Close Button -->
         <div class="w-full flex justify-end pt-2 pr-2">
-            <button class="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center border border-white/20">
+            <button class="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center border border-white/20 active:scale-90 transition-transform">
                 <i class="fas fa-xmark text-lg"></i>
             </button>
         </div>
 
-        <!-- Image Container -->
-        <div class="flex-1 flex items-center justify-center w-full px-2 my-auto">
-            <img id="lb-img" src="" class="max-w-full max-h-[75vh] rounded-2xl object-contain border border-white/10 shadow-2xl">
+        <!-- Full Image Display -->
+        <div class="flex-1 flex items-center justify-center w-full px-1 my-auto">
+            <img id="lb-img" src="" class="max-w-full max-h-[78vh] rounded-2xl object-contain border border-white/10 shadow-2xl">
         </div>
 
-        <!-- Info Footer -->
-        <div id="lb-info" class="w-full max-w-sm bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/15 text-center text-white mb-2">
-            <p id="lb-date" class="text-xs font-semibold text-slate-200"></p>
+        <!-- Info Card -->
+        <div class="w-full max-w-xs bg-white/10 backdrop-blur-md rounded-2xl py-2.5 px-4 border border-white/15 text-center text-white mb-3">
+            <p id="lb-date" class="text-xs font-semibold text-slate-200 tracking-wide"></p>
         </div>
     </div>
 
@@ -275,6 +275,40 @@
         if (!myUserId) {
             myUserId = 'user_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('cc_user_id', myUserId);
+        }
+
+        // Safe Date Parsing Helper to prevent "Invalid Date"
+        function parseAndFormatDate(rawTime) {
+            if (!rawTime) {
+                const now = new Date();
+                return {
+                    dateStr: now.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }),
+                    timeStr: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                };
+            }
+
+            let d;
+            if (typeof rawTime === 'number') {
+                d = new Date(rawTime);
+            } else if (typeof rawTime === 'string') {
+                // If timestamp is stored as a numeric string e.g. "1711234567890"
+                if (!isNaN(rawTime) && rawTime.trim() !== '') {
+                    d = new Date(Number(rawTime));
+                } else {
+                    d = new Date(rawTime);
+                }
+            } else {
+                d = new Date(rawTime);
+            }
+
+            // Fallback if parsing fails
+            if (isNaN(d.getTime())) {
+                d = new Date();
+            }
+
+            const dateStr = d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+            const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return { dateStr, timeStr, timestamp: d.getTime() };
         }
 
         async function loadAllMemories() {
@@ -305,7 +339,7 @@
                             memoryMap.set(key, { 
                                 id: key, 
                                 image: m.url || m.image, 
-                                time: m.time || Date.now(), 
+                                time: m.time || m.timestamp || m.createdAt, 
                                 tag: m.tag || 'Me', 
                                 sender: m.sender 
                             });
@@ -331,7 +365,13 @@
         }
 
         function renderGallery(data) {
-            data.sort((a,b) => (b.time || 0) - (a.time || 0));
+            // Sort items accurately by parsed timestamp
+            data.sort((a, b) => {
+                const timeA = parseAndFormatDate(a.time || a.timestamp || a.createdAt).timestamp;
+                const timeB = parseAndFormatDate(b.time || b.timestamp || b.createdAt).timestamp;
+                return timeB - timeA;
+            });
+
             document.getElementById('total-count').textContent = data.length;
             document.getElementById('skeleton').classList.add('hidden');
 
@@ -356,30 +396,27 @@
             if (activeTab === 'tl') tlBox.classList.remove('hidden'); else glBox.classList.remove('hidden');
 
             data.forEach((m, i) => {
-                const validTime = m.time ? new Date(m.time) : new Date();
-                const dateStr = validTime.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
-                const timeStr = validTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const { dateStr, timeStr } = parseAndFormatDate(m.time || m.timestamp || m.createdAt);
                 const style = tagStyle(m.tag);
                 const delay = Math.min(i * 0.04, 0.35);
 
-                // Safe escaped image string to prevent base64 breaking JS calls
                 const safeImgSrc = m.image;
 
-                // Timeline Item Card
+                // Timeline Item Card (Compact View)
                 const tlCard = document.createElement('div');
                 tlCard.className = 'relative pl-[44px] fade-up';
                 tlCard.style.animationDelay = `${delay}s`;
                 tlCard.innerHTML = `
-                    <div class="tl-dot absolute left-[15px] top-3 w-3.5 h-3.5 rounded-full" style="background:${style.color};"></div>
-                    <div class="flex items-center justify-between mb-2 pr-1">
+                    <div class="tl-dot absolute left-[15px] top-2.5 w-3.5 h-3.5 rounded-full" style="background:${style.color};"></div>
+                    <div class="flex items-center justify-between mb-1.5 pr-1">
                         <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">${dateStr} • ${timeStr}</span>
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide border" style="background:${style.bg}; color:${style.color}; border-color:${style.color}25;">
                             <i class="fas ${style.icon} text-[8px]"></i>${style.label}
                         </span>
                     </div>
                     <div class="tl-card rounded-2xl overflow-hidden cursor-pointer">
-                        <div class="photo-frame">
-                            <img src="${safeImgSrc}" class="photo-img" loading="lazy">
+                        <div class="photo-thumb-container">
+                            <img src="${safeImgSrc}" class="photo-thumb-img" loading="lazy">
                         </div>
                     </div>
                 `;
