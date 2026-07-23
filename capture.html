@@ -85,13 +85,13 @@
             </div>
 
             <!-- Minimize Button -->
-            <button onclick="togglePip()" class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[9px] border border-white/20">
+            <button onclick="togglePip()" class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[9px] border border-white/20 z-10">
                 <i id="pip-icon" class="fas fa-minus"></i>
             </button>
 
             <!-- Live Status Tag -->
             <div class="absolute bottom-1.5 left-1.5 bg-black/70 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[8px] font-extrabold text-teal-300 border border-teal-500/30 uppercase tracking-wider">
-                <i class="fas fa-circle text-[5px] text-teal-400 mr-1 animate-pulse"></i>Friend
+                <i class="fas fa-circle text-[5px] text-teal-400 mr-1 animate-pulse"></i>Friend Live
             </div>
         </div>
 
@@ -165,10 +165,10 @@
         </div>
     </div>
 
-    <!-- Firebase & WebRTC Signaling Logic -->
+    <!-- Firebase & Live WebRTC Stream Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, onDisconnect, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
         const app = initializeApp(firebaseConfig);
@@ -178,8 +178,18 @@
         const myUserId = localStorage.getItem('cc_user_id') || 'user_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('cc_user_id', myUserId);
 
+        let peerConnection = null;
+        let videoSender = null;
+
+        const rtcConfig = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+        };
+
         if (pin) {
-            // Realtime friend photo counter
+            // 1. Realtime Friend Photo Counter
             onValue(ref(db, 'rooms/' + pin + '/memories'), (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -191,25 +201,118 @@
                 }
             });
 
-            // Live Friend Online/Offline Status for PIP
-            const peerSignalRef = ref(db, `rooms/${pin}/signals/${myUserId}`);
-            set(peerSignalRef, { online: true, time: Date.now() });
-            onDisconnect(peerSignalRef).remove();
+            // 2. WebRTC Live Video Connection Initializer
+            window.setupLiveStream = async function() {
+                if (!window.localStream) return;
 
-            onValue(ref(db, `rooms/${pin}/signals`), (snapshot) => {
-                const signals = snapshot.val();
-                const remoteOffline = document.getElementById('remote-offline');
-                if (signals) {
-                    const friendOnline = Object.keys(signals).some(id => id !== myUserId);
-                    if (friendOnline) {
-                        remoteOffline.classList.add('hidden');
+                peerConnection = new RTCPeerConnection(rtcConfig);
+
+                // Add local camera tracks to peer connection
+                window.localStream.getTracks().forEach(track => {
+                    if (track.kind === 'video') {
+                        videoSender = peerConnection.addTrack(track, window.localStream);
                     } else {
-                        remoteOffline.classList.remove('hidden');
+                        peerConnection.addTrack(track, window.localStream);
                     }
-                } else {
-                    remoteOffline.classList.remove('hidden');
-                }
-            });
+                });
+
+                window.peerVideoSender = videoSender;
+
+                // Handle incoming live remote video track
+                peerConnection.ontrack = (event) => {
+                    const remoteVideo = document.getElementById('remote-video');
+                    remoteVideo.srcObject = event.streams[0];
+                    document.getElementById('remote-offline').classList.add('hidden');
+                };
+
+                // Send ICE Candidates to Firebase
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        push(ref(db, `rooms/${pin}/candidates/${myUserId}`), event.candidate.toJSON());
+                    }
+                };
+
+                // Track online presence
+                const myPresenceRef = ref(db, `rooms/${pin}/users/${myUserId}`);
+                set(myPresenceRef, true);
+                onDisconnect(myPresenceRef).remove();
+
+                // Listen for room users to trigger WebRTC signaling
+                onValue(ref(db, `rooms/${pin}/users`), async (snapshot) => {
+                    const users = snapshot.val() || {};
+                    const otherUsers = Object.keys(users).filter(id => id !== myUserId);
+
+                    if (otherUsers.length > 0) {
+                        const otherId = otherUsers[0];
+
+                        // Caller Logic (Lexicographically smaller ID acts as offerer)
+                        if (myUserId < otherId && peerConnection.signalingState === "stable") {
+                            const offer = await peerConnection.createOffer();
+                            await peerConnection.setLocalDescription(offer);
+                            set(ref(db, `rooms/${pin}/offers/${myUserId}_${otherId}`), {
+                                sdp: offer.sdp,
+                                type: offer.type
+                            });
+                        }
+                    } else {
+                        document.getElementById('remote-offline').classList.remove('hidden');
+                    }
+                });
+
+                // Listen for incoming WebRTC Offers
+                onValue(ref(db, `rooms/${pin}/offers`), async (snapshot) => {
+                    const offers = snapshot.val();
+                    if (!offers) return;
+
+                    for (let key in offers) {
+                        if (key.endsWith(`_${myUserId}`)) {
+                            const offer = offers[key];
+                            if (peerConnection.signalingState === "stable") {
+                                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                                const answer = await peerConnection.createAnswer();
+                                await peerConnection.setLocalDescription(answer);
+                                set(ref(db, `rooms/${pin}/answers/${key}`), {
+                                    sdp: answer.sdp,
+                                    type: answer.type
+                                });
+                            }
+                        }
+                    }
+                });
+
+                // Listen for incoming WebRTC Answers
+                onValue(ref(db, `rooms/${pin}/answers`), async (snapshot) => {
+                    const answers = snapshot.val();
+                    if (!answers) return;
+
+                    for (let key in answers) {
+                        if (key.startsWith(`${myUserId}_`)) {
+                            const answer = answers[key];
+                            if (peerConnection.signalingState === "have-local-offer") {
+                                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                            }
+                        }
+                    }
+                });
+
+                // Listen for ICE Candidates
+                onChildAdded(ref(db, `rooms/${pin}/candidates`), (snapshot) => {
+                    const peerId = snapshot.key;
+                    if (peerId !== myUserId) {
+                        onChildAdded(ref(db, `rooms/${pin}/candidates/${peerId}`), (candSnap) => {
+                            const candidate = candSnap.val();
+                            if (candidate && peerConnection) {
+                                peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
+                            }
+                        });
+                    }
+                });
+            };
+
+            // Auto-trigger signaling if camera is ready
+            if (window.localStream) {
+                window.setupLiveStream();
+            }
         }
 
         window.finalize = async function(choice) {
@@ -241,15 +344,25 @@
                     video.srcObject.getTracks().forEach(track => track.stop());
                 }
                 const s = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } } 
+                    video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false
                 }); 
+
                 video.srcObject = s; 
+                window.localStream = s;
                 
                 // Mirror effect for front camera only
                 if (currentFacingMode === "user") {
                     video.classList.add('mirror');
                 } else {
                     video.classList.remove('mirror');
+                }
+
+                // Update track if WebRTC live stream is active
+                if (window.peerVideoSender && s.getVideoTracks().length > 0) {
+                    window.peerVideoSender.replaceTrack(s.getVideoTracks()[0]);
+                } else if (window.setupLiveStream) {
+                    window.setupLiveStream();
                 }
             } catch(e) { 
                 alert("Camera access needed!"); 
