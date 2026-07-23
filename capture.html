@@ -65,8 +65,8 @@
         </div>
     </div>
 
-    <!-- Main Local Camera Video Feed -->
-    <video id="video" autoplay playsinline class="absolute inset-0 w-full h-full object-cover mirror"></video>
+    <!-- Main Local Camera Video Feed (Muted locally to avoid echo) -->
+    <video id="video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover mirror"></video>
     
     <!-- Flash Effect Layer -->
     <div id="flash" class="absolute inset-0 bg-white opacity-0 z-50 pointer-events-none"></div>
@@ -76,6 +76,7 @@
         
         <!-- Live Remote Stream Content -->
         <div class="pip-hide-on-min relative w-full h-full bg-black/60">
+            <!-- Friend Audio & Video stream -->
             <video id="remote-video" class="w-full h-full object-cover" autoplay playsinline></video>
             
             <!-- Friend Offline Overlay -->
@@ -107,19 +108,25 @@
         <div id="preview-strip" class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x"></div>
 
         <!-- Shutter Bar -->
-        <div class="flex justify-between items-center glass-dark p-3.5 rounded-3xl border border-white/10 shadow-2xl">
-            <!-- Camera Switch Button -->
-            <button onclick="switchCamera()" class="w-12 h-12 bg-white/10 hover:bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md active:scale-90 transition-all border border-white/10 text-white">
-                <i class="fas fa-camera-rotate text-lg"></i>
-            </button>
+        <div class="flex justify-between items-center glass-dark p-3 rounded-3xl border border-white/10 shadow-2xl gap-2">
+            <!-- Control Buttons: Mic On/Off & Camera Switch -->
+            <div class="flex items-center gap-2">
+                <button id="mic-btn" onclick="toggleMic()" class="w-11 h-11 bg-white/10 hover:bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md active:scale-90 transition-all border border-white/10 text-white">
+                    <i id="mic-icon" class="fas fa-microphone text-base"></i>
+                </button>
+
+                <button onclick="switchCamera()" class="w-11 h-11 bg-white/10 hover:bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md active:scale-90 transition-all border border-white/10 text-white">
+                    <i class="fas fa-camera-rotate text-base"></i>
+                </button>
+            </div>
 
             <!-- Shutter Snap Button -->
-            <button onclick="takePhoto()" class="w-16 h-16 bg-white rounded-full border-4 border-slate-900/30 flex items-center justify-center active:scale-90 transition-all shadow-lg">
+            <button onclick="takePhoto()" class="w-16 h-16 bg-white rounded-full border-4 border-slate-900/30 flex items-center justify-center active:scale-90 transition-all shadow-lg flex-shrink-0">
                 <div class="w-12 h-12 rounded-full bg-teal-500 border border-white/40"></div>
             </button>
 
             <!-- Collect Button -->
-            <button id="collect-btn" onclick="showCollector()" class="hidden bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-xs px-5 py-3.5 rounded-2xl shadow-lg tracking-wider animate-bounce">
+            <button id="collect-btn" onclick="showCollector()" class="hidden bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-xs px-4 py-3.5 rounded-2xl shadow-lg tracking-wider animate-bounce flex-shrink-0">
                 COLLECT
             </button>
         </div>
@@ -165,10 +172,10 @@
         </div>
     </div>
 
-    <!-- Firebase & Live WebRTC Stream Logic -->
+    <!-- Firebase & WebRTC Live Stream/Audio Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, onDisconnect, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, onDisconnect, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
         const app = initializeApp(firebaseConfig);
@@ -189,7 +196,7 @@
         };
 
         if (pin) {
-            // 1. Realtime Friend Photo Counter
+            // Realtime Friend Photo Counter
             onValue(ref(db, 'rooms/' + pin + '/memories'), (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -201,13 +208,13 @@
                 }
             });
 
-            // 2. WebRTC Live Video Connection Initializer
+            // WebRTC Live Audio & Video Connection Initializer
             window.setupLiveStream = async function() {
                 if (!window.localStream) return;
 
                 peerConnection = new RTCPeerConnection(rtcConfig);
 
-                // Add local camera tracks to peer connection
+                // Add both video and audio tracks to peer connection
                 window.localStream.getTracks().forEach(track => {
                     if (track.kind === 'video') {
                         videoSender = peerConnection.addTrack(track, window.localStream);
@@ -218,14 +225,14 @@
 
                 window.peerVideoSender = videoSender;
 
-                // Handle incoming live remote video track
+                // Handle incoming live remote video & audio stream
                 peerConnection.ontrack = (event) => {
                     const remoteVideo = document.getElementById('remote-video');
                     remoteVideo.srcObject = event.streams[0];
                     document.getElementById('remote-offline').classList.add('hidden');
                 };
 
-                // Send ICE Candidates to Firebase
+                // Send ICE Candidates
                 peerConnection.onicecandidate = (event) => {
                     if (event.candidate) {
                         push(ref(db, `rooms/${pin}/candidates/${myUserId}`), event.candidate.toJSON());
@@ -245,7 +252,7 @@
                     if (otherUsers.length > 0) {
                         const otherId = otherUsers[0];
 
-                        // Caller Logic (Lexicographically smaller ID acts as offerer)
+                        // Caller Logic
                         if (myUserId < otherId && peerConnection.signalingState === "stable") {
                             const offer = await peerConnection.createOffer();
                             await peerConnection.setLocalDescription(offer);
@@ -309,7 +316,6 @@
                 });
             };
 
-            // Auto-trigger signaling if camera is ready
             if (window.localStream) {
                 window.setupLiveStream();
             }
@@ -327,15 +333,16 @@
                     if (choice === 'Me' || choice === 'Both') store.add({ id: uniqueId, image: m.image, time: m.time, tag: choice, sender: myUserId });
                     if (choice === 'Friend' || choice === 'Both') push(ref(db, 'rooms/' + pin + '/memories'), { url: m.image, tag: choice, time: m.time, sender: myUserId });
                 }
-                window.location.href = 'timeline.html';
+                window.location.href = 'memories.html';
             };
         };
     </script>
 
-    <!-- Camera & UI Handler Script -->
+    <!-- Camera, Mic & UI Handler Script -->
     <script>
         window.sessionMemories = [];
         let currentFacingMode = "user"; // Start with front camera
+        let isMicMuted = false;
         const video = document.getElementById('video');
 
         async function startCamera() { 
@@ -343,9 +350,11 @@
                 if (video.srcObject) {
                     video.srcObject.getTracks().forEach(track => track.stop());
                 }
+                
+                // Request BOTH Video and Audio stream
                 const s = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
-                    audio: false
+                    audio: true
                 }); 
 
                 video.srcObject = s; 
@@ -358,17 +367,38 @@
                     video.classList.remove('mirror');
                 }
 
-                // Update track if WebRTC live stream is active
+                // Update video track if WebRTC live stream is active
                 if (window.peerVideoSender && s.getVideoTracks().length > 0) {
                     window.peerVideoSender.replaceTrack(s.getVideoTracks()[0]);
                 } else if (window.setupLiveStream) {
                     window.setupLiveStream();
                 }
             } catch(e) { 
-                alert("Camera access needed!"); 
+                alert("Camera and Microphone access needed for Live Call!"); 
             } 
         }
         startCamera();
+
+        // Mic Mute / Unmute Toggle Logic
+        function toggleMic() {
+            if (!window.localStream) return;
+            const audioTracks = window.localStream.getAudioTracks();
+            if (audioTracks.length > 0) {
+                isMicMuted = !isMicMuted;
+                audioTracks[0].enabled = !isMicMuted;
+                
+                const micIcon = document.getElementById('mic-icon');
+                const micBtn = document.getElementById('mic-btn');
+
+                if (isMicMuted) {
+                    micIcon.className = 'fas fa-microphone-slash text-rose-400';
+                    micBtn.classList.add('border-rose-500/50', 'bg-rose-500/20');
+                } else {
+                    micIcon.className = 'fas fa-microphone text-white';
+                    micBtn.classList.remove('border-rose-500/50', 'bg-rose-500/20');
+                }
+            }
+        }
 
         function switchCamera() { 
             currentFacingMode = currentFacingMode === "environment" ? "user" : "environment"; 
