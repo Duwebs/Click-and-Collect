@@ -138,8 +138,9 @@
             <div id="ambient" class="ambient-glow rounded-full" style="background:radial-gradient(circle, rgba(255,255,255,.6), transparent 65%);"></div>
 
             <div id="polaroid-card" class="skin-white p-3.5 pb-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] max-w-xs w-full relative transition-all duration-300 z-10 border border-white/40">
-                <div id="sticker-dropzone" class="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-slate-100 relative shadow-inner">
-                    <img id="image-preview" src="" alt="Captured moment" class="w-full h-full object-cover hidden pointer-events-none" crossorigin="anonymous">
+                <!-- Dropzone adapts dynamically to the uploaded photo ratio to avoid cropping -->
+                <div id="sticker-dropzone" class="w-full max-h-[58vh] min-h-[220px] rounded-2xl overflow-hidden bg-slate-100 relative shadow-inner flex items-center justify-center">
+                    <img id="image-preview" src="" alt="Captured moment" class="w-full h-full object-contain hidden pointer-events-none">
                     <div id="loading-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-2">
                         <i class="fas fa-circle-notch spin text-2xl text-[var(--teal-bg-start)]"></i>
                         <span class="text-[10px] font-semibold text-slate-400">Loading Canvas...</span>
@@ -361,9 +362,15 @@
         // ---------- LOAD IMAGE ----------
         window.addEventListener('DOMContentLoaded', () => {
             const cachedImage = sessionStorage.getItem('recent_memory_image') || "https://images.unsplash.com/photo-1547891654-e66ed7edd96c?auto=format&fit=crop&w=600&q=80";
+            
             imgPreview.onload = () => {
                 imgPreview.classList.remove('hidden');
                 document.getElementById('loading-placeholder')?.remove();
+                
+                // Dynamically adjust dropzone aspect ratio to match photo's exact dimensions
+                if (imgPreview.naturalWidth && imgPreview.naturalHeight) {
+                    dropzone.style.aspectRatio = `${imgPreview.naturalWidth} / ${imgPreview.naturalHeight}`;
+                }
                 sizeDoodleCanvas();
             };
             imgPreview.onerror = () => { document.getElementById('loading-placeholder').innerHTML = '<i class="fas fa-image-slash text-xl text-slate-400"></i>'; };
@@ -419,7 +426,7 @@
 
         // ---------- GENERIC STICKER ENGINE ----------
         function createSticker({ char, isText = false, color = '#ffffff' }) {
-            const obj = { id: Date.now() + Math.floor(Math.random() * 1000), char, left: 40, top: 40, scale: isText ? 1 : 1.2, angle: 0, isText, color };
+            const obj = { id: Date.now() + Math.floor(Math.random() * 1000), char, left: 50, top: 50, scale: isText ? 1 : 1.2, angle: 0, isText, color };
             state.stickers.push(obj);
             spawnStickerElement(obj);
             pushUndo({ type: 'addSticker', id: obj.id });
@@ -574,6 +581,7 @@
 
         function sizeDoodleCanvas() {
             const rect = dropzone.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
             const prev = doodleCanvas.toDataURL();
             doodleCanvas.width = rect.width; doodleCanvas.height = rect.height;
             const img = new Image();
@@ -675,8 +683,9 @@
             clone.querySelectorAll('#fullscreen-tap-catcher').forEach(b => b.remove());
             clone.className = 'w-[92vw] max-w-md';
             clone.style.padding = '0'; clone.style.borderRadius = '24px'; clone.style.overflow = 'hidden'; clone.style.background = 'transparent'; clone.style.boxShadow = 'none';
+            
             const dz = clone.querySelector('#sticker-dropzone');
-            if (dz) { dz.style.borderRadius = '24px'; dz.classList.remove('aspect-[4/3]'); dz.style.aspectRatio = '4/3'; }
+            if (dz) { dz.style.borderRadius = '24px'; }
             const dateRow = clone.querySelector('.mt-3.5'); if (dateRow) dateRow.remove();
             stage.appendChild(clone);
 
@@ -697,23 +706,19 @@
             setTimeout(() => modal.classList.remove('active'), 300);
         });
 
-        // ---------- SAVE PIPELINE ----------
-        function drawImageCover(ctx, img, W, H) {
-            const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
-            const scale = Math.max(W / iw, H / ih);
-            const sw = W / scale, sh = H / scale;
-            const sx = (iw - sw) / 2, sy = (ih - sh) / 2;
-            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
-        }
-
+        // ---------- SAVE PIPELINE (EXACT ORIGINAL ASPECT RATIO) ----------
         async function compositeFinalImage() {
-            const W = 900, H = Math.round(900 * 3 / 4);
+            const iw = imgPreview.naturalWidth || 900;
+            const ih = imgPreview.naturalHeight || 675;
+            const W = 1080;
+            const H = Math.round(1080 * (ih / iw));
+
             const canvas = document.createElement('canvas');
             canvas.width = W; canvas.height = H;
             const ctx = canvas.getContext('2d');
 
             ctx.filter = FILTERS[state.filterKey]?.css || 'none';
-            drawImageCover(ctx, imgPreview, W, H);
+            ctx.drawImage(imgPreview, 0, 0, W, H);
             ctx.filter = 'none';
 
             ctx.drawImage(doodleCanvas, 0, 0, W, H);
