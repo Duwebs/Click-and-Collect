@@ -337,7 +337,7 @@
 
             let memoryMap = new Map();
 
-            // Populate Map with Local Data (Fallback ID Generation)
+            // Local Data (Default Sender: Current User)
             localData.forEach((m, idx) => {
                 if (!m) return;
                 const memId = m.id || m.key || `local_${idx}_${m.time || Date.now()}`;
@@ -350,7 +350,7 @@
                 });
             });
 
-            // 2. Fetch Firebase Cloud Data (if Room PIN active)
+            // 2. Fetch Firebase Cloud Data
             if (pin) {
                 onValue(ref(db, 'rooms/' + pin + '/memories'), (snapshot) => {
                     const cloudData = snapshot.val();
@@ -376,11 +376,19 @@
         }
 
         function processAndRender(memoryMap) {
-            // Filter logic: Always show self-created/local photos; filter friend photos by tag
+            // Strict Receiver/Sender Tag Filtering Logic
             let finalData = Array.from(memoryMap.values()).filter(m => {
                 if (!m.image) return false;
-                if (!m.sender || m.sender === myUserId || m.sender === 'local') return true; 
-                return (m.tag === 'Friend' || m.tag === 'Both');
+
+                const isMyPhoto = (!m.sender || m.sender === myUserId || m.sender === 'local');
+
+                if (isMyPhoto) {
+                    // Maine bheli: 'Me' aur 'Both' meri timeline par dikhegi. 'Friend' wali mere me hide ho jayegi!
+                    return (m.tag === 'Me' || m.tag === 'Both');
+                } else {
+                    // Friend ne bheji: 'Friend' (yani mere liye) aur 'Both' meri timeline par dikhegi. Friend ki 'Me' mere me hide ho jayegi!
+                    return (m.tag === 'Friend' || m.tag === 'Both');
+                }
             });
 
             renderGallery(finalData);
@@ -494,7 +502,6 @@
             slider.classList.add('right');
         };
 
-        // Live refresh triggers for new uploads/edits
         window.addEventListener('focus', () => loadAllMemories());
         window.addEventListener('storage', () => loadAllMemories());
 
