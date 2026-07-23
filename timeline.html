@@ -1,120 +1,159 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="hi" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>C&C - Memories Feed</title>
     <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', sans-serif; }
+        * { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
-            background: linear-gradient(180deg, #0d4f4a 0%, #0a3d39 100%);
+            background: #092c28;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.25) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(244, 63, 94, 0.15) 0px, transparent 50%);
             overscroll-behavior: none;
         }
 
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Header */
+        /* Header Styling */
         .header-glass {
-            background: rgba(13, 79, 74, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: rgba(9, 44, 40, 0.75);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .icon-btn {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .icon-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.16); }
+        .icon-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.18); }
 
         .count-badge {
-            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
-            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4);
+            background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+            box-shadow: 0 4px 16px rgba(244, 63, 94, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Tab switcher */
+        /* Tab Switcher */
         .tab-wrap {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(15, 23, 42, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 4px;
         }
         .tab-btn {
             transition: color 0.3s ease;
-            color: rgba(255,255,255,0.45);
+            color: #64748b;
         }
-        .tab-btn.active { color: #05221f; }
+        .tab-btn.active { color: #0f172a; }
         .tab-slider {
             position: absolute;
             top: 4px; bottom: 4px; left: 4px;
             width: calc(50% - 4px);
-            background: linear-gradient(135deg, #2dd4bf 0%, #f43f5e 100%);
+            background: #ffffff;
             border-radius: 14px;
-            transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
         }
         .tab-slider.right { transform: translateX(100%); }
 
-        /* Main surface */
+        /* Main Sheet Surface */
         .content-sheet {
-            background: #fafaf9;
+            background: #f8fafc;
             border-radius: 32px 32px 0 0;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
         }
 
-        /* Timeline */
+        /* Timeline Items */
         .tl-rail::before {
             content: '';
             position: absolute;
-            left: 27px; top: 6px; bottom: 6px;
+            left: 21px; top: 12px; bottom: 12px;
             width: 2px;
-            background: linear-gradient(180deg, #ccfbf1 0%, #fecdd3 100%);
+            background: linear-gradient(180deg, #14b8a6 0%, #f43f5e 100%);
+            opacity: 0.3;
         }
         .tl-dot {
-            box-shadow: 0 0 0 4px #fafaf9, 0 0 0 6px rgba(20, 184, 166, 0.15);
+            box-shadow: 0 0 0 4px #f8fafc, 0 0 0 7px rgba(20, 184, 166, 0.2);
         }
         .tl-card {
             background: #ffffff;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .tl-card:active {
-            transform: scale(0.98);
-            box-shadow: 0 1px 2px rgba(15,23,42,0.08);
+            transform: scale(0.985);
         }
 
-        .tag-pill {
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+        /* Responsive image box that preserves edited drawings/aspect-ratio */
+        .photo-frame {
+            background-color: #0f172a;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-center: center;
         }
 
-        /* Gallery grid */
+        .photo-img {
+            width: 100%;
+            height: auto;
+            max-height: 520px;
+            object-fit: contain; /* Prevents user edits, canvas drawing, stickers from getting cropped */
+            image-rendering: -webkit-optimize-contrast;
+        }
+
+        .gl-img {
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            object-fit: cover;
+            image-rendering: -webkit-optimize-contrast;
+        }
+
+        /* Gallery Item */
         .gl-item {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
             transition: transform 0.2s ease;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
         }
         .gl-item:active { transform: scale(0.95); }
 
-        /* Lightbox */
-        #lightbox { display: none; }
-        #lightbox.active { display: flex; animation: fadeIn 0.25s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        #lb-img { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* Empty state */
-        .empty-icon {
-            background: linear-gradient(135deg, rgba(45, 212, 191, 0.12) 0%, rgba(244, 63, 94, 0.12) 100%);
+        /* Lightbox Overlay */
+        #lightbox { 
+            display: none; 
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        #lightbox.active { 
+            display: flex; 
+            opacity: 1;
+        }
+        #lb-img { 
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #lightbox.active #lb-img {
+            transform: scale(1);
         }
 
-        /* Skeleton loader */
+        /* Skeleton Loader */
         .skel {
-            background: linear-gradient(90deg, #f1f5f4 25%, #e7ebea 37%, #f1f5f4 63%);
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 37%, #e2e8f0 63%);
             background-size: 400% 100%;
             animation: skelShine 1.4s ease infinite;
         }
@@ -124,10 +163,10 @@
         }
 
         .fade-up {
-            animation: fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -136,71 +175,101 @@
 
     <!-- Header -->
     <header class="header-glass sticky top-0 z-30 px-5 pt-5 pb-4 flex items-center justify-between">
-        <a href="dashboard.html" class="icon-btn w-11 h-11 rounded-2xl flex items-center justify-center text-white">
+        <a href="dashboard.html" class="icon-btn w-11 h-11 rounded-2xl flex items-center justify-center text-white active:scale-90">
             <i class="fas fa-arrow-left text-sm"></i>
         </a>
-        
-        <div id="page-loader">
-    <img src="/assets/loader.svg" alt="Loading...">
-  </div>
+
         <div class="text-center">
-            <h1 class="text-white font-black text-sm uppercase tracking-[0.2em]">Memories</h1>
-            <p class="text-teal-200/50 text-[10px] font-medium mt-0.5">C &amp; C Collection</p>
+            <h1 class="text-white font-extrabold text-xs uppercase tracking-[0.25em]">Memories</h1>
+            <p class="text-teal-200/60 text-[10px] font-semibold mt-0.5 tracking-wide">C &amp; C Collection</p>
         </div>
+
         <div class="count-badge w-11 h-11 rounded-2xl flex items-center justify-center">
             <span id="total-count" class="text-white font-black text-sm">0</span>
         </div>
     </header>
 
-    <!-- Sheet -->
-    <div class="content-sheet flex-1 flex flex-col overflow-hidden -mt-1">
+    <!-- Main Content Area -->
+    <div class="content-sheet flex-1 flex flex-col overflow-hidden -mt-2">
 
-        <div class="px-5 pt-6 pb-2">
-            <div class="tab-wrap relative flex p-1 rounded-2xl h-12" style="background:#f1f5f4;border-color:#e7ebea;">
+        <!-- Tabs Switcher -->
+        <div class="px-5 pt-5 pb-2">
+            <div class="tab-wrap relative flex rounded-2xl h-12">
                 <div id="tab-slider" class="tab-slider"></div>
-                <button id="tl-btn" class="tab-btn active relative z-10 flex-1 font-black text-xs uppercase tracking-wider">Timeline</button>
-                <button id="gl-btn" class="tab-btn relative z-10 flex-1 font-black text-xs uppercase tracking-wider">Gallery</button>
+                <button id="tl-btn" class="tab-btn active relative z-10 flex-1 font-bold text-xs uppercase tracking-wider">Timeline</button>
+                <button id="gl-btn" class="tab-btn relative z-10 flex-1 font-bold text-xs uppercase tracking-wider">Gallery</button>
             </div>
         </div>
 
-        <main class="flex-1 overflow-y-auto scrollbar-none px-5 pt-4 pb-24">
+        <!-- Scrollable Feed -->
+        <main class="flex-1 overflow-y-auto scrollbar-none px-4 pt-3 pb-24">
 
-            <!-- Skeleton (shown until first render) -->
-            <div id="skeleton" class="space-y-5">
-                <div class="flex gap-3"><div class="skel w-3 h-3 rounded-full mt-2"></div><div class="skel flex-1 h-28 rounded-2xl"></div></div>
-                <div class="flex gap-3"><div class="skel w-3 h-3 rounded-full mt-2"></div><div class="skel flex-1 h-28 rounded-2xl"></div></div>
-                <div class="flex gap-3"><div class="skel w-3 h-3 rounded-full mt-2"></div><div class="skel flex-1 h-28 rounded-2xl"></div></div>
+            <!-- Skeleton Loading State -->
+            <div id="skeleton" class="space-y-6 pt-2">
+                <div class="flex gap-4">
+                    <div class="skel w-3.5 h-3.5 rounded-full mt-1.5 shrink-0"></div>
+                    <div class="skel flex-1 h-44 rounded-3xl"></div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="skel w-3.5 h-3.5 rounded-full mt-1.5 shrink-0"></div>
+                    <div class="skel flex-1 h-44 rounded-3xl"></div>
+                </div>
             </div>
 
-            <div id="timeline-box" class="tl-rail relative space-y-7 hidden"></div>
-            <div id="gallery-box" class="grid grid-cols-2 gap-3 hidden"></div>
+            <!-- Feed Boxes -->
+            <div id="timeline-box" class="tl-rail relative space-y-6 hidden pl-1"></div>
+            <div id="gallery-box" class="grid grid-cols-2 gap-3.5 hidden"></div>
 
-            <!-- Empty state -->
+            <!-- Empty State -->
             <div id="empty-state" class="hidden flex-col items-center justify-center text-center pt-20 pb-10">
-                <div class="empty-icon w-20 h-20 rounded-3xl flex items-center justify-center mb-5">
-                    <i class="fas fa-camera-retro text-2xl" style="color:#14b8a6;"></i>
+                <div class="w-20 h-20 rounded-3xl bg-teal-500/10 flex items-center justify-center mb-4 text-teal-600 border border-teal-500/20">
+                    <i class="fas fa-camera-retro text-2xl"></i>
                 </div>
-                <h3 class="font-black text-slate-700 text-sm uppercase tracking-wide">No memories yet</h3>
-                <p class="text-slate-400 text-xs mt-1.5 max-w-[220px] leading-relaxed">Click your first photo and it'll show up here</p>
+                <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">No memories saved</h3>
+                <p class="text-slate-400 text-xs mt-1.5 max-w-[210px] leading-relaxed font-medium">Click or upload photos to save your moments here.</p>
             </div>
 
         </main>
     </div>
 
-    <!-- Lightbox -->
-    <div id="lightbox" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md items-center justify-center p-5" onclick="this.classList.remove('active')">
-        <img id="lb-img" src="" class="max-w-full max-h-[85vh] rounded-[28px] object-contain border-4 border-white/90 shadow-2xl">
+    <!-- Enhanced Lightbox View -->
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-between p-4" onclick="closeLB()">
+        <!-- Close Button -->
+        <div class="w-full flex justify-end pt-2 pr-2">
+            <button class="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center border border-white/20">
+                <i class="fas fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Image Container -->
+        <div class="flex-1 flex items-center justify-center w-full px-2 my-auto">
+            <img id="lb-img" src="" class="max-w-full max-h-[75vh] rounded-2xl object-contain border border-white/10 shadow-2xl">
+        </div>
+
+        <!-- Info Footer -->
+        <div id="lb-info" class="w-full max-w-sm bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/15 text-center text-white mb-2">
+            <p id="lb-date" class="text-xs font-semibold text-slate-200"></p>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", authDomain: "clickandcollect-6c5d4.firebaseapp.com", databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "clickandcollect-6c5d4", storageBucket: "clickandcollect-6c5d4.firebasestorage.app", messagingSenderId: "739076323619", appId: "1:739076323619:web:9f75d0012923c0b44bb496", measurementId: "G-8V0CJ0ZJVM" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI", 
+            authDomain: "clickandcollect-6c5d4.firebaseapp.com", 
+            databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app", 
+            projectId: "clickandcollect-6c5d4", 
+            storageBucket: "clickandcollect-6c5d4.firebasestorage.app", 
+            messagingSenderId: "739076323619", 
+            appId: "1:739076323619:web:9f75d0012923c0b44bb496", 
+            measurementId: "G-8V0CJ0ZJVM" 
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        // SWITCHED TO LOCALSTORAGE WITH FALLBACK
         const pin = localStorage.getItem('cc_room_pin');
         let myUserId = localStorage.getItem('cc_user_id');
         if (!myUserId) {
@@ -212,8 +281,12 @@
             const localData = await new Promise(r => {
                 const req = indexedDB.open('CC_Memories_DB', 1);
                 req.onsuccess = () => {
-                    const tx = req.result.transaction('memories', 'readonly');
-                    tx.objectStore('memories').getAll().onsuccess = (e) => r(e.target.result);
+                    try {
+                        const tx = req.result.transaction('memories', 'readonly');
+                        tx.objectStore('memories').getAll().onsuccess = (e) => r(e.target.result || []);
+                    } catch(err) {
+                        r([]);
+                    }
                 };
                 req.onerror = () => r([]);
             });
@@ -223,15 +296,22 @@
                     const cloudData = snapshot.val();
                     let memoryMap = new Map();
 
-                    localData.forEach(m => memoryMap.set(m.id, m));
+                    localData.forEach(m => {
+                        if (m && m.id) memoryMap.set(m.id, m);
+                    });
                     
                     if (cloudData) {
                         Object.entries(cloudData).forEach(([key, m]) => {
-                            memoryMap.set(key, { id: key, image: m.url, time: m.time, tag: m.tag, sender: m.sender });
+                            memoryMap.set(key, { 
+                                id: key, 
+                                image: m.url || m.image, 
+                                time: m.time || Date.now(), 
+                                tag: m.tag || 'Me', 
+                                sender: m.sender 
+                            });
                         });
                     }
 
-                    // FIXED ROBUST FILTER
                     let finalData = Array.from(memoryMap.values()).filter(m => {
                         if (m.sender === myUserId) return (m.tag === 'Me' || m.tag === 'Both');
                         return (m.tag === 'Friend' || m.tag === 'Both');
@@ -245,22 +325,21 @@
         }
 
         function tagStyle(tag) {
-            if (tag === 'Friend') return { bg: 'rgba(168, 85, 247, 0.12)', color: '#9333ea', icon: 'fa-user-group' };
-            if (tag === 'Both') return { bg: 'rgba(244, 63, 94, 0.12)', color: '#e11d48', icon: 'fa-heart' };
-            return { bg: 'rgba(20, 184, 166, 0.12)', color: '#0d9488', icon: 'fa-user' };
+            if (tag === 'Friend') return { bg: 'rgba(168, 85, 247, 0.1)', color: '#9333ea', label: 'Friend', icon: 'fa-user-group' };
+            if (tag === 'Both') return { bg: 'rgba(244, 63, 94, 0.1)', color: '#e11d48', label: 'Both', icon: 'fa-heart' };
+            return { bg: 'rgba(20, 184, 166, 0.1)', color: '#0d9488', label: 'Me', icon: 'fa-user' };
         }
 
         function renderGallery(data) {
-            // FIXED: Numeric sorting based on timestamps
             data.sort((a,b) => (b.time || 0) - (a.time || 0));
             document.getElementById('total-count').textContent = data.length;
-
             document.getElementById('skeleton').classList.add('hidden');
 
             const tlBox = document.getElementById('timeline-box');
             const glBox = document.getElementById('gallery-box');
             const emptyState = document.getElementById('empty-state');
-            tlBox.innerHTML = ''; glBox.innerHTML = '';
+            tlBox.innerHTML = ''; 
+            glBox.innerHTML = '';
 
             if (data.length === 0) {
                 emptyState.classList.remove('hidden');
@@ -269,6 +348,7 @@
                 glBox.classList.add('hidden');
                 return;
             }
+
             emptyState.classList.add('hidden');
             emptyState.classList.remove('flex');
 
@@ -276,37 +356,62 @@
             if (activeTab === 'tl') tlBox.classList.remove('hidden'); else glBox.classList.remove('hidden');
 
             data.forEach((m, i) => {
-                const dateStr = new Date(m.time).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
-                const timeStr = new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const validTime = m.time ? new Date(m.time) : new Date();
+                const dateStr = validTime.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+                const timeStr = validTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const style = tagStyle(m.tag);
-                const delay = Math.min(i * 0.05, 0.4);
+                const delay = Math.min(i * 0.04, 0.35);
 
-                tlBox.innerHTML += `
-                    <div class="relative pl-[52px] fade-up" style="animation-delay:${delay}s">
-                        <div class="tl-dot absolute left-[22px] top-2 w-3 h-3 rounded-full" style="background:${style.color};"></div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="text-[10px] font-bold uppercase tracking-wider" style="color:#94a3a8;">${dateStr} · ${timeStr}</span>
-                            <span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide" style="background:${style.bg};color:${style.color};">
-                                <i class="fas ${style.icon} text-[8px]"></i>${m.tag || 'Me'}
-                            </span>
-                        </div>
-                        <div class="tl-card rounded-[22px] overflow-hidden cursor-pointer" onclick="openLB('${m.image}')">
-                            <img src="${m.image}" class="w-full aspect-[4/3] object-cover">
-                        </div>
-                    </div>`;
+                // Safe escaped image string to prevent base64 breaking JS calls
+                const safeImgSrc = m.image;
 
-                glBox.innerHTML += `
-                    <div class="gl-item relative rounded-[20px] overflow-hidden cursor-pointer fade-up" style="animation-delay:${delay}s" onclick="openLB('${m.image}')">
-                        <img src="${m.image}" class="aspect-square w-full object-cover">
-                        <div class="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center" style="background:${style.color};">
-                            <i class="fas ${style.icon} text-[8px] text-white"></i>
+                // Timeline Item Card
+                const tlCard = document.createElement('div');
+                tlCard.className = 'relative pl-[44px] fade-up';
+                tlCard.style.animationDelay = `${delay}s`;
+                tlCard.innerHTML = `
+                    <div class="tl-dot absolute left-[15px] top-3 w-3.5 h-3.5 rounded-full" style="background:${style.color};"></div>
+                    <div class="flex items-center justify-between mb-2 pr-1">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">${dateStr} • ${timeStr}</span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide border" style="background:${style.bg}; color:${style.color}; border-color:${style.color}25;">
+                            <i class="fas ${style.icon} text-[8px]"></i>${style.label}
+                        </span>
+                    </div>
+                    <div class="tl-card rounded-2xl overflow-hidden cursor-pointer">
+                        <div class="photo-frame">
+                            <img src="${safeImgSrc}" class="photo-img" loading="lazy">
                         </div>
-                    </div>`;
+                    </div>
+                `;
+                tlCard.querySelector('.tl-card').onclick = () => openLB(safeImgSrc, `${dateStr} • ${timeStr} (${style.label})`);
+                tlBox.appendChild(tlCard);
+
+                // Gallery Grid Item
+                const glCard = document.createElement('div');
+                glCard.className = 'gl-item relative rounded-2xl overflow-hidden cursor-pointer fade-up';
+                glCard.style.animationDelay = `${delay}s`;
+                glCard.innerHTML = `
+                    <img src="${safeImgSrc}" class="gl-img" loading="lazy">
+                    <div class="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center border border-white/40 shadow-sm" style="background:${style.color};">
+                        <i class="fas ${style.icon} text-[9px] text-white"></i>
+                    </div>
+                `;
+                glCard.onclick = () => openLB(safeImgSrc, `${dateStr} • ${timeStr} (${style.label})`);
+                glBox.appendChild(glCard);
             });
         }
 
-        window.openLB = function(src) { document.getElementById('lb-img').src = src; document.getElementById('lightbox').classList.add('active'); }
-        
+        window.openLB = function(src, metaInfo = '') { 
+            const lb = document.getElementById('lightbox');
+            document.getElementById('lb-img').src = src; 
+            document.getElementById('lb-date').textContent = metaInfo;
+            lb.classList.add('active'); 
+        };
+
+        window.closeLB = function() {
+            document.getElementById('lightbox').classList.remove('active');
+        };
+
         const slider = document.getElementById('tab-slider');
 
         document.getElementById('tl-btn').onclick = function() {
@@ -327,6 +432,6 @@
 
         loadAllMemories();
     </script>
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
