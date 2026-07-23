@@ -101,19 +101,19 @@
         /* Fixed Compact Photo Container in Timeline */
         .photo-thumb-container {
             width: 100%;
-            height: 190px; /* Controlled compact height so it doesn't cover full screen */
+            height: 220px;
             background-color: #0f172a;
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-center: center;
         }
 
         .photo-thumb-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Compact card thumbnail view */
+            object-fit: cover;
             image-rendering: -webkit-optimize-contrast;
         }
 
@@ -171,69 +171,74 @@
         }
     </style>
 </head>
-<body class="h-full flex flex-col overflow-hidden">
+<body class="h-full flex items-center justify-center overflow-hidden">
 
-    <!-- Header -->
-    <header class="header-glass sticky top-0 z-30 px-5 pt-5 pb-4 flex items-center justify-between">
-        <a href="dashboard.html" class="icon-btn w-11 h-11 rounded-2xl flex items-center justify-center text-white">
-            <i class="fas fa-arrow-left text-sm"></i>
-        </a>
+    <!-- Desktop Centered Wrapper Frame -->
+    <div class="w-full max-w-lg h-full flex flex-col overflow-hidden relative shadow-2xl">
 
-        <div class="text-center">
-            <h1 class="text-white font-extrabold text-xs uppercase tracking-[0.25em]">Memories</h1>
-            <p class="text-teal-200/60 text-[10px] font-semibold mt-0.5 tracking-wide">C &amp; C Collection</p>
-        </div>
+        <!-- Header -->
+        <header class="header-glass sticky top-0 z-30 px-5 pt-5 pb-4 flex items-center justify-between">
+            <a href="dashboard.html" class="icon-btn w-11 h-11 rounded-2xl flex items-center justify-center text-white">
+                <i class="fas fa-arrow-left text-sm"></i>
+            </a>
 
-        <div class="count-badge w-11 h-11 rounded-2xl flex items-center justify-center">
-            <span id="total-count" class="text-white font-black text-sm">0</span>
-        </div>
-    </header>
-
-    <!-- Main Content Area -->
-    <div class="content-sheet flex-1 flex flex-col overflow-hidden -mt-2">
-
-        <!-- Tabs Switcher -->
-        <div class="px-5 pt-5 pb-2">
-            <div class="tab-wrap relative flex rounded-2xl h-12">
-                <div id="tab-slider" class="tab-slider"></div>
-                <button id="tl-btn" class="tab-btn active relative z-10 flex-1 font-bold text-xs uppercase tracking-wider">Timeline</button>
-                <button id="gl-btn" class="tab-btn relative z-10 flex-1 font-bold text-xs uppercase tracking-wider">Gallery</button>
+            <div class="text-center">
+                <h1 class="text-white font-extrabold text-xs uppercase tracking-[0.25em]">Memories</h1>
+                <p class="text-teal-200/60 text-[10px] font-semibold mt-0.5 tracking-wide">C &amp; C Collection</p>
             </div>
-        </div>
 
-        <!-- Scrollable Feed -->
-        <main class="flex-1 overflow-y-auto scrollbar-none px-4 pt-3 pb-24">
+            <div class="count-badge w-11 h-11 rounded-2xl flex items-center justify-center">
+                <span id="total-count" class="text-white font-black text-sm">0</span>
+            </div>
+        </header>
 
-            <!-- Skeleton Loading State -->
-            <div id="skeleton" class="space-y-5 pt-2">
-                <div class="flex gap-4">
-                    <div class="skel w-3.5 h-3.5 rounded-full mt-1.5 shrink-0"></div>
-                    <div class="skel flex-1 h-36 rounded-3xl"></div>
-                </div>
-                <div class="flex gap-4">
-                    <div class="skel w-3.5 h-3.5 rounded-full mt-1.5 shrink-0"></div>
-                    <div class="skel flex-1 h-36 rounded-3xl"></div>
+        <!-- Main Content Area -->
+        <div class="content-sheet flex-1 flex flex-col overflow-hidden -mt-2">
+
+            <!-- Tabs Switcher -->
+            <div class="px-5 pt-5 pb-2">
+                <div class="tab-wrap relative flex rounded-2xl h-12">
+                    <div id="tab-slider" class="tab-slider"></div>
+                    <button id="tl-btn" class="tab-btn active relative z-10 flex-1 font-bold text-xs uppercase tracking-wider">Timeline</button>
+                    <button id="gl-btn" class="tab-btn relative z-10 flex-1 font-bold text-xs uppercase tracking-wider">Gallery</button>
                 </div>
             </div>
 
-            <!-- Feed Boxes -->
-            <div id="timeline-box" class="tl-rail relative space-y-5 hidden pl-1"></div>
-            <div id="gallery-box" class="grid grid-cols-2 gap-3.5 hidden"></div>
+            <!-- Scrollable Feed -->
+            <main class="flex-1 overflow-y-auto scrollbar-none px-4 pt-3 pb-24">
 
-            <!-- Empty State -->
-            <div id="empty-state" class="hidden flex-col items-center justify-center text-center pt-20 pb-10">
-                <div class="w-20 h-20 rounded-3xl bg-teal-500/10 flex items-center justify-center mb-4 text-teal-600 border border-teal-500/20">
-                    <i class="fas fa-camera-retro text-2xl"></i>
+                <!-- Skeleton Loading State -->
+                <div id="skeleton" class="space-y-5 pt-2">
+                    <div class="flex gap-4">
+                        <div class="skel w-3.5 h-3.5 rounded-full mt-1.5 shrink-0"></div>
+                        <div class="skel flex-1 h-36 rounded-3xl"></div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="skel w-3.5 h-3.5 rounded-full mt-1.5 shrink-0"></div>
+                        <div class="skel flex-1 h-36 rounded-3xl"></div>
+                    </div>
                 </div>
-                <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">No memories saved</h3>
-                <p class="text-slate-400 text-xs mt-1.5 max-w-[210px] leading-relaxed font-medium">Click or upload photos to save your moments here.</p>
-            </div>
 
-        </main>
+                <!-- Feed Boxes -->
+                <div id="timeline-box" class="tl-rail relative space-y-5 hidden pl-1"></div>
+                <div id="gallery-box" class="grid grid-cols-2 gap-3.5 hidden"></div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden flex-col items-center justify-center text-center pt-20 pb-10">
+                    <div class="w-20 h-20 rounded-3xl bg-teal-500/10 flex items-center justify-center mb-4 text-teal-600 border border-teal-500/20">
+                        <i class="fas fa-camera-retro text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">No memories saved</h3>
+                    <p class="text-slate-400 text-xs mt-1.5 max-w-[210px] leading-relaxed font-medium">Click or upload photos to save your moments here.</p>
+                </div>
+
+            </main>
+        </div>
+
     </div>
 
     <!-- Lightbox Full-Screen View -->
-    <div id="lightbox" class="fixed inset-0 z-50 bg-black/92 backdrop-blur-xl flex flex-col items-center justify-between p-4" onclick="closeLB()">
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-between p-4" onclick="closeLB()">
         <!-- Close Button -->
         <div class="w-full flex justify-end pt-2 pr-2">
             <button class="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center border border-white/20 active:scale-90 transition-transform">
@@ -243,12 +248,12 @@
 
         <!-- Full Image Display -->
         <div class="flex-1 flex items-center justify-center w-full px-1 my-auto">
-            <img id="lb-img" src="" class="max-w-full max-h-[78vh] rounded-2xl object-contain border border-white/10 shadow-2xl">
+            <img id="lb-img" src="" class="max-w-full max-h-[75vh] rounded-2xl object-contain border border-white/10 shadow-2xl">
         </div>
 
-        <!-- Info Card -->
-        <div class="w-full max-w-xs bg-white/10 backdrop-blur-md rounded-2xl py-2.5 px-4 border border-white/15 text-center text-white mb-3">
-            <p id="lb-date" class="text-xs font-semibold text-slate-200 tracking-wide"></p>
+        <!-- High Contrast Dark Info Pill -->
+        <div id="lb-info" class="w-auto bg-slate-900/90 backdrop-blur-md rounded-full py-2 px-5 border border-slate-700/80 text-center shadow-xl mb-4">
+            <p id="lb-date" class="text-xs font-bold text-slate-100 tracking-wide"></p>
         </div>
     </div>
 
@@ -277,7 +282,7 @@
             localStorage.setItem('cc_user_id', myUserId);
         }
 
-        // Safe Date Parsing Helper to prevent "Invalid Date"
+        // Safe Date Parsing Helper
         function parseAndFormatDate(rawTime) {
             if (!rawTime) {
                 const now = new Date();
@@ -291,7 +296,6 @@
             if (typeof rawTime === 'number') {
                 d = new Date(rawTime);
             } else if (typeof rawTime === 'string') {
-                // If timestamp is stored as a numeric string e.g. "1711234567890"
                 if (!isNaN(rawTime) && rawTime.trim() !== '') {
                     d = new Date(Number(rawTime));
                 } else {
@@ -301,7 +305,6 @@
                 d = new Date(rawTime);
             }
 
-            // Fallback if parsing fails
             if (isNaN(d.getTime())) {
                 d = new Date();
             }
@@ -365,7 +368,6 @@
         }
 
         function renderGallery(data) {
-            // Sort items accurately by parsed timestamp
             data.sort((a, b) => {
                 const timeA = parseAndFormatDate(a.time || a.timestamp || a.createdAt).timestamp;
                 const timeB = parseAndFormatDate(b.time || b.timestamp || b.createdAt).timestamp;
@@ -402,7 +404,7 @@
 
                 const safeImgSrc = m.image;
 
-                // Timeline Item Card (Compact View)
+                // Timeline Item Card
                 const tlCard = document.createElement('div');
                 tlCard.className = 'relative pl-[44px] fade-up';
                 tlCard.style.animationDelay = `${delay}s`;
@@ -464,7 +466,7 @@
             document.getElementById('gallery-box').classList.remove('hidden');
             this.classList.add('active');
             document.getElementById('tl-btn').classList.remove('active');
-            slider.classList.add('right');
+            slider.add('right');
         };
 
         loadAllMemories();
