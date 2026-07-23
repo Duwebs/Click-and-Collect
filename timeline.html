@@ -98,7 +98,6 @@
             transform: scale(0.985);
         }
 
-        /* Responsive Compact Frame */
         .photo-thumb-container {
             width: 100%;
             height: 220px;
@@ -176,7 +175,7 @@
 </head>
 <body class="h-full flex flex-col overflow-hidden w-full">
 
-    <!-- Header (Full Screen Responsive) -->
+    <!-- Header -->
     <header class="header-glass sticky top-0 z-30 px-4 md:px-8 pt-5 pb-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <a href="dashboard.html" class="icon-btn w-11 h-11 rounded-2xl flex items-center justify-center text-white">
@@ -224,10 +223,10 @@
                     </div>
                 </div>
 
-                <!-- Timeline Box (Centered Feed on Desktop) -->
+                <!-- Timeline Box -->
                 <div id="timeline-box" class="tl-rail relative space-y-5 hidden pl-1 max-w-2xl mx-auto w-full"></div>
 
-                <!-- Gallery Box (Responsive Multi-Column Grid) -->
+                <!-- Gallery Box -->
                 <div id="gallery-box" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 md:gap-5 hidden w-full"></div>
 
                 <!-- Empty State -->
@@ -294,7 +293,8 @@
                 const now = new Date();
                 return {
                     dateStr: now.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }),
-                    timeStr: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    timeStr: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    timestamp: now.getTime()
                 };
             }
 
@@ -321,6 +321,7 @@
         }
 
         async function loadAllMemories() {
+            // 1. Fetch Local IndexedDB Memories
             const localData = await new Promise(r => {
                 const req = indexedDB.open('CC_Memories_DB', 1);
                 req.onsuccess = () => {
@@ -334,37 +335,55 @@
                 req.onerror = () => r([]);
             });
 
+            let memoryMap = new Map();
+
+            // Populate Map with Local Data (Fallback ID Generation)
+            localData.forEach((m, idx) => {
+                if (!m) return;
+                const memId = m.id || m.key || `local_${idx}_${m.time || Date.now()}`;
+                memoryMap.set(memId, {
+                    id: memId,
+                    image: m.image || m.url || m.data,
+                    time: m.time || m.timestamp || m.createdAt || Date.now(),
+                    tag: m.tag || 'Me',
+                    sender: m.sender || myUserId
+                });
+            });
+
+            // 2. Fetch Firebase Cloud Data (if Room PIN active)
             if (pin) {
                 onValue(ref(db, 'rooms/' + pin + '/memories'), (snapshot) => {
                     const cloudData = snapshot.val();
-                    let memoryMap = new Map();
-
-                    localData.forEach(m => {
-                        if (m && m.id) memoryMap.set(m.id, m);
-                    });
                     
                     if (cloudData) {
                         Object.entries(cloudData).forEach(([key, m]) => {
+                            if (!m) return;
                             memoryMap.set(key, { 
                                 id: key, 
-                                image: m.url || m.image, 
-                                time: m.time || m.timestamp || m.createdAt, 
+                                image: m.url || m.image || m.data, 
+                                time: m.time || m.timestamp || m.createdAt || Date.now(), 
                                 tag: m.tag || 'Me', 
-                                sender: m.sender 
+                                sender: m.sender || 'unknown'
                             });
                         });
                     }
 
-                    let finalData = Array.from(memoryMap.values()).filter(m => {
-                        if (m.sender === myUserId) return (m.tag === 'Me' || m.tag === 'Both');
-                        return (m.tag === 'Friend' || m.tag === 'Both');
-                    });
-
-                    renderGallery(finalData);
+                    processAndRender(memoryMap);
                 });
             } else {
-                renderGallery(localData);
+                processAndRender(memoryMap);
             }
+        }
+
+        function processAndRender(memoryMap) {
+            // Filter logic: Always show self-created/local photos; filter friend photos by tag
+            let finalData = Array.from(memoryMap.values()).filter(m => {
+                if (!m.image) return false;
+                if (!m.sender || m.sender === myUserId || m.sender === 'local') return true; 
+                return (m.tag === 'Friend' || m.tag === 'Both');
+            });
+
+            renderGallery(finalData);
         }
 
         function tagStyle(tag) {
@@ -375,8 +394,8 @@
 
         function renderGallery(data) {
             data.sort((a, b) => {
-                const timeA = parseAndFormatDate(a.time || a.timestamp || a.createdAt).timestamp;
-                const timeB = parseAndFormatDate(b.time || b.timestamp || b.createdAt).timestamp;
+                const timeA = parseAndFormatDate(a.time).timestamp;
+                const timeB = parseAndFormatDate(b.time).timestamp;
                 return timeB - timeA;
             });
 
@@ -404,7 +423,7 @@
             if (activeTab === 'tl') tlBox.classList.remove('hidden'); else glBox.classList.remove('hidden');
 
             data.forEach((m, i) => {
-                const { dateStr, timeStr } = parseAndFormatDate(m.time || m.timestamp || m.createdAt);
+                const { dateStr, timeStr } = parseAndFormatDate(m.time);
                 const style = tagStyle(m.tag);
                 const delay = Math.min(i * 0.04, 0.35);
 
@@ -474,6 +493,10 @@
             document.getElementById('tl-btn').classList.remove('active');
             slider.classList.add('right');
         };
+
+        // Live refresh triggers for new uploads/edits
+        window.addEventListener('focus', () => loadAllMemories());
+        window.addEventListener('storage', () => loadAllMemories());
 
         loadAllMemories();
     </script>
