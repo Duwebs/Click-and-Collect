@@ -337,7 +337,7 @@
 
             let memoryMap = new Map();
 
-            // Local Data (Default Sender: Current User)
+            // Local Data
             localData.forEach((m, idx) => {
                 if (!m) return;
                 const memId = m.id || m.key || `local_${idx}_${m.time || Date.now()}`;
@@ -376,22 +376,36 @@
         }
 
         function processAndRender(memoryMap) {
-            // Strict Receiver/Sender Tag Filtering Logic
-            let finalData = Array.from(memoryMap.values()).filter(m => {
+            // 1. Tag Filtering Rules
+            let filteredData = Array.from(memoryMap.values()).filter(m => {
                 if (!m.image) return false;
 
                 const isMyPhoto = (!m.sender || m.sender === myUserId || m.sender === 'local');
 
                 if (isMyPhoto) {
-                    // Maine bheli: 'Me' aur 'Both' meri timeline par dikhegi. 'Friend' wali mere me hide ho jayegi!
                     return (m.tag === 'Me' || m.tag === 'Both');
                 } else {
-                    // Friend ne bheji: 'Friend' (yani mere liye) aur 'Both' meri timeline par dikhegi. Friend ki 'Me' mere me hide ho jayegi!
                     return (m.tag === 'Friend' || m.tag === 'Both');
                 }
             });
 
-            renderGallery(finalData);
+            // 2. Smart Deduplication Fix (Prevents Local + Cloud Duplicate Display)
+            let uniqueData = [];
+            let seen = new Set();
+
+            filteredData.forEach(item => {
+                // Generate unique key based on image fingerprint and creation time
+                const imgPrefix = item.image ? item.image.substring(0, 100) : '';
+                const timeStamp = parseAndFormatDate(item.time).timestamp;
+                const uniqueKey = `${imgPrefix}_${timeStamp}`;
+
+                if (!seen.has(uniqueKey)) {
+                    seen.add(uniqueKey);
+                    uniqueData.push(item);
+                }
+            });
+
+            renderGallery(uniqueData);
         }
 
         function tagStyle(tag) {
