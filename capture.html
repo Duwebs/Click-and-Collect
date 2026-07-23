@@ -224,7 +224,7 @@
                     if (choice === 'Me' || choice === 'Both') store.add({ id: uniqueId, image: m.image, time: m.time, tag: choice, sender: myUserId });
                     if (choice === 'Friend' || choice === 'Both') push(ref(db, 'rooms/' + pin + '/memories'), { url: m.image, tag: choice, time: m.time, sender: myUserId });
                 }
-                window.location.href = 'memories.html';
+                window.location.href = 'timeline.html';
             };
         };
     </script>
