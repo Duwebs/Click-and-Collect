@@ -2,7 +2,7 @@
 <html lang="en" class="h-full bg-slate-950 select-none overflow-hidden">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>C&C - Connecting Session...</title>
     
     <!-- Tailwind CSS -->
@@ -37,8 +37,8 @@
         }
         
         .avatar-glow {
-            width: 46px;
-            height: 46px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: #0f172a;
             border: 2.5px solid #38bdf8;
@@ -47,6 +47,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            flex-shrink: 0;
         }
         
         .guest-glow {
@@ -94,20 +95,26 @@
     </div>
 
     <!-- 3. SUCCESS OVERLAY (SLIDING AVATARS + LINKED ANIMATION) -->
-    <div id="user-success-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-700">
+    <div id="user-success-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-700 p-4">
         
-        <div class="glass-hud p-6 px-8 rounded-3xl flex items-center gap-6 border-sky-400/40 shadow-2xl">
-            <!-- Left Avatar -->
-            <img id="left-avatar" src="" class="w-20 h-20 rounded-full border-4 border-sky-400 shadow-2xl object-cover opacity-0">
+        <div class="glass-hud p-4 sm:p-6 px-5 sm:px-8 rounded-3xl flex items-center justify-between gap-3 sm:gap-6 border-sky-400/40 shadow-2xl w-full max-w-xs sm:max-w-md">
             
-            <!-- Linked Text -->
-            <div class="text-center">
-                <h1 id="linked-text" class="text-3xl font-black uppercase tracking-widest text-white opacity-0 drop-shadow-lg">Linked!</h1>
-                <p class="text-[10px] font-bold tracking-widest text-sky-300 uppercase mt-1">Satellite Synced</p>
+            <!-- Left Avatar Wrapper (Guarantees Perfect Circle) -->
+            <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 aspect-square rounded-full overflow-hidden border-4 border-sky-400 shadow-2xl bg-slate-900">
+                <img id="left-avatar" src="" class="w-full h-full object-cover opacity-0">
             </div>
             
-            <!-- Right Avatar -->
-            <img id="right-avatar" src="" class="w-20 h-20 rounded-full border-4 border-purple-400 shadow-2xl object-cover opacity-0">
+            <!-- Linked Text -->
+            <div class="text-center flex-1 min-w-0">
+                <h1 id="linked-text" class="text-2xl sm:text-3xl font-black uppercase tracking-wider text-white opacity-0 drop-shadow-lg leading-none">Linked!</h1>
+                <p class="text-[9px] sm:text-[10px] font-bold tracking-widest text-sky-300 uppercase mt-1.5 whitespace-nowrap">Satellite Synced</p>
+            </div>
+            
+            <!-- Right Avatar Wrapper (Guarantees Perfect Circle) -->
+            <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 aspect-square rounded-full overflow-hidden border-4 border-purple-400 shadow-2xl bg-slate-900">
+                <img id="right-avatar" src="" class="w-full h-full object-cover opacity-0">
+            </div>
+
         </div>
 
         <p class="mt-6 text-[11px] font-extrabold tracking-[0.25em] text-white/70 uppercase animate-pulse">Launching Camera Module...</p>
@@ -116,7 +123,7 @@
     <script>
         let map;
 
-        // Fallback Coords agar GPS allow na ho (Delhi & Dehradun as default demonstration)
+        // Fallback Coords
         const myCoords = JSON.parse(localStorage.getItem('userLocation')) || [77.2090, 28.6139];
         const friendCoords = JSON.parse(localStorage.getItem('friendLocation')) || [78.0322, 30.3165];
         
@@ -158,7 +165,7 @@
             const el1 = document.createElement('div');
             el1.className = 'earth-marker';
             el1.innerHTML = `
-                <div class="avatar-glow"><img src="${hostAvatar}" class="w-full h-full object-cover"></div>
+                <div class="avatar-glow"><img src="${hostAvatar}" class="w-full h-full object-cover rounded-full"></div>
                 <div class="name-tag">${hostName}</div>
             `;
             new maplibregl.Marker({ element: el1 }).setLngLat(myCoords).addTo(map);
@@ -167,7 +174,7 @@
             const el2 = document.createElement('div');
             el2.className = 'earth-marker';
             el2.innerHTML = `
-                <div class="avatar-glow guest-glow"><img src="${guestAvatar}" class="w-full h-full object-cover"></div>
+                <div class="avatar-glow guest-glow"><img src="${guestAvatar}" class="w-full h-full object-cover rounded-full"></div>
                 <div class="name-tag">${guestName}</div>
             `;
             new maplibregl.Marker({ element: el2 }).setLngLat(friendCoords).addTo(map);
