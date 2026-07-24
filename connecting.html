@@ -2,7 +2,7 @@
 <html lang="en" class="h-full bg-slate-950 select-none overflow-hidden">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C&C - Connecting Session...</title>
     
     <!-- Tailwind CSS -->
@@ -19,6 +19,7 @@
     <style>
         * { font-family: 'Plus Jakarta Sans', sans-serif; }
 
+        /* Glass HUD styling */
         .glass-hud {
             background: rgba(10, 15, 26, 0.85);
             backdrop-filter: blur(16px);
@@ -26,6 +27,7 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
         }
 
+        /* Earth Map Markers */
         .earth-marker {
             display: flex;
             flex-direction: column;
@@ -35,8 +37,8 @@
         }
         
         .avatar-glow {
-            width: 48px;
-            height: 48px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
             background: #0f172a;
             border: 2.5px solid #38bdf8;
@@ -45,7 +47,6 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            flex-shrink: 0;
         }
         
         .guest-glow {
@@ -65,6 +66,7 @@
             white-space: nowrap;
         }
 
+        /* Avatar Slide Animations */
         @keyframes slideLeft { 
             0% { transform: translateX(-200%); opacity: 0; } 
             100% { transform: translateX(0); opacity: 1; } 
@@ -83,7 +85,7 @@
     <!-- 1. Background 3D Earth Map -->
     <div id="map" class="absolute inset-0 w-full h-full z-0 bg-black"></div>
 
-    <!-- 2. Top HUD -->
+    <!-- 2. Top HUD (Live Status updates) -->
     <div class="relative z-20 p-5 flex justify-center pointer-events-none">
         <div class="glass-hud px-6 py-2.5 rounded-full flex items-center gap-3 transition-all duration-500" id="top-hud">
             <span class="w-3 h-3 rounded-full bg-sky-400 animate-ping"></span>
@@ -92,26 +94,20 @@
     </div>
 
     <!-- 3. SUCCESS OVERLAY (SLIDING AVATARS + LINKED ANIMATION) -->
-    <div id="user-success-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-700 p-4">
+    <div id="user-success-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-700">
         
-        <div class="glass-hud p-4 sm:p-6 px-5 sm:px-8 rounded-3xl flex items-center justify-between gap-3 sm:gap-6 border-sky-400/40 shadow-2xl w-full max-w-xs sm:max-w-md">
-            
-            <!-- Left Avatar (Strict Circular Wrapper) -->
-            <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 aspect-square rounded-full overflow-hidden border-4 border-sky-400 shadow-2xl bg-slate-900">
-                <img id="left-avatar" src="" class="w-full h-full object-cover opacity-0">
-            </div>
+        <div class="glass-hud p-6 px-8 rounded-3xl flex items-center gap-6 border-sky-400/40 shadow-2xl">
+            <!-- Left Avatar -->
+            <img id="left-avatar" src="" class="w-20 h-20 rounded-full border-4 border-sky-400 shadow-2xl object-cover opacity-0">
             
             <!-- Linked Text -->
-            <div class="text-center flex-1 min-w-0">
-                <h1 id="linked-text" class="text-2xl sm:text-3xl font-black uppercase tracking-wider text-white opacity-0 drop-shadow-lg leading-none">Linked!</h1>
-                <p class="text-[9px] sm:text-[10px] font-bold tracking-widest text-sky-300 uppercase mt-1.5 whitespace-nowrap">Satellite Synced</p>
+            <div class="text-center">
+                <h1 id="linked-text" class="text-3xl font-black uppercase tracking-widest text-white opacity-0 drop-shadow-lg">Linked!</h1>
+                <p class="text-[10px] font-bold tracking-widest text-sky-300 uppercase mt-1">Satellite Synced</p>
             </div>
             
-            <!-- Right Avatar (Strict Circular Wrapper) -->
-            <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 aspect-square rounded-full overflow-hidden border-4 border-purple-400 shadow-2xl bg-slate-900">
-                <img id="right-avatar" src="" class="w-full h-full object-cover opacity-0">
-            </div>
-
+            <!-- Right Avatar -->
+            <img id="right-avatar" src="" class="w-20 h-20 rounded-full border-4 border-purple-400 shadow-2xl object-cover opacity-0">
         </div>
 
         <p class="mt-6 text-[11px] font-extrabold tracking-[0.25em] text-white/70 uppercase animate-pulse">Launching Camera Module...</p>
@@ -120,32 +116,18 @@
     <script>
         let map;
 
-        async function getOrFetchLocation(key, defaultCoords) {
-            const saved = localStorage.getItem(key);
-            if (saved) return JSON.parse(saved);
+        // Fallback Coords agar GPS allow na ho (Delhi & Dehradun as default demonstration)
+        const myCoords = JSON.parse(localStorage.getItem('userLocation')) || [77.2090, 28.6139];
+        const friendCoords = JSON.parse(localStorage.getItem('friendLocation')) || [78.0322, 30.3165];
+        
+        // Avatars and Names from LocalStorage
+        const hostAvatar = localStorage.getItem('animHostAvatar') || 'https://via.placeholder.com/150';
+        const guestAvatar = localStorage.getItem('animGuestAvatar') || 'https://via.placeholder.com/150';
 
-            try {
-                const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                if (data.latitude && data.longitude) {
-                    return [data.longitude, data.latitude];
-                }
-            } catch (e) {
-                console.log("IP Fetch Failed:", e);
-            }
-            return defaultCoords;
-        }
+        const hostName = localStorage.getItem('userName') || "Host";
+        const guestName = localStorage.getItem('friendName') || "Partner";
 
-        async function startConnectingFlow() {
-            const myCoords = await getOrFetchLocation('userLocation', [77.2090, 28.6139]);
-            const friendCoords = await getOrFetchLocation('friendLocation', [78.0322, 30.3165]);
-            
-            const hostAvatar = localStorage.getItem('animHostAvatar') || 'https://via.placeholder.com/150';
-            const guestAvatar = localStorage.getItem('animGuestAvatar') || 'https://via.placeholder.com/150';
-
-            const hostName = localStorage.getItem('userName') || "Host";
-            const guestName = localStorage.getItem('friendName') || "Partner";
-
+        function initEarthMap() {
             map = new maplibregl.Map({
                 container: 'map',
                 style: {
@@ -166,28 +148,31 @@
             });
 
             map.on('load', () => {
-                setupMarkersAndLine(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName);
-                runCinematicFlow(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName);
+                setupMarkersAndLine();
+                runCinematicFlow();
             });
         }
 
-        function setupMarkersAndLine(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName) {
+        function setupMarkersAndLine() {
+            // Host Marker
             const el1 = document.createElement('div');
             el1.className = 'earth-marker';
             el1.innerHTML = `
-                <div class="avatar-glow"><img src="${hostAvatar}" class="w-full h-full object-cover rounded-full"></div>
+                <div class="avatar-glow"><img src="${hostAvatar}" class="w-full h-full object-cover"></div>
                 <div class="name-tag">${hostName}</div>
             `;
             new maplibregl.Marker({ element: el1 }).setLngLat(myCoords).addTo(map);
 
+            // Guest Marker
             const el2 = document.createElement('div');
             el2.className = 'earth-marker';
             el2.innerHTML = `
-                <div class="avatar-glow guest-glow"><img src="${guestAvatar}" class="w-full h-full object-cover rounded-full"></div>
+                <div class="avatar-glow guest-glow"><img src="${guestAvatar}" class="w-full h-full object-cover"></div>
                 <div class="name-tag">${guestName}</div>
             `;
             new maplibregl.Marker({ element: el2 }).setLngLat(friendCoords).addTo(map);
 
+            // Connecting Line Source & Layer
             map.addSource('route', {
                 'type': 'geojson',
                 'data': { 'type': 'Feature', 'geometry': { 'type': 'LineString', 'coordinates': [myCoords, friendCoords] } }
@@ -205,20 +190,20 @@
             });
         }
 
-        function runCinematicFlow(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName) {
+        function runCinematicFlow() {
             const hudText = document.getElementById('hud-text');
 
-            // STEP 1: Fly to Host
+            // STEP 1: Fly to Host Location
             hudText.textContent = `LOCATING ${hostName.toUpperCase()}...`;
             map.flyTo({ center: myCoords, zoom: 12, pitch: 60, bearing: -20, duration: 2500 });
 
-            // STEP 2: Fly to Partner
+            // STEP 2: Fly to Guest Location
             setTimeout(() => {
                 hudText.textContent = `LOCATING ${guestName.toUpperCase()}...`;
                 map.flyTo({ center: friendCoords, zoom: 12, pitch: 60, bearing: 20, duration: 2500 });
             }, 2700);
 
-            // STEP 3: Zoom-out to show both
+            // STEP 3: Zoom-out to show BOTH targets together
             setTimeout(() => {
                 hudText.textContent = "BOTH TARGETS ACQUIRED!";
                 const bounds = new maplibregl.LngLatBounds();
@@ -228,16 +213,19 @@
                 map.fitBounds(bounds, { padding: 120, maxZoom: 10, pitch: 45, duration: 2000 });
             }, 5400);
 
-            // STEP 4: Success Overlay & Redirect
+            // STEP 4: Trigger Avatar Slide Overlay & Redirect
             setTimeout(() => {
                 document.getElementById('top-hud').style.opacity = '0';
 
+                // Set avatar images
                 document.getElementById('left-avatar').src = hostAvatar;
                 document.getElementById('right-avatar').src = guestAvatar;
 
+                // Make overlay visible
                 const successScreen = document.getElementById('user-success-screen');
                 successScreen.classList.remove('opacity-0');
 
+                // Trigger animations
                 document.getElementById('left-avatar').classList.add('animate-avatar-left');
                 document.getElementById('right-avatar').classList.add('animate-avatar-right');
 
@@ -247,6 +235,7 @@
                     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                 }, 700);
 
+                // Auto Redirect to Capture Page
                 setTimeout(() => {
                     window.location.href = 'capture.html';
                 }, 3200);
@@ -254,7 +243,7 @@
             }, 7600);
         }
 
-        window.onload = startConnectingFlow;
+        window.onload = initEarthMap;
     </script>
 </body>
 </html>
