@@ -78,7 +78,6 @@
         
         const userData = JSON.parse(localStorage.getItem('userData'));
 
-        // Smart Location Fetcher (GPS -> IP Fallback)
         async function fetchUserLocation() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
@@ -104,43 +103,48 @@
             } catch (e) { console.log("IP fetch error:", e); }
         }
 
-        window.onload = () => {
-            fetchUserLocation();
+        window.onload = async () => {
+            await fetchUserLocation();
             if(userData) {
                 document.getElementById('navAvatar').src = userData.avatar;
                 document.getElementById('navName').innerText = userData.name;
                 document.getElementById('qr-avatar').src = userData.avatar;
             }
+
+            const pin = Math.floor(1000 + Math.random() * 9000).toString();
+            localStorage.setItem('cc_room_pin', pin);
+
+            document.getElementById('generated-pin').textContent = pin;
+            new QRCode(document.getElementById("qrcode"), { text: pin, width: 200, height: 200 });
+
+            const myLocation = JSON.parse(localStorage.getItem('userLocation')) || [77.2090, 28.6139];
+
+            // Room Create in Firebase with Host Coords
+            set(ref(db, 'rooms/' + pin), { 
+                status: 'waiting', 
+                hostAvatar: userData ? userData.avatar : '',
+                hostName: userData ? userData.name : 'Host',
+                hostCoords: myLocation
+            });
+
+            // Connection Listener
+            onValue(ref(db, 'rooms/' + pin), (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.status === 'connected') {
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    
+                    localStorage.setItem('animHostAvatar', data.hostAvatar || userData?.avatar || '');
+                    localStorage.setItem('animGuestAvatar', data.guestAvatar || '');
+                    localStorage.setItem('userName', userData?.name || 'Host');
+                    localStorage.setItem('friendName', data.guestName || 'Partner');
+                    
+                    localStorage.setItem('userLocation', JSON.stringify(data.hostCoords || myLocation));
+                    localStorage.setItem('friendLocation', JSON.stringify(data.guestCoords || [78.0322, 30.3165]));
+
+                    window.location.href = 'connecting.html';
+                }
+            });
         };
-
-        const pin = Math.floor(1000 + Math.random() * 9000).toString();
-
-        localStorage.setItem('cc_room_pin', pin);
-
-        document.getElementById('generated-pin').textContent = pin;
-        new QRCode(document.getElementById("qrcode"), { text: pin, width: 200, height: 200 });
-
-        // Room Create in Firebase
-        set(ref(db, 'rooms/' + pin), { 
-            status: 'waiting', 
-            hostAvatar: userData ? userData.avatar : '',
-            hostName: userData ? userData.name : 'Host'
-        });
-
-        // Connection Listener
-        onValue(ref(db, 'rooms/' + pin), (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.status === 'connected') {
-                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                
-                localStorage.setItem('animHostAvatar', data.hostAvatar || userData?.avatar || '');
-                localStorage.setItem('animGuestAvatar', data.guestAvatar || '');
-                localStorage.setItem('userName', userData?.name || 'Host');
-                localStorage.setItem('friendName', data.guestName || 'Partner');
-                
-                window.location.href = 'connecting.html';
-            }
-        });
     </script>
 <script src="script.js"></script>
 </body>

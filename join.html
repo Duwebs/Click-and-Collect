@@ -68,7 +68,6 @@
         const db = getDatabase(app);
         const userData = JSON.parse(localStorage.getItem('userData'));
         
-        // Smart Location Fetcher (GPS -> IP Fallback)
         async function fetchFriendLocation() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
@@ -94,8 +93,8 @@
             } catch (e) { console.log("IP fetch error:", e); }
         }
 
-        window.onload = () => {
-            fetchFriendLocation();
+        window.onload = async () => {
+            await fetchFriendLocation();
             startScanner();
             if(userData) {
                 document.getElementById('navAvatar').src = userData.avatar;
@@ -112,11 +111,13 @@
             
             if (snapshot.exists()) {
                 localStorage.setItem('cc_room_pin', inputPin);
+                const guestLocation = JSON.parse(localStorage.getItem('friendLocation')) || [78.0322, 30.3165];
 
                 await update(roomRef, { 
                     status: 'connected',
                     guestAvatar: userData ? userData.avatar : '',
-                    guestName: userData ? userData.name : 'Guest'
+                    guestName: userData ? userData.name : 'Guest',
+                    guestCoords: guestLocation
                 });
                 
                 onValue(roomRef, (snapshot) => {
@@ -128,6 +129,9 @@
                         localStorage.setItem('animGuestAvatar', data.guestAvatar || userData?.avatar || '');
                         localStorage.setItem('userName', data.hostName || 'Host');
                         localStorage.setItem('friendName', userData?.name || 'Partner');
+
+                        localStorage.setItem('userLocation', JSON.stringify(data.hostCoords || [77.2090, 28.6139]));
+                        localStorage.setItem('friendLocation', JSON.stringify(data.guestCoords || guestLocation));
                         
                         window.location.href = 'connecting.html';
                     }

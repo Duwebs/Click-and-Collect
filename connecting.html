@@ -91,23 +91,20 @@
         </div>
     </div>
 
-    <!-- 3. SUCCESS OVERLAY (SLIDING AVATARS + LINKED ANIMATION) -->
+    <!-- 3. SUCCESS OVERLAY -->
     <div id="user-success-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-700 p-4">
         
         <div class="glass-hud p-4 sm:p-6 px-5 sm:px-8 rounded-3xl flex items-center justify-between gap-3 sm:gap-6 border-sky-400/40 shadow-2xl w-full max-w-xs sm:max-w-md">
             
-            <!-- Left Avatar -->
             <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 aspect-square rounded-full overflow-hidden border-4 border-sky-400 shadow-2xl bg-slate-900">
                 <img id="left-avatar" src="" class="w-full h-full object-cover opacity-0">
             </div>
             
-            <!-- Linked Text -->
             <div class="text-center flex-1 min-w-0">
                 <h1 id="linked-text" class="text-2xl sm:text-3xl font-black uppercase tracking-wider text-white opacity-0 drop-shadow-lg leading-none">Linked!</h1>
                 <p class="text-[9px] sm:text-[10px] font-bold tracking-widest text-sky-300 uppercase mt-1.5 whitespace-nowrap">Satellite Synced</p>
             </div>
             
-            <!-- Right Avatar -->
             <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 aspect-square rounded-full overflow-hidden border-4 border-purple-400 shadow-2xl bg-slate-900">
                 <img id="right-avatar" src="" class="w-full h-full object-cover opacity-0">
             </div>
@@ -137,9 +134,15 @@
         }
 
         async function startConnectingFlow() {
-            const myCoords = await getOrFetchLocation('userLocation', [77.2090, 28.6139]);
-            const friendCoords = await getOrFetchLocation('friendLocation', [78.0322, 30.3165]);
+            let myCoords = await getOrFetchLocation('userLocation', [77.2090, 28.6139]);
+            let friendCoords = await getOrFetchLocation('friendLocation', [78.0322, 30.3165]);
             
+            // Check if coordinates overlap (e.g. testing on same device/IP)
+            if (Math.abs(myCoords[0] - friendCoords[0]) < 0.001 && Math.abs(myCoords[1] - friendCoords[1]) < 0.001) {
+                // Add slight visual separation so both markers are visible
+                friendCoords = [friendCoords[0] + 0.05, friendCoords[1] + 0.05];
+            }
+
             const hostAvatar = localStorage.getItem('animHostAvatar') || 'https://via.placeholder.com/150';
             const guestAvatar = localStorage.getItem('animGuestAvatar') || 'https://via.placeholder.com/150';
 
@@ -172,6 +175,7 @@
         }
 
         function setupMarkersAndLine(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName) {
+            // Marker 1: Host
             const el1 = document.createElement('div');
             el1.className = 'earth-marker';
             el1.innerHTML = `
@@ -180,6 +184,7 @@
             `;
             new maplibregl.Marker({ element: el1 }).setLngLat(myCoords).addTo(map);
 
+            // Marker 2: Guest
             const el2 = document.createElement('div');
             el2.className = 'earth-marker';
             el2.innerHTML = `
@@ -188,6 +193,7 @@
             `;
             new maplibregl.Marker({ element: el2 }).setLngLat(friendCoords).addTo(map);
 
+            // Line Connecting Both
             map.addSource('route', {
                 'type': 'geojson',
                 'data': { 'type': 'Feature', 'geometry': { 'type': 'LineString', 'coordinates': [myCoords, friendCoords] } }
@@ -210,12 +216,12 @@
 
             // STEP 1: Fly to Host Location
             hudText.textContent = `LOCATING ${hostName.toUpperCase()}...`;
-            map.flyTo({ center: myCoords, zoom: 12, pitch: 60, bearing: -20, duration: 2500 });
+            map.flyTo({ center: myCoords, zoom: 11, pitch: 60, bearing: -20, duration: 2500 });
 
             // STEP 2: Fly to Guest Location
             setTimeout(() => {
                 hudText.textContent = `LOCATING ${guestName.toUpperCase()}...`;
-                map.flyTo({ center: friendCoords, zoom: 12, pitch: 60, bearing: 20, duration: 2500 });
+                map.flyTo({ center: friendCoords, zoom: 11, pitch: 60, bearing: 20, duration: 2500 });
             }, 2700);
 
             // STEP 3: Zoom out to show both targets together
@@ -225,10 +231,10 @@
                 bounds.extend(myCoords);
                 bounds.extend(friendCoords);
 
-                map.fitBounds(bounds, { padding: 120, maxZoom: 10, pitch: 45, duration: 2000 });
+                map.fitBounds(bounds, { padding: 120, maxZoom: 9, pitch: 45, duration: 2000 });
             }, 5400);
 
-            // STEP 4: Success Overlay & Redirect to capture.html
+            // STEP 4: Success Overlay
             setTimeout(() => {
                 document.getElementById('top-hud').style.opacity = '0';
 
