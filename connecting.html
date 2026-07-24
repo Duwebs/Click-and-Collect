@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 select-none overflow-hidden">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C&C - Connecting Session...</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- MapLibre GL JS -->
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Glass HUD styling */
+        .glass-hud {
+            background: rgba(10, 15, 26, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Earth Map Markers */
+        .earth-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translate(-50%, -100%);
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8));
+        }
+        
+        .avatar-glow {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #0f172a;
+            border: 2.5px solid #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .guest-glow {
+            border-color: #a855f7 !important;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.8) !important;
+        }
+        
+        .name-tag {
+            background: rgba(15, 23, 42, 0.9);
+            color: #ffffff;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 800;
+            margin-top: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+        }
+
+        /* Avatar Slide Animations */
+        @keyframes slideLeft { 
+            0% { transform: translateX(-200%); opacity: 0; } 
+            100% { transform: translateX(0); opacity: 1; } 
+        }
+        @keyframes slideRight { 
+            0% { transform: translateX(200%); opacity: 0; } 
+            100% { transform: translateX(0); opacity: 1; } 
+        }
+        
+        .animate-avatar-left { animation: slideLeft 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-avatar-right { animation: slideRight 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+</head>
+<body class="h-full bg-slate-950 text-white relative flex flex-col justify-between overflow-hidden">
+
+    <!-- 1. Background 3D Earth Map -->
+    <div id="map" class="absolute inset-0 w-full h-full z-0 bg-black"></div>
+
+    <!-- 2. Top HUD (Live Status updates) -->
+    <div class="relative z-20 p-5 flex justify-center pointer-events-none">
+        <div class="glass-hud px-6 py-2.5 rounded-full flex items-center gap-3 transition-all duration-500" id="top-hud">
+            <span class="w-3 h-3 rounded-full bg-sky-400 animate-ping"></span>
+            <span id="hud-text" class="text-xs font-black uppercase tracking-widest text-sky-300">ESTABLISHING ORBITAL LINK...</span>
+        </div>
+    </div>
+
+    <!-- 3. SUCCESS OVERLAY (SLIDING AVATARS + LINKED ANIMATION) -->
+    <div id="user-success-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-700">
+        
+        <div class="glass-hud p-6 px-8 rounded-3xl flex items-center gap-6 border-sky-400/40 shadow-2xl">
+            <!-- Left Avatar -->
+            <img id="left-avatar" src="" class="w-20 h-20 rounded-full border-4 border-sky-400 shadow-2xl object-cover opacity-0">
+            
+            <!-- Linked Text -->
+            <div class="text-center">
+                <h1 id="linked-text" class="text-3xl font-black uppercase tracking-widest text-white opacity-0 drop-shadow-lg">Linked!</h1>
+                <p class="text-[10px] font-bold tracking-widest text-sky-300 uppercase mt-1">Satellite Synced</p>
+            </div>
+            
+            <!-- Right Avatar -->
+            <img id="right-avatar" src="" class="w-20 h-20 rounded-full border-4 border-purple-400 shadow-2xl object-cover opacity-0">
+        </div>
+
+        <p class="mt-6 text-[11px] font-extrabold tracking-[0.25em] text-white/70 uppercase animate-pulse">Launching Camera Module...</p>
+    </div>
+
+    <script>
+        let map;
+
+        // Fallback Coords agar GPS allow na ho (Delhi & Dehradun as default demonstration)
+        const myCoords = JSON.parse(localStorage.getItem('userLocation')) || [77.2090, 28.6139];
+        const friendCoords = JSON.parse(localStorage.getItem('friendLocation')) || [78.0322, 30.3165];
+        
+        // Avatars and Names from LocalStorage
+        const hostAvatar = localStorage.getItem('animHostAvatar') || 'https://via.placeholder.com/150';
+        const guestAvatar = localStorage.getItem('animGuestAvatar') || 'https://via.placeholder.com/150';
+
+        const hostName = localStorage.getItem('userName') || "Host";
+        const guestName = localStorage.getItem('friendName') || "Partner";
+
+        function initEarthMap() {
+            map = new maplibregl.Map({
+                container: 'map',
+                style: {
+                    'version': 8,
+                    'sources': {
+                        'esri-satellite': {
+                            'type': 'raster',
+                            'tiles': ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+                            'tileSize': 256,
+                            'maxzoom': 19
+                        }
+                    },
+                    'layers': [{ 'id': 'esri-satellite-layer', 'type': 'raster', 'source': 'esri-satellite' }]
+                },
+                center: myCoords,
+                zoom: 3,
+                pitch: 55
+            });
+
+            map.on('load', () => {
+                setupMarkersAndLine();
+                runCinematicFlow();
+            });
+        }
+
+        function setupMarkersAndLine() {
+            // Host Marker
+            const el1 = document.createElement('div');
+            el1.className = 'earth-marker';
+            el1.innerHTML = `
+                <div class="avatar-glow"><img src="${hostAvatar}" class="w-full h-full object-cover"></div>
+                <div class="name-tag">${hostName}</div>
+            `;
+            new maplibregl.Marker({ element: el1 }).setLngLat(myCoords).addTo(map);
+
+            // Guest Marker
+            const el2 = document.createElement('div');
+            el2.className = 'earth-marker';
+            el2.innerHTML = `
+                <div class="avatar-glow guest-glow"><img src="${guestAvatar}" class="w-full h-full object-cover"></div>
+                <div class="name-tag">${guestName}</div>
+            `;
+            new maplibregl.Marker({ element: el2 }).setLngLat(friendCoords).addTo(map);
+
+            // Connecting Line Source & Layer
+            map.addSource('route', {
+                'type': 'geojson',
+                'data': { 'type': 'Feature', 'geometry': { 'type': 'LineString', 'coordinates': [myCoords, friendCoords] } }
+            });
+            map.addLayer({
+                'id': 'route-line', 
+                'type': 'line', 
+                'source': 'route',
+                'paint': { 
+                    'line-color': '#38bdf8', 
+                    'line-width': 4, 
+                    'line-opacity': 0.85, 
+                    'line-dasharray': [2, 1] 
+                }
+            });
+        }
+
+        function runCinematicFlow() {
+            const hudText = document.getElementById('hud-text');
+
+            // STEP 1: Fly to Host Location
+            hudText.textContent = `LOCATING ${hostName.toUpperCase()}...`;
+            map.flyTo({ center: myCoords, zoom: 12, pitch: 60, bearing: -20, duration: 2500 });
+
+            // STEP 2: Fly to Guest Location
+            setTimeout(() => {
+                hudText.textContent = `LOCATING ${guestName.toUpperCase()}...`;
+                map.flyTo({ center: friendCoords, zoom: 12, pitch: 60, bearing: 20, duration: 2500 });
+            }, 2700);
+
+            // STEP 3: Zoom-out to show BOTH targets together
+            setTimeout(() => {
+                hudText.textContent = "BOTH TARGETS ACQUIRED!";
+                const bounds = new maplibregl.LngLatBounds();
+                bounds.extend(myCoords);
+                bounds.extend(friendCoords);
+
+                map.fitBounds(bounds, { padding: 120, maxZoom: 10, pitch: 45, duration: 2000 });
+            }, 5400);
+
+            // STEP 4: Trigger Avatar Slide Overlay & Redirect
+            setTimeout(() => {
+                document.getElementById('top-hud').style.opacity = '0';
+
+                // Set avatar images
+                document.getElementById('left-avatar').src = hostAvatar;
+                document.getElementById('right-avatar').src = guestAvatar;
+
+                // Make overlay visible
+                const successScreen = document.getElementById('user-success-screen');
+                successScreen.classList.remove('opacity-0');
+
+                // Trigger animations
+                document.getElementById('left-avatar').classList.add('animate-avatar-left');
+                document.getElementById('right-avatar').classList.add('animate-avatar-right');
+
+                setTimeout(() => {
+                    document.getElementById('linked-text').classList.remove('opacity-0');
+                    document.getElementById('linked-text').classList.add('animate-pulse');
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                }, 700);
+
+                // Auto Redirect to Capture Page
+                setTimeout(() => {
+                    window.location.href = 'capture.html';
+                }, 3200);
+
+            }, 7600);
+        }
+
+        window.onload = initEarthMap;
+    </script>
+</body>
+</html>

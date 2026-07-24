@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
     <title>C&C - Secure Join</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -22,20 +22,14 @@
             from { background-position: 100% 50%; }
             to { background-position: 0% 50%; }
         }
-
-        /* Avatar Slide Animations */
-        @keyframes slideLeft { 0% { transform: translateX(-200%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
-        @keyframes slideRight { 0% { transform: translateX(200%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
-        .animate-avatar-left { animation: slideLeft 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .animate-avatar-right { animation: slideRight 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     </style>
 </head>
 
 <body class="h-[100dvh] text-white p-4 flex flex-col overflow-hidden">
     
     <div id="page-loader">
-    <img src="/assets/loader.svg" alt="Loading...">
-  </div>
+        <img src="/assets/loader.svg" alt="Loading...">
+    </div>
     
     <div class="bg-scroll"></div>
 
@@ -53,14 +47,6 @@
         <div class="bg-black/30 backdrop-blur-md p-4 rounded-3xl border border-white/10 w-full">
             <input type="number" id="pin-input" placeholder="Enter PIN" class="w-full bg-transparent text-center text-2xl font-black tracking-[0.5em] outline-none placeholder-white/20">
             <button id="connect-btn" class="w-full mt-2 bg-rose-500 py-3 rounded-xl font-bold uppercase text-xs hover:bg-rose-600 transition">Connect Now</button>
-        </div>
-    </div>
-    
-    <div id="success-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl">
-        <div class="flex items-center gap-6">
-            <img id="left-avatar" src="" class="animate-avatar-left w-24 h-24 rounded-full border-4 border-white shadow-2xl object-cover opacity-0">
-            <h1 class="text-3xl font-black uppercase tracking-widest text-white animate-pulse">Linked!</h1>
-            <img id="right-avatar" src="" class="animate-avatar-right w-24 h-24 rounded-full border-4 border-white shadow-2xl object-cover opacity-0">
         </div>
     </div>
     
@@ -82,6 +68,13 @@
         const db = getDatabase(app);
         const userData = JSON.parse(localStorage.getItem('userData'));
         
+        // Location save kar rahe hain map ke liye
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                localStorage.setItem('userLocation', JSON.stringify([pos.coords.longitude, pos.coords.latitude]));
+            });
+        }
+
         window.onload = () => {
             startScanner();
             if(userData) {
@@ -98,28 +91,26 @@
             const snapshot = await get(roomRef);
             
             if (snapshot.exists()) {
-                // ✅ FIX: Save the pin locally so capture.html / timeline.html can find the room
                 localStorage.setItem('cc_room_pin', inputPin);
 
-                // Update Firebase with Status and Guest Avatar
                 await update(roomRef, { 
                     status: 'connected',
-                    guestAvatar: userData.avatar 
+                    guestAvatar: userData ? userData.avatar : '',
+                    guestName: userData ? userData.name : 'Guest'
                 });
                 
-                // Start listening to the room for animation trigger
                 onValue(roomRef, (snapshot) => {
                     const data = snapshot.val();
-                    if (data.status === 'connected') {
+                    if (data && data.status === 'connected') {
                         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                         
-                        document.getElementById('left-avatar').src = data.hostAvatar;
-                        document.getElementById('right-avatar').src = data.guestAvatar;
+                        // Avatars localStorage me save kar rahe hain
+                        localStorage.setItem('animHostAvatar', data.hostAvatar || '');
+                        localStorage.setItem('animGuestAvatar', data.guestAvatar || '');
+                        localStorage.setItem('friendName', data.hostName || 'Host');
                         
-                        document.getElementById('join-screen').classList.add('hidden');
-                        document.getElementById('success-screen').classList.remove('hidden');
-                        
-                        setTimeout(() => window.location.href = 'capture.html', 3000);
+                        // Map animation screen par redirect
+                        window.location.href = 'connecting.html';
                     }
                 });
             } else {
