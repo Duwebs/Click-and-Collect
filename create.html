@@ -1,128 +1,75 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C&C - Host Room</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C&C - Create Session</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        .bg-scroll {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('/assets/InstallGraphic.png');
-            background-size: 200% 100%;
-            z-index: -1;
-            animation: scrollBg 40s linear infinite;
-            filter: brightness(0.3);
-        }
-        @keyframes scrollBg {
-            from { background-position: 100% 50%; }
-            to { background-position: 0% 50%; }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>* { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
 </head>
-<body class="h-full flex flex-col items-center justify-center p-6 text-white overflow-hidden">
+<body class="h-full flex flex-col items-center justify-center p-6 text-white bg-slate-950 relative overflow-hidden">
     
-    <div id="page-loader">
-        <img src="/assets/loader.svg" alt="Loading...">
-    </div>
+    <div class="w-full max-w-sm bg-slate-900/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl relative z-10">
+        <h1 class="text-2xl font-black text-center tracking-wider uppercase mb-1 text-sky-400">Create Session</h1>
+        <p class="text-xs text-slate-400 text-center mb-6">Setup your profile to start connecting</p>
 
-    <div class="bg-scroll"></div>
-
-    <div id="wait-screen" class="w-full max-w-sm flex flex-col items-center animate-in fade-in duration-500">
-        
-        <div id="profileBadge" class="flex items-center gap-4 bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 shadow-xl mb-6">
-            <img id="navAvatar" src="" class="w-12 h-12 rounded-full object-cover border-2 border-white/20">
-            <span id="navName" class="text-base font-bold tracking-wider">...</span>
-        </div>
-
-        <h1 class="text-xl font-black uppercase tracking-widest text-teal-400 mb-8">Scan to Connect</h1>
-        
-        <div id="qr-wrapper" class="relative inline-block mb-8">
-            <div id="qrcode" class="bg-white p-4 rounded-3xl shadow-2xl"></div>
-            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full border-4 border-white bg-white overflow-hidden shadow-xl">
-                <img id="qr-avatar" src="" class="w-full h-full object-cover">
+        <div class="space-y-4">
+            <div>
+                <label class="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5">Your Name</label>
+                <input type="text" id="host-name" placeholder="Enter your name" class="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-400 font-bold">
             </div>
-        </div>
-        
-        <div class="bg-black/30 backdrop-blur-md w-full py-4 rounded-2xl text-center border border-white/10 mb-6">
-            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Or enter this PIN</p>
-            <h2 id="generated-pin" class="text-4xl font-black tracking-[0.2em] text-white">----</h2>
-        </div>
-        
-        <div class="text-teal-400 font-bold text-xs animate-pulse">
-            <i class="fas fa-circle-notch fa-spin mr-2"></i> Waiting for partner...
+
+            <div>
+                <label class="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5">Avatar Image URL</label>
+                <input type="text" id="host-avatar" placeholder="Paste image URL or leave default" value="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" class="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-400 font-bold">
+            </div>
+
+            <button onclick="startSession()" class="w-full mt-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-black py-3.5 rounded-xl shadow-lg shadow-sky-500/25 uppercase tracking-wider text-xs transition-all active:scale-95">
+                Start Radar Link <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyDJRuqOFaKxEkzMHAYM9eIKwX3dzEzisrI",
-          authDomain: "clickandcollect-6c5d4.firebaseapp.com",
-          databaseURL: "https://clickandcollect-6c5d4-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "clickandcollect-6c5d4",
-          storageBucket: "clickandcollect-6c5d4.firebasestorage.app",
-          messagingSenderId: "739076323619",
-          appId: "1:739076323619:web:9f75d0012923c0b44bb496",
-          measurementId: "G-8V0CJ0ZJVM"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        
-        const userData = JSON.parse(localStorage.getItem('userData'));
-
-        // Location save kar rahe hain map ke liye
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-                localStorage.setItem('userLocation', JSON.stringify([pos.coords.longitude, pos.coords.latitude]));
-            });
+    <script>
+        // Smart Location Fetcher (GPS -> IP Fallback)
+        async function fetchUserLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const coords = [pos.coords.longitude, pos.coords.latitude];
+                        localStorage.setItem('userLocation', JSON.stringify(coords));
+                    },
+                    async () => { await fetchLocationByIP(); },
+                    { timeout: 4000 }
+                );
+            } else {
+                await fetchLocationByIP();
+            }
         }
 
-        window.onload = () => {
-            if(userData) {
-                document.getElementById('navAvatar').src = userData.avatar;
-                document.getElementById('navName').innerText = userData.name;
-                document.getElementById('qr-avatar').src = userData.avatar;
-            }
-        };
+        async function fetchLocationByIP() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                if (data.latitude && data.longitude) {
+                    localStorage.setItem('userLocation', JSON.stringify([data.longitude, data.latitude]));
+                }
+            } catch (e) { console.log("IP fetch error:", e); }
+        }
 
-        const pin = Math.floor(1000 + Math.random() * 9000).toString();
+        window.onload = fetchUserLocation;
 
-        localStorage.setItem('cc_room_pin', pin);
+        function startSession() {
+            const name = document.getElementById('host-name').value.trim() || "Host";
+            const avatar = document.getElementById('host-avatar').value.trim();
 
-        document.getElementById('generated-pin').textContent = pin;
-        new QRCode(document.getElementById("qrcode"), { text: pin, width: 200, height: 200 });
+            localStorage.setItem('userName', name);
+            localStorage.setItem('animHostAvatar', avatar);
 
-        // Room Create
-        set(ref(db, 'rooms/' + pin), { 
-            status: 'waiting', 
-            hostAvatar: userData ? userData.avatar : '',
-            hostName: userData ? userData.name : 'Host'
-        });
-
-        // Connection Listener
-        onValue(ref(db, 'rooms/' + pin), (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.status === 'connected') {
-                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                
-                // Avatars localStorage me save kar rahe hain
-                localStorage.setItem('animHostAvatar', data.hostAvatar || '');
-                localStorage.setItem('animGuestAvatar', data.guestAvatar || '');
-                localStorage.setItem('friendName', data.guestName || 'Partner');
-                
-                // Map animation screen par redirect
-                window.location.href = 'connecting.html';
-            }
-        });
+            window.location.href = 'connecting.html';
+        }
     </script>
-<script src="script.js"></script>
 </body>
 </html>
