@@ -6,7 +6,7 @@
     <title>C&C - Host Room</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-        <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -22,19 +22,13 @@
             from { background-position: 100% 50%; }
             to { background-position: 0% 50%; }
         }
-
-        /* Avatar Slide Animations */
-        @keyframes slideLeft { 0% { transform: translateX(-200%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
-        @keyframes slideRight { 0% { transform: translateX(200%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
-        .animate-avatar-left { animation: slideLeft 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .animate-avatar-right { animation: slideRight 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     </style>
 </head>
 <body class="h-full flex flex-col items-center justify-center p-6 text-white overflow-hidden">
     
     <div id="page-loader">
-    <img src="/assets/loader.svg" alt="Loading...">
-  </div>
+        <img src="/assets/loader.svg" alt="Loading...">
+    </div>
 
     <div class="bg-scroll"></div>
 
@@ -64,14 +58,6 @@
         </div>
     </div>
 
-    <div id="success-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl">
-        <div class="flex items-center gap-6">
-            <img id="left-avatar" src="" class="animate-avatar-left w-24 h-24 rounded-full border-4 border-white shadow-2xl object-cover opacity-0">
-            <h1 class="text-3xl font-black uppercase tracking-widest text-white animate-pulse">Linked!</h1>
-            <img id="right-avatar" src="" class="animate-avatar-right w-24 h-24 rounded-full border-4 border-white shadow-2xl object-cover opacity-0">
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
@@ -90,10 +76,36 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        // Load User Data
         const userData = JSON.parse(localStorage.getItem('userData'));
 
+        // Smart Location Fetcher (GPS -> IP Fallback)
+        async function fetchUserLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const coords = [pos.coords.longitude, pos.coords.latitude];
+                        localStorage.setItem('userLocation', JSON.stringify(coords));
+                    },
+                    async () => { await fetchLocationByIP(); },
+                    { timeout: 4000 }
+                );
+            } else {
+                await fetchLocationByIP();
+            }
+        }
+
+        async function fetchLocationByIP() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                if (data.latitude && data.longitude) {
+                    localStorage.setItem('userLocation', JSON.stringify([data.longitude, data.latitude]));
+                }
+            } catch (e) { console.log("IP fetch error:", e); }
+        }
+
         window.onload = () => {
+            fetchUserLocation();
             if(userData) {
                 document.getElementById('navAvatar').src = userData.avatar;
                 document.getElementById('navName').innerText = userData.name;
@@ -103,16 +115,16 @@
 
         const pin = Math.floor(1000 + Math.random() * 9000).toString();
 
-        // ✅ FIX: Save the pin locally so capture.html / timeline.html can find the room
         localStorage.setItem('cc_room_pin', pin);
 
         document.getElementById('generated-pin').textContent = pin;
         new QRCode(document.getElementById("qrcode"), { text: pin, width: 200, height: 200 });
 
-        // Room Create
+        // Room Create in Firebase
         set(ref(db, 'rooms/' + pin), { 
             status: 'waiting', 
-            hostAvatar: userData.avatar 
+            hostAvatar: userData ? userData.avatar : '',
+            hostName: userData ? userData.name : 'Host'
         });
 
         // Connection Listener
@@ -121,16 +133,12 @@
             if (data && data.status === 'connected') {
                 if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                 
-                // Set Avatars
-                document.getElementById('left-avatar').src = data.hostAvatar;
-                document.getElementById('right-avatar').src = data.guestAvatar;
+                localStorage.setItem('animHostAvatar', data.hostAvatar || userData?.avatar || '');
+                localStorage.setItem('animGuestAvatar', data.guestAvatar || '');
+                localStorage.setItem('userName', userData?.name || 'Host');
+                localStorage.setItem('friendName', data.guestName || 'Partner');
                 
-                // UI Switch
-                document.getElementById('wait-screen').classList.add('hidden');
-                document.getElementById('success-screen').classList.remove('hidden');
-                
-                // Redirect
-                setTimeout(() => window.location.href = 'capture.html', 3000);
+                window.location.href = 'connecting.html';
             }
         });
     </script>
