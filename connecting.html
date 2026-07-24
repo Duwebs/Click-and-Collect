@@ -84,10 +84,14 @@
     <div id="map" class="absolute inset-0 w-full h-full z-0 bg-black"></div>
 
     <!-- 2. Top HUD -->
-    <div class="relative z-20 p-5 flex justify-center pointer-events-none">
+    <div class="relative z-20 p-5 flex flex-col items-center pointer-events-none gap-2">
         <div class="glass-hud px-6 py-2.5 rounded-full flex items-center gap-3 transition-all duration-500" id="top-hud">
             <span class="w-3 h-3 rounded-full bg-sky-400 animate-ping"></span>
             <span id="hud-text" class="text-xs font-black uppercase tracking-widest text-sky-300">ESTABLISHING ORBITAL LINK...</span>
+        </div>
+        <!-- Same Place Alert Badge (Hidden by default) -->
+        <div id="same-place-badge" class="glass-hud px-4 py-1.5 rounded-full border-emerald-500/40 text-emerald-400 text-[10px] font-extrabold uppercase tracking-widest opacity-0 transition-opacity duration-500">
+            ✨ You both are at the same place!
         </div>
     </div>
 
@@ -133,14 +137,39 @@
             return defaultCoords;
         }
 
+        // Haversine formula to calculate distance between two coordinates in kilometers
+        function calculateDistance(coord1, coord2) {
+            const [lon1, lat1] = coord1;
+            const [lon2, lat2] = coord2;
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+            ; 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            return R * c; // Distance in km
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+
         async function startConnectingFlow() {
             let myCoords = await getOrFetchLocation('userLocation', [77.2090, 28.6139]);
             let friendCoords = await getOrFetchLocation('friendLocation', [78.0322, 30.3165]);
             
-            // Check if coordinates overlap (e.g. testing on same device/IP)
-            if (Math.abs(myCoords[0] - friendCoords[0]) < 0.001 && Math.abs(myCoords[1] - friendCoords[1]) < 0.001) {
-                // Add slight visual separation so both markers are visible
-                friendCoords = [friendCoords[0] + 0.05, friendCoords[1] + 0.05];
+            // Distance check (< 15 km matlab paas me hain)
+            const distanceKm = calculateDistance(myCoords, friendCoords);
+            const areTheyClose = distanceKm < 15; 
+
+            if (areTheyClose) {
+                // Agar bilkul exact same point ya bohot paas hain, toh halka sa micro-offset do taaki overlap na ho kar paas-paas dikhein
+                if (Math.abs(myCoords[0] - friendCoords[0]) < 0.0001 && Math.abs(myCoords[1] - friendCoords[1]) < 0.0001) {
+                    friendCoords = [friendCoords[0] + 0.0015, friendCoords[1] + 0.0015];
+                }
             }
 
             const hostAvatar = localStorage.getItem('animHostAvatar') || 'https://via.placeholder.com/150';
@@ -170,12 +199,12 @@
 
             map.on('load', () => {
                 setupMarkersAndLine(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName);
-                runCinematicFlow(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName);
+                runCinematicFlow(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName, areTheyClose);
             });
         }
 
         function setupMarkersAndLine(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName) {
-            // Marker 1: Host
+            // Host Marker
             const el1 = document.createElement('div');
             el1.className = 'earth-marker';
             el1.innerHTML = `
@@ -184,7 +213,7 @@
             `;
             new maplibregl.Marker({ element: el1 }).setLngLat(myCoords).addTo(map);
 
-            // Marker 2: Guest
+            // Guest Marker
             const el2 = document.createElement('div');
             el2.className = 'earth-marker';
             el2.innerHTML = `
@@ -193,7 +222,7 @@
             `;
             new maplibregl.Marker({ element: el2 }).setLngLat(friendCoords).addTo(map);
 
-            // Line Connecting Both
+            // Connecting Line
             map.addSource('route', {
                 'type': 'geojson',
                 'data': { 'type': 'Feature', 'geometry': { 'type': 'LineString', 'coordinates': [myCoords, friendCoords] } }
@@ -211,32 +240,41 @@
             });
         }
 
-        function runCinematicFlow(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName) {
+        function runCinematicFlow(myCoords, friendCoords, hostAvatar, guestAvatar, hostName, guestName, areTheyClose) {
             const hudText = document.getElementById('hud-text');
+            const samePlaceBadge = document.getElementById('same-place-badge');
 
             // STEP 1: Fly to Host Location
             hudText.textContent = `LOCATING ${hostName.toUpperCase()}...`;
-            map.flyTo({ center: myCoords, zoom: 11, pitch: 60, bearing: -20, duration: 2500 });
+            map.flyTo({ center: myCoords, zoom: 12, pitch: 60, bearing: -20, duration: 2500 });
 
             // STEP 2: Fly to Guest Location
             setTimeout(() => {
                 hudText.textContent = `LOCATING ${guestName.toUpperCase()}...`;
-                map.flyTo({ center: friendCoords, zoom: 11, pitch: 60, bearing: 20, duration: 2500 });
+                map.flyTo({ center: friendCoords, zoom: 12, pitch: 60, bearing: 20, duration: 2500 });
             }, 2700);
 
             // STEP 3: Zoom out to show both targets together
             setTimeout(() => {
                 hudText.textContent = "BOTH TARGETS ACQUIRED!";
+                
+                // Agar paas hain, toh special badge dikhao
+                if (areTheyClose) {
+                    samePlaceBadge.classList.remove('opacity-0');
+                }
+
                 const bounds = new maplibregl.LngLatBounds();
                 bounds.extend(myCoords);
                 bounds.extend(friendCoords);
 
-                map.fitBounds(bounds, { padding: 120, maxZoom: 9, pitch: 45, duration: 2000 });
+                // Agar bohot paas hain toh high zoom level par fit karo taaki dono close dikhein
+                map.fitBounds(bounds, { padding: 150, maxZoom: areTheyClose ? 14 : 9, pitch: 45, duration: 2000 });
             }, 5400);
 
-            // STEP 4: Success Overlay
+            // STEP 4: Success Overlay & Redirect
             setTimeout(() => {
                 document.getElementById('top-hud').style.opacity = '0';
+                samePlaceBadge.style.opacity = '0';
 
                 document.getElementById('left-avatar').src = hostAvatar;
                 document.getElementById('right-avatar').src = guestAvatar;
